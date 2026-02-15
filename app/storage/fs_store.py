@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from datetime import datetime, timezone
 from typing import Literal
 
-from app.core.models import Artifact, Style, StyleVersion
+from app.core.models import Artifact, RunnerJob, Style, StyleVersion
 
 
 class FSStore:
@@ -15,6 +16,7 @@ class FSStore:
         self.index_dir = self.base_dir / "index"
         self.styles_index_path = self.index_dir / "styles.json"
         self.artifacts_index_path = self.index_dir / "artifacts.json"
+        self.runner_jobs_index_path = self.index_dir / "runner_jobs.json"
 
     def create_style(self, style: Style) -> Style:
         self._ensure_layout()
@@ -135,6 +137,63 @@ class FSStore:
             artifacts = [artifact for artifact in artifacts if artifact.style_id == style_id]
         return sorted(artifacts, key=lambda artifact: artifact.created_at)
 
+    def create_runner_job(self, job: RunnerJob) -> RunnerJob:
+        self._ensure_layout()
+        jobs_index = self._read_json(self.runner_jobs_index_path)
+        jobs_index[job.job_id] = job.model_dump(mode="json")
+        self._write_json(self.runner_jobs_index_path, jobs_index)
+        return job
+
+    def get_runner_job(self, job_id: str) -> RunnerJob | None:
+        jobs_index = self._read_json(self.runner_jobs_index_path)
+        raw = jobs_index.get(job_id)
+        if raw is None:
+            return None
+        return RunnerJob.model_validate(raw)
+
+    def list_runner_jobs(
+        self,
+        *,
+        status: str | None = None,
+        limit: int | None = None,
+    ) -> list[RunnerJob]:
+        jobs_index = self._read_json(self.runner_jobs_index_path)
+        jobs = [RunnerJob.model_validate(raw) for raw in jobs_index.values()]
+        if status is not None:
+            jobs = [job for job in jobs if job.status == status]
+        jobs = sorted(jobs, key=lambda job: job.created_at)
+        if limit is not None:
+            jobs = jobs[:limit]
+        return jobs
+
+    def update_runner_job(
+        self,
+        job_id: str,
+        *,
+        status: str | None = None,
+        result: dict | None = None,
+        error: str | None = None,
+        logs: list[dict] | None = None,
+    ) -> RunnerJob | None:
+        jobs_index = self._read_json(self.runner_jobs_index_path)
+        raw = jobs_index.get(job_id)
+        if raw is None:
+            return None
+
+        if status is not None:
+            raw["status"] = status
+        if result is not None:
+            raw["result"] = result
+        if error is not None:
+            raw["error"] = error
+        if logs is not None:
+            raw["logs"] = logs
+        raw["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+        jobs_index[job_id] = raw
+        self._write_json(self.runner_jobs_index_path, jobs_index)
+        return RunnerJob.model_validate(raw)
+
     def _style_dir(self, slug: str) -> Path:
         return self.styles_dir / slug
 
@@ -148,6 +207,8 @@ class FSStore:
             self._write_json(self.styles_index_path, {})
         if not self.artifacts_index_path.exists():
             self._write_json(self.artifacts_index_path, {})
+        if not self.runner_jobs_index_path.exists():
+            self._write_json(self.runner_jobs_index_path, {})
 
     def _read_json(self, path: Path) -> dict:
         if not path.exists():
@@ -194,3 +255,32 @@ def get_artifact(artifact_id: str) -> tuple[Artifact, bytes] | None:
 
 def list_artifacts(style_id: str | None = None) -> list[Artifact]:
     return _default_store.list_artifacts(style_id=style_id)
+
+
+def create_runner_job(job: RunnerJob) -> RunnerJob:
+    return _default_store.create_runner_job(job)
+
+
+def get_runner_job(job_id: str) -> RunnerJob | None:
+    return _default_store.get_runner_job(job_id)
+
+
+def list_runner_jobs(*, status: str | None = None, limit: int | None = None) -> list[RunnerJob]:
+    return _default_store.list_runner_jobs(status=status, limit=limit)
+
+
+def update_runner_job(
+    job_id: str,
+    *,
+    status: str | None = None,
+    result: dict | None = None,
+    error: str | None = None,
+    logs: list[dict] | None = None,
+) -> RunnerJob | None:
+    return _default_store.update_runner_job(
+        job_id,
+        status=status,
+        result=result,
+        error=error,
+        logs=logs,
+    )

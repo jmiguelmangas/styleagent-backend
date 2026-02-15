@@ -75,6 +75,12 @@ Service URL:
 - `POST /styles/{style_id}/versions/{version}/compile?target=captureone`
 - `GET /styles/{style_id}/artifacts`
 - `GET /artifacts/{artifact_id}`
+- `GET /runner/jobs?status=pending&limit=1`
+- `GET /runner/jobs/{job_id}`
+- `POST /runner/jobs` (debug/admin helper to seed jobs)
+- `POST /runner/jobs/{job_id}/claim`
+- `POST /runner/jobs/{job_id}/heartbeat`
+- `POST /runner/jobs/{job_id}/complete`
 
 ## Storage Layout (Filesystem)
 
