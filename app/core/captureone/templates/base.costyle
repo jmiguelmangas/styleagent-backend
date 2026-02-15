@@ -1,0 +1,6 @@
+<SL Engine="CaptureOne" Version="1.0">
+  <Header>StyleAgent Base Template</Header>
+  <E K="Exposure" V="0.00"/>
+  <E K="Contrast" V="0"/>
+  <UnknownTag attr="kept" />
+</SL>
