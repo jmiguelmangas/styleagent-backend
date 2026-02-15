@@ -2,6 +2,7 @@ import logging
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -76,10 +77,10 @@ async def validation_exception_handler(
 ) -> JSONResponse:
     return _error_response(
         request=request,
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         error_id="validation_error",
         message="request validation failed",
-        context={"errors": exc.errors()},
+        context={"errors": jsonable_encoder(exc.errors())},
     )
 
 
