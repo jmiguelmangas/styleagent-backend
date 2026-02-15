@@ -13,7 +13,7 @@ from app.core.models import (
     StyleVersionCreate,
 )
 from app.core.services import compile_style_version
-from app.storage.fs_store import FSStore
+from app.storage.base import Store
 
 router = APIRouter(prefix="/styles", tags=["styles"])
 
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/styles", tags=["styles"])
     description="Return all styles currently stored in the backend.",
     response_description="List of style resources.",
 )
-def list_styles(store: FSStore = Depends(get_store)) -> list[Style]:
+def list_styles(store: Store = Depends(get_store)) -> list[Style]:
     return store.list_styles()
 
 
@@ -39,7 +39,7 @@ def list_styles(store: FSStore = Depends(get_store)) -> list[Style]:
 )
 def create_style(
     payload: StyleCreate = Body(..., description="Style creation payload."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> Style:
     style = Style(name=payload.name, slug=payload.slug or "")
     return store.create_style(style)
@@ -54,7 +54,7 @@ def create_style(
 )
 def get_style(
     style_id: str = Path(..., description="Style identifier."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> Style:
     style = store.get_style(style_id)
     if style is None:
@@ -73,7 +73,7 @@ def get_style(
 def create_style_version(
     style_id: str = Path(..., description="Style identifier."),
     payload: StyleVersionCreate = Body(..., description="Version creation payload."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> StyleVersion:
     safe_policy = payload.safe_policy or SafePolicy.model_validate(
         payload.style_spec.safe.model_dump()
@@ -102,7 +102,7 @@ def create_style_version(
 def get_style_version(
     style_id: str = Path(..., description="Style identifier."),
     version: str = Path(..., description="Version label (for example: v1)."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> StyleVersion:
     stored = store.get_version(style_id, version)
     if stored is None:
@@ -119,7 +119,7 @@ def get_style_version(
 )
 def list_style_artifacts(
     style_id: str = Path(..., description="Style identifier."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> list[Artifact]:
     style = store.get_style(style_id)
     if style is None:
@@ -144,7 +144,7 @@ def compile_version(
         "captureone",
         description="Compilation target. Current supported value: `captureone`.",
     ),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> CompileResponse:
     try:
         artifact = compile_style_version(
