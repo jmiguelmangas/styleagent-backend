@@ -39,6 +39,15 @@ class FSStore:
 
         return Style.model_validate(self._read_json(style_json_path))
 
+    def list_styles(self) -> list[Style]:
+        styles_index = self._read_json(self.styles_index_path)
+        styles: list[Style] = []
+        for style_id in sorted(styles_index.keys()):
+            style = self.get_style(style_id)
+            if style is not None:
+                styles.append(style)
+        return styles
+
     def create_version(self, style_id: str, version: StyleVersion) -> StyleVersion:
         style = self.get_style(style_id)
         if style is None:
@@ -119,6 +128,13 @@ class FSStore:
 
         return artifact, artifact_path.read_bytes()
 
+    def list_artifacts(self, style_id: str | None = None) -> list[Artifact]:
+        artifacts_index = self._read_json(self.artifacts_index_path)
+        artifacts = [Artifact.model_validate(raw) for raw in artifacts_index.values()]
+        if style_id is not None:
+            artifacts = [artifact for artifact in artifacts if artifact.style_id == style_id]
+        return sorted(artifacts, key=lambda artifact: artifact.created_at)
+
     def _style_dir(self, slug: str) -> Path:
         return self.styles_dir / slug
 
@@ -154,6 +170,10 @@ def get_style(style_id: str) -> Style | None:
     return _default_store.get_style(style_id)
 
 
+def list_styles() -> list[Style]:
+    return _default_store.list_styles()
+
+
 def create_version(style_id: str, version: StyleVersion) -> StyleVersion:
     return _default_store.create_version(style_id, version)
 
@@ -170,3 +190,7 @@ def save_artifact(
 
 def get_artifact(artifact_id: str) -> tuple[Artifact, bytes] | None:
     return _default_store.get_artifact(artifact_id)
+
+
+def list_artifacts(style_id: str | None = None) -> list[Artifact]:
+    return _default_store.list_artifacts(style_id=style_id)

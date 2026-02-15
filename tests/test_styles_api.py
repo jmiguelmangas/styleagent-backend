@@ -32,6 +32,18 @@ def test_create_and_get_style(client: TestClient) -> None:
     assert missing_response.status_code == 404
 
 
+def test_list_styles_returns_created_styles(client: TestClient) -> None:
+    response_a = client.post("/styles", json={"name": "Style A"})
+    response_b = client.post("/styles", json={"name": "Style B"})
+    assert response_a.status_code == 201
+    assert response_b.status_code == 201
+
+    list_response = client.get("/styles")
+    assert list_response.status_code == 200
+    names = {style["name"] for style in list_response.json()}
+    assert "Style A" in names
+    assert "Style B" in names
+
 
 def test_create_and_get_style_version(client: TestClient) -> None:
     create_style_response = client.post("/styles", json={"name": "Film Warm"})

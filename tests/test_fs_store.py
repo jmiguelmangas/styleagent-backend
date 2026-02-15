@@ -85,3 +85,49 @@ def test_missing_entries_return_none(tmp_path) -> None:
     assert store.get_style("missing") is None
     assert store.get_version("missing", "v1") is None
     assert store.get_artifact("missing") is None
+
+
+def test_list_styles_returns_stored_styles(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+    first = store.create_style(Style(name="First Style", slug="first-style"))
+    second = store.create_style(Style(name="Second Style", slug="second-style"))
+
+    styles = store.list_styles()
+    style_ids = {style.style_id for style in styles}
+
+    assert first.style_id in style_ids
+    assert second.style_id in style_ids
+
+
+def test_list_artifacts_can_filter_by_style(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+
+    style_a = store.create_style(Style(name="Style A", slug="style-a"))
+    style_b = store.create_style(Style(name="Style B", slug="style-b"))
+    version_a = _build_style_version(style_a.style_id, version="v1")
+    version_b = _build_style_version(style_b.style_id, version="v1")
+    store.create_version(style_a.style_id, version_a)
+    store.create_version(style_b.style_id, version_b)
+
+    store.save_artifact(
+        style_id=style_a.style_id,
+        version="v1",
+        target="captureone",
+        filename="a.costyle",
+        content=b"a",
+    )
+    store.save_artifact(
+        style_id=style_b.style_id,
+        version="v1",
+        target="captureone",
+        filename="b.costyle",
+        content=b"b",
+    )
+
+    artifacts_a = store.list_artifacts(style_id=style_a.style_id)
+    artifacts_b = store.list_artifacts(style_id=style_b.style_id)
+
+    assert len(artifacts_a) == 1
+    assert len(artifacts_b) == 1
+    assert artifacts_a[0].style_id == style_a.style_id
+    assert artifacts_b[0].style_id == style_b.style_id

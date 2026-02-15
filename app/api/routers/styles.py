@@ -3,11 +3,23 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import get_store
-from app.core.models import SafePolicy, Style, StyleCreate, StyleVersion, StyleVersionCreate
+from app.core.models import (
+    Artifact,
+    SafePolicy,
+    Style,
+    StyleCreate,
+    StyleVersion,
+    StyleVersionCreate,
+)
 from app.core.services import compile_style_version
 from app.storage.fs_store import FSStore
 
 router = APIRouter(prefix="/styles", tags=["styles"])
+
+
+@router.get("", response_model=list[Style])
+def list_styles(store: FSStore = Depends(get_store)) -> list[Style]:
+    return store.list_styles()
 
 
 @router.post("", response_model=Style, status_code=status.HTTP_201_CREATED)
@@ -59,6 +71,14 @@ def get_style_version(
     if stored is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="version not found")
     return stored
+
+
+@router.get("/{style_id}/artifacts", response_model=list[Artifact])
+def list_style_artifacts(style_id: str, store: FSStore = Depends(get_store)) -> list[Artifact]:
+    style = store.get_style(style_id)
+    if style is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="style not found")
+    return store.list_artifacts(style_id=style_id)
 
 
 @router.post("/{style_id}/versions/{version}/compile")
