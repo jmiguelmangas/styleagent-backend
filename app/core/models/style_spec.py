@@ -8,22 +8,33 @@ CaptureOneValue = Union[str, int, float]
 
 
 class CaptureOneSpec(BaseModel):
-    keys: dict[str, CaptureOneValue] = Field(default_factory=dict)
-    notes: str | None = None
+    keys: dict[str, CaptureOneValue] = Field(
+        default_factory=dict,
+        description="Capture One key/value overrides to patch into the template.",
+    )
+    notes: str | None = Field(default=None, description="Optional notes for this capture profile.")
 
     @field_validator("keys")
     @classmethod
-    def validate_keys_not_empty(cls, value: dict[str, CaptureOneValue]) -> dict[str, CaptureOneValue]:
+    def validate_keys_not_empty(
+        cls, value: dict[str, CaptureOneValue]
+    ) -> dict[str, CaptureOneValue]:
         if not value:
             raise ValueError("captureone.keys must include at least one key")
         return value
 
 
 class StyleSpec(BaseModel):
-    name: str = Field(min_length=1)
-    intent: list[str] = Field(default_factory=list)
-    captureone: CaptureOneSpec
-    safe: SafePolicy = Field(default_factory=SafePolicy)
+    name: str = Field(min_length=1, description="Style specification display name.")
+    intent: list[str] = Field(
+        default_factory=list,
+        description="Intent tags (for example: cinematic, warm, moody).",
+    )
+    captureone: CaptureOneSpec = Field(description="Capture One compile payload.")
+    safe: SafePolicy = Field(
+        default_factory=SafePolicy,
+        description="Safe-policy defaults to apply during compile/export.",
+    )
 
     @field_validator("name")
     @classmethod

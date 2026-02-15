@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from fastapi.responses import FileResponse
 
 from app.api.deps import get_store
@@ -9,9 +9,14 @@ from app.storage.fs_store import FSStore
 router = APIRouter(tags=["artifacts"])
 
 
-@router.get("/artifacts/{artifact_id}")
+@router.get(
+    "/artifacts/{artifact_id}",
+    summary="Download Artifact",
+    description="Download a previously compiled artifact binary by artifact identifier.",
+    response_description="Artifact file stream.",
+)
 def download_artifact(
-    artifact_id: str,
+    artifact_id: str = Path(..., description="Artifact identifier."),
     store: FSStore = Depends(get_store),
 ) -> FileResponse:
     artifact_result = store.get_artifact(artifact_id)
