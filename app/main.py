@@ -8,7 +8,14 @@ from fastapi.responses import JSONResponse
 
 from app.api.routers import artifacts_router, styles_router
 
-app = FastAPI(title="StyleAgent Backend")
+app = FastAPI(
+    title="StyleAgent Backend API",
+    version="0.9.0",
+    description=(
+        "Backend API for managing StyleAgent styles, versions, and Capture One artifacts. "
+        "Includes compile/export flow, safe-policy enforcement, and artifact download."
+    ),
+)
 logger = logging.getLogger("styleagent.backend")
 
 
@@ -97,6 +104,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 app.include_router(styles_router)
 app.include_router(artifacts_router)
 
-@app.get("/health")
+@app.get(
+    "/health",
+    summary="Health Check",
+    description="Simple liveness endpoint to verify the API process is running.",
+    response_description="Service health status.",
+)
 def health():
     return {"status": "ok"}
