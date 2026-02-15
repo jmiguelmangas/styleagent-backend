@@ -60,7 +60,7 @@ def create_runner_job(
     "/jobs/{job_id}/claim",
     response_model=RunnerJob,
     summary="Claim Runner Job",
-    description="Mark a pending runner job as picked up.",
+    description="Atomically claim a runner job using a lease lock.",
 )
 def claim_runner_job(
     job_id: str = Path(..., description="Runner job identifier."),
@@ -69,9 +69,12 @@ def claim_runner_job(
     job = store.get_runner_job(job_id)
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="runner job not found")
-    updated = store.update_runner_job(job_id, status="picked_up")
+    updated = store.claim_runner_job(job_id)
     if updated is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="runner job not found")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="runner job is already claimed",
+        )
     return updated
 
 

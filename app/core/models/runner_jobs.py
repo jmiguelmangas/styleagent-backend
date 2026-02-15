@@ -24,6 +24,12 @@ class RunnerJob(BaseModel):
     job_type: RunnerJobType = Field(description="Runner job type.")
     payload: RunnerCompilePayload = Field(description="Runner job payload.")
     status: RunnerJobStatus = Field(default="pending", description="Current runner job status.")
+    claimed_by: str | None = Field(default=None, description="Runner instance currently owning the job.")
+    locked_until: datetime | None = Field(
+        default=None,
+        description="Lease expiration timestamp in UTC for in-progress jobs.",
+    )
+    attempt: int = Field(default=0, ge=0, description="Number of processing attempts.")
     result: dict[str, Any] | None = Field(default=None, description="Optional execution result payload.")
     error: str | None = Field(default=None, description="Optional execution error.")
     logs: list[dict[str, Any]] = Field(default_factory=list, description="Structured execution logs.")
@@ -46,4 +52,3 @@ class RunnerJobComplete(BaseModel):
     result: dict[str, Any] | None = Field(default=None, description="Execution result.")
     error: str | None = Field(default=None, description="Execution error message.")
     logs: list[dict[str, Any]] = Field(default_factory=list, description="Execution logs.")
-
