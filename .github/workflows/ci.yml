@@ -28,4 +28,11 @@ jobs:
       - name: Tests
         run: |
           python -m pip install pytest
-          pytest -q
+          pytest -vv -ra --durations=10 --junitxml=pytest-report.xml
+
+      - name: Upload Pytest Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: pytest-report.xml
