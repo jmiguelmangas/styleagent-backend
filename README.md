@@ -49,6 +49,12 @@ ruff check .
 pytest -q
 ```
 
+With coverage gate (same as CI):
+
+```bash
+pytest --cov=app --cov-fail-under=80 --cov-report=term-missing -q
+```
+
 ## Run With Docker
 
 Build image from `backend/`:
