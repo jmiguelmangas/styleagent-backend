@@ -3,17 +3,18 @@
 FastAPI backend for StyleAgent MVP (Capture One first).
 
 Current implementation includes:
-- health endpoint
 - styles + versions API
-- domain models and validation
-- filesystem storage layer
-- Capture One `.costyle` parser/writer core
+- compile/export flow for Capture One `.costyle`
+- artifact download endpoint
+- safe policy system
+- filesystem persistence
+- request-id middleware and structured error responses
 
 ## Requirements
 
 - Python 3.12+
 
-## Setup
+## Setup (Local)
 
 ```bash
 python -m venv .venv
@@ -21,7 +22,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Run
+## Run (Local)
 
 ```bash
 uvicorn app.main:app --reload
@@ -39,26 +40,40 @@ ruff check .
 pytest -q
 ```
 
+## Run With Docker
+
+Build image from `backend/`:
+
+```bash
+docker build -t styleagent-backend:dev .
+```
+
+Run container:
+
+```bash
+docker run --rm -p 8000:8000 styleagent-backend:dev
+```
+
+Service URL:
+- API: `http://localhost:8000`
+- Docs: `http://localhost:8000/docs`
+- Health: `http://localhost:8000/health`
+
 ## API Endpoints (Current)
 
 - `GET /health`
-  - Returns `{ "status": "ok" }`
-
+- `GET /styles`
 - `POST /styles`
-  - Creates a style from `StyleCreate`
-
 - `GET /styles/{style_id}`
-  - Returns stored style or `404`
-
 - `POST /styles/{style_id}/versions`
-  - Creates a style version from `StyleVersionCreate`
-
 - `GET /styles/{style_id}/versions/{version}`
-  - Returns stored version or `404`
+- `POST /styles/{style_id}/versions/{version}/compile?target=captureone`
+- `GET /styles/{style_id}/artifacts`
+- `GET /artifacts/{artifact_id}`
 
 ## Storage Layout (Filesystem)
 
-Current storage root is `data/`.
+Storage root is `data/`.
 
 - `data/styles/{style_slug}/style.json`
 - `data/styles/{style_slug}/versions/{version}/version.json`
@@ -68,68 +83,8 @@ Current storage root is `data/`.
 - `data/index/styles.json`
 - `data/index/artifacts.json`
 
-## Project Structure (Current)
-
-```text
-app/
-  main.py
-  api/
-    deps.py
-    routers/
-      styles.py
-  core/
-    models/
-      style_models.py
-      style_spec.py
-    utils/
-      ids.py
-      text.py
-    captureone/
-      costyle_parser.py
-      costyle_writer.py
-      templates/
-        base.costyle
-  storage/
-    fs_store.py
-
-tests/
-  test_health.py
-  test_utils.py
-  test_models.py
-  test_fs_store.py
-  test_styles_api.py
-  test_costyle_parser_writer.py
-  fixtures/
-    sample.costyle
-```
-
-## Test Coverage (Current)
-
-- `tests/test_health.py`
-  - health endpoint contract
-
-- `tests/test_utils.py`
-  - `slugify()` behavior and ID generation
-
-- `tests/test_models.py`
-  - Pydantic model validation edge cases
-
-- `tests/test_fs_store.py`
-  - filesystem storage roundtrips (`tmp_path`)
-
-- `tests/test_styles_api.py`
-  - API contracts for styles/versions (`201/200/404`)
-
-- `tests/test_costyle_parser_writer.py`
-  - `.costyle` parser/writer parsing and deterministic roundtrip
-
 ## CI
 
-GitHub Actions workflow is defined in `.github/workflows/ci.yml` and runs:
-- lint (`ruff check .`)
-- tests (`pytest -q`)
-
-## Notes
-
-- This backend is currently focused on Phases 0-4 from `docs/Implementation-Plan.md`.
-- Next phases add safe-policy application and compile/export endpoints.
+GitHub Actions workflow is in `.github/workflows/ci.yml` and runs:
+- `ruff check .`
+- `pytest -q`
