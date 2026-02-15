@@ -29,6 +29,11 @@ jobs:
         run: |
           pytest --cov=app --cov-fail-under=80 --cov-report=term-missing -vv -ra --durations=10 --junitxml=pytest-report.xml
 
+      - name: Dependency Audit
+        run: |
+          python -m pip install pip-audit
+          pip-audit -r requirements.txt
+
       - name: Upload Pytest Report
         if: always()
         uses: actions/upload-artifact@v4
