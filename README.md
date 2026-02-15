@@ -35,6 +35,7 @@ Environment variables:
 - `STYLEAGENT_DB_URL` (if set to `mongodb://...`, backend selects `MongoStore`; FS behavior remains default in current phase)
 - `MONGO_DB_NAME` (Mongo database name, default `styleagent`)
 - `STYLEAGENT_DATA_DIR` (filesystem base dir, default `data`)
+- `RUNNER_JOB_LOCK_TTL_SECONDS` (runner job lease duration in seconds, default `60`)
 
 ## Lint
 

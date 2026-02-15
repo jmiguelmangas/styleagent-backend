@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 from app.core.models import Artifact, RunnerJob, Style, StyleVersion
@@ -171,6 +172,9 @@ class FSStore:
         job_id: str,
         *,
         status: str | None = None,
+        claimed_by: str | None = None,
+        locked_until: datetime | None = None,
+        attempt_inc: int = 0,
         result: dict | None = None,
         error: str | None = None,
         logs: list[dict] | None = None,
@@ -182,6 +186,12 @@ class FSStore:
 
         if status is not None:
             raw["status"] = status
+        if claimed_by is not None:
+            raw["claimed_by"] = claimed_by
+        if locked_until is not None:
+            raw["locked_until"] = locked_until.isoformat()
+        if attempt_inc:
+            raw["attempt"] = int(raw.get("attempt", 0)) + attempt_inc
         if result is not None:
             raw["result"] = result
         if error is not None:
@@ -193,6 +203,24 @@ class FSStore:
         jobs_index[job_id] = raw
         self._write_json(self.runner_jobs_index_path, jobs_index)
         return RunnerJob.model_validate(raw)
+
+    def claim_runner_job(self, job_id: str, *, claimed_by: str = "runner") -> RunnerJob | None:
+        current = self.get_runner_job(job_id)
+        if current is None:
+            return None
+
+        now = datetime.now(timezone.utc)
+        if current.status in {"picked_up", "running"} and current.locked_until is not None:
+            if current.locked_until > now:
+                return None
+
+        return self.update_runner_job(
+            job_id,
+            status="running",
+            claimed_by=claimed_by,
+            locked_until=now + _runner_lock_ttl(),
+            attempt_inc=1,
+        )
 
     def _style_dir(self, slug: str) -> Path:
         return self.styles_dir / slug
@@ -273,6 +301,9 @@ def update_runner_job(
     job_id: str,
     *,
     status: str | None = None,
+    claimed_by: str | None = None,
+    locked_until: datetime | None = None,
+    attempt_inc: int = 0,
     result: dict | None = None,
     error: str | None = None,
     logs: list[dict] | None = None,
@@ -280,7 +311,23 @@ def update_runner_job(
     return _default_store.update_runner_job(
         job_id,
         status=status,
+        claimed_by=claimed_by,
+        locked_until=locked_until,
+        attempt_inc=attempt_inc,
         result=result,
         error=error,
         logs=logs,
     )
+
+
+def claim_runner_job(job_id: str, *, claimed_by: str = "runner") -> RunnerJob | None:
+    return _default_store.claim_runner_job(job_id, claimed_by=claimed_by)
+
+
+def _runner_lock_ttl() -> timedelta:
+    raw = os.getenv("RUNNER_JOB_LOCK_TTL_SECONDS", "60").strip()
+    try:
+        seconds = max(1, int(raw))
+    except ValueError:
+        seconds = 60
+    return timedelta(seconds=seconds)
