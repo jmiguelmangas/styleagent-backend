@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
 from app.api.deps import get_store
 from app.core.models import RunnerJob, RunnerJobComplete, RunnerJobCreate, RunnerJobHeartbeat
-from app.storage.fs_store import FSStore
+from app.storage.base import Store
 
 router = APIRouter(prefix="/runner", tags=["runner"])
 
@@ -20,7 +20,7 @@ def list_runner_jobs(
         description="Filter by job status. Default value is `pending`.",
     ),
     limit: int = Query(1, ge=1, le=100, description="Maximum number of jobs to return."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> list[RunnerJob]:
     return store.list_runner_jobs(status=status_filter, limit=limit)
 
@@ -33,7 +33,7 @@ def list_runner_jobs(
 )
 def get_runner_job(
     job_id: str = Path(..., description="Runner job identifier."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> RunnerJob:
     job = store.get_runner_job(job_id)
     if job is None:
@@ -50,7 +50,7 @@ def get_runner_job(
 )
 def create_runner_job(
     payload: RunnerJobCreate = Body(..., description="Runner job payload."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> RunnerJob:
     job = RunnerJob(job_type=payload.job_type, payload=payload.payload)
     return store.create_runner_job(job)
@@ -64,7 +64,7 @@ def create_runner_job(
 )
 def claim_runner_job(
     job_id: str = Path(..., description="Runner job identifier."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> RunnerJob:
     job = store.get_runner_job(job_id)
     if job is None:
@@ -84,7 +84,7 @@ def claim_runner_job(
 def heartbeat_runner_job(
     payload: RunnerJobHeartbeat = Body(..., description="Heartbeat payload."),
     job_id: str = Path(..., description="Runner job identifier."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> RunnerJob:
     updated = store.update_runner_job(job_id, status=payload.status)
     if updated is None:
@@ -101,7 +101,7 @@ def heartbeat_runner_job(
 def complete_runner_job(
     payload: RunnerJobComplete = Body(..., description="Completion payload."),
     job_id: str = Path(..., description="Runner job identifier."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> RunnerJob:
     updated = store.update_runner_job(
         job_id,
@@ -113,4 +113,3 @@ def complete_runner_job(
     if updated is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="runner job not found")
     return updated
-

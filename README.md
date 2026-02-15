@@ -32,6 +32,9 @@ uvicorn app.main:app --reload
 
 Environment variables:
 - `CORS_ALLOW_ORIGINS` (comma-separated list, default allows `http://localhost:5173` and `http://127.0.0.1:5173`)
+- `STYLEAGENT_DB_URL` (if set to `mongodb://...`, backend selects `MongoStore`; FS behavior remains default in current phase)
+- `MONGO_DB_NAME` (Mongo database name, default `styleagent`)
+- `STYLEAGENT_DATA_DIR` (filesystem base dir, default `data`)
 
 ## Lint
 

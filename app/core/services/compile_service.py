@@ -6,14 +6,14 @@ from typing import Literal
 from app.core.captureone import apply_safe_policy, parse_costyle, write_costyle
 from app.core.captureone.costyle_parser import CostyleDocument, Entry
 from app.core.models import Artifact
-from app.storage.fs_store import FSStore
+from app.storage.base import Store
 
 _TARGET = "captureone"
 _TEMPLATE_PATH = Path(__file__).resolve().parents[1] / "captureone" / "templates" / "base.costyle"
 
 
 def compile_style_version(
-    store: FSStore,
+    store: Store,
     style_id: str,
     version: str,
     target: Literal["captureone"] = "captureone",

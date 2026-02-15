@@ -1,7 +1,6 @@
-from pathlib import Path
+from app.storage.base import Store
+from app.storage.store_factory import get_store_instance
 
-from app.storage.fs_store import FSStore
 
-
-def get_store() -> FSStore:
-    return FSStore(base_dir=Path("data"))
+def get_store() -> Store:
+    return get_store_instance()

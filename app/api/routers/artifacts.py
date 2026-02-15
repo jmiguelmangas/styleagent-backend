@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from fastapi.responses import FileResponse
 
 from app.api.deps import get_store
-from app.storage.fs_store import FSStore
+from app.storage.base import Store
 
 router = APIRouter(tags=["artifacts"])
 
@@ -17,7 +17,7 @@ router = APIRouter(tags=["artifacts"])
 )
 def download_artifact(
     artifact_id: str = Path(..., description="Artifact identifier."),
-    store: FSStore = Depends(get_store),
+    store: Store = Depends(get_store),
 ) -> FileResponse:
     artifact_result = store.get_artifact(artifact_id)
     if artifact_result is None:
