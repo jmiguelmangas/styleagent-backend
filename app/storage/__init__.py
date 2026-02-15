@@ -5,6 +5,8 @@ from app.storage.fs_store import (
     get_artifact,
     get_style,
     get_version,
+    list_artifacts,
+    list_styles,
     save_artifact,
 )
 
@@ -15,5 +17,7 @@ __all__ = [
     "get_artifact",
     "get_style",
     "get_version",
+    "list_artifacts",
+    "list_styles",
     "save_artifact",
 ]

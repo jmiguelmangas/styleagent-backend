@@ -57,6 +57,13 @@ def test_compile_endpoint_returns_artifact_metadata(client: TestClient) -> None:
     assert ".costyle" in download_resp.headers["content-disposition"]
     assert "<SL Engine=" in download_resp.text
 
+    style_artifacts_resp = client.get(f"/styles/{style_id}/artifacts")
+    assert style_artifacts_resp.status_code == 200
+    artifacts = style_artifacts_resp.json()
+    assert len(artifacts) == 1
+    assert artifacts[0]["artifact_id"] == payload["artifact_id"]
+    assert artifacts[0]["target"] == "captureone"
+
 
 def test_compile_endpoint_returns_404_for_missing_version(client: TestClient) -> None:
     style_id = _create_style_and_version(client)
@@ -67,4 +74,9 @@ def test_compile_endpoint_returns_404_for_missing_version(client: TestClient) ->
 
 def test_download_artifact_returns_404_for_missing_artifact(client: TestClient) -> None:
     response = client.get("/artifacts/missing-artifact-id")
+    assert response.status_code == 404
+
+
+def test_list_artifacts_returns_404_for_missing_style(client: TestClient) -> None:
+    response = client.get("/styles/missing-style/artifacts")
     assert response.status_code == 404
