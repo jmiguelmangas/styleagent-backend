@@ -1,7 +1,10 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import get_store
 from app.core.models import SafePolicy, Style, StyleCreate, StyleVersion, StyleVersionCreate
+from app.core.services import compile_style_version
 from app.storage.fs_store import FSStore
 
 router = APIRouter(prefix="/styles", tags=["styles"])
@@ -56,3 +59,30 @@ def get_style_version(
     if stored is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="version not found")
     return stored
+
+
+@router.post("/{style_id}/versions/{version}/compile")
+def compile_version(
+    style_id: str,
+    version: str,
+    target: Literal["captureone"] = "captureone",
+    store: FSStore = Depends(get_store),
+) -> dict[str, str]:
+    try:
+        artifact = compile_style_version(
+            store=store,
+            style_id=style_id,
+            version=version,
+            target=target,
+        )
+    except ValueError as exc:
+        detail = str(exc)
+        if "not found" in detail:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail) from exc
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail) from exc
+
+    return {
+        "artifact_id": artifact.artifact_id,
+        "sha256": artifact.sha256,
+        "download_url": f"/artifacts/{artifact.artifact_id}",
+    }
