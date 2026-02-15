@@ -1,4 +1,4 @@
-from pathlib import Path
+from pathlib import Path as FilePath
 
 from fastapi import APIRouter, Depends, HTTPException, Path, status
 from fastapi.responses import FileResponse
@@ -24,8 +24,8 @@ def download_artifact(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="artifact not found")
 
     artifact, _ = artifact_result
-    absolute_path = store.base_dir / Path(artifact.path)
-    filename = Path(artifact.path).name
+    absolute_path = store.base_dir / FilePath(artifact.path)
+    filename = FilePath(artifact.path).name
 
     return FileResponse(
         path=absolute_path,
