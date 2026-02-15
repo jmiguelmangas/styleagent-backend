@@ -50,9 +50,21 @@ def test_compile_endpoint_returns_artifact_metadata(client: TestClient) -> None:
     assert len(payload["sha256"]) == 64
     assert payload["download_url"].startswith("/artifacts/")
 
+    download_resp = client.get(payload["download_url"])
+    assert download_resp.status_code == 200
+    assert download_resp.headers["content-type"] == "application/octet-stream"
+    assert "attachment;" in download_resp.headers["content-disposition"]
+    assert ".costyle" in download_resp.headers["content-disposition"]
+    assert "<SL Engine=" in download_resp.text
+
 
 def test_compile_endpoint_returns_404_for_missing_version(client: TestClient) -> None:
     style_id = _create_style_and_version(client)
 
     missing_resp = client.post(f"/styles/{style_id}/versions/missing/compile?target=captureone")
     assert missing_resp.status_code == 404
+
+
+def test_download_artifact_returns_404_for_missing_artifact(client: TestClient) -> None:
+    response = client.get("/artifacts/missing-artifact-id")
+    assert response.status_code == 404
