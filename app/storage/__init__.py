@@ -11,6 +11,7 @@ from app.storage.fs_store import (
     list_runner_jobs,
     save_artifact,
     create_runner_job,
+    claim_runner_job,
     get_runner_job,
     update_runner_job,
 )
@@ -31,6 +32,7 @@ __all__ = [
     "list_styles",
     "save_artifact",
     "create_runner_job",
+    "claim_runner_job",
     "get_runner_job",
     "update_runner_job",
     "get_store_instance",

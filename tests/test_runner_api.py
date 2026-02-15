@@ -46,7 +46,14 @@ def test_runner_job_lifecycle_endpoints(client: TestClient) -> None:
 
     claim_response = client.post(f"/runner/jobs/{job_id}/claim")
     assert claim_response.status_code == 200
-    assert claim_response.json()["status"] == "picked_up"
+    claimed = claim_response.json()
+    assert claimed["status"] == "running"
+    assert claimed["attempt"] == 1
+    assert claimed["claimed_by"] == "runner"
+    assert claimed["locked_until"] is not None
+
+    second_claim_response = client.post(f"/runner/jobs/{job_id}/claim")
+    assert second_claim_response.status_code == 409
 
     heartbeat_response = client.post(
         f"/runner/jobs/{job_id}/heartbeat",
@@ -84,4 +91,3 @@ def test_runner_job_endpoints_return_404_for_missing_job(client: TestClient) -> 
     assert claim_response.status_code == 404
     assert heartbeat_response.status_code == 404
     assert complete_response.status_code == 404
-

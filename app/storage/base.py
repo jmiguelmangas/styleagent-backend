@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Literal, Protocol
 
@@ -40,8 +41,11 @@ class Store(Protocol):
         job_id: str,
         *,
         status: str | None = None,
+        claimed_by: str | None = None,
+        locked_until: datetime | None = None,
+        attempt_inc: int = 0,
         result: dict | None = None,
         error: str | None = None,
         logs: list[dict] | None = None,
     ) -> RunnerJob | None: ...
-
+    def claim_runner_job(self, job_id: str, *, claimed_by: str = "runner") -> RunnerJob | None: ...
