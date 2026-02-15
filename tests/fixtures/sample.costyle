@@ -1,0 +1,8 @@
+<SL Engine="CaptureOne" Version="1.0">
+  <Header>Sample</Header>
+  <E K="Exposure" V="0.35"/>
+  <E K="Contrast" V="12"/>
+  <LongLine>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</LongLine>
+  <E K="Saturation" V="4"/>
+  <UnknownTag attr="kept" />
+</SL>
