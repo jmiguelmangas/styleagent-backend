@@ -1,9 +1,11 @@
 import logging
+import os
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.routers import artifacts_router, styles_router
@@ -17,6 +19,16 @@ app = FastAPI(
     ),
 )
 logger = logging.getLogger("styleagent.backend")
+
+
+def _allowed_origins() -> list[str]:
+    raw = os.getenv("CORS_ALLOW_ORIGINS")
+    if raw:
+        return [origin.strip() for origin in raw.split(",") if origin.strip()]
+    return [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
 
 
 def _request_id_from(request: Request) -> str:
@@ -103,6 +115,14 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 app.include_router(styles_router)
 app.include_router(artifacts_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_allowed_origins(),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get(
     "/health",
