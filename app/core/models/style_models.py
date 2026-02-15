@@ -3,7 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from app.core.models.style_spec import SafePolicySpec, StyleSpec
+from app.core.models.safe_policy import SafePolicy
+from app.core.models.style_spec import StyleSpec
 from app.core.utils import generate_id, slugify
 
 
@@ -36,7 +37,7 @@ class Style(BaseModel):
 class StyleVersionCreate(BaseModel):
     version: str = Field(min_length=1)
     style_spec: StyleSpec
-    safe_policy: SafePolicySpec | None = None
+    safe_policy: SafePolicy | None = None
 
     @field_validator("version")
     @classmethod
@@ -51,7 +52,7 @@ class StyleVersion(BaseModel):
     style_id: str = Field(min_length=1)
     version: str = Field(min_length=1)
     style_spec: StyleSpec
-    safe_policy: SafePolicySpec = Field(default_factory=SafePolicySpec)
+    safe_policy: SafePolicy = Field(default_factory=SafePolicy)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

@@ -2,6 +2,8 @@ from typing import Union
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.core.models.safe_policy import SafePolicy
+
 CaptureOneValue = Union[str, int, float]
 
 
@@ -17,17 +19,11 @@ class CaptureOneSpec(BaseModel):
         return value
 
 
-class SafePolicySpec(BaseModel):
-    remove_lens_light_falloff: bool = True
-    remove_white_balance: bool = True
-    remove_exposure: bool = False
-
-
 class StyleSpec(BaseModel):
     name: str = Field(min_length=1)
     intent: list[str] = Field(default_factory=list)
     captureone: CaptureOneSpec
-    safe: SafePolicySpec = Field(default_factory=SafePolicySpec)
+    safe: SafePolicy = Field(default_factory=SafePolicy)
 
     @field_validator("name")
     @classmethod

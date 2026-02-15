@@ -57,6 +57,9 @@ def test_create_and_get_style_version(client: TestClient) -> None:
     created_version = create_version_response.json()
     assert created_version["style_id"] == style_id
     assert created_version["version"] == "v1"
+    assert created_version["safe_policy"]["remove_lens_light_falloff"] is True
+    assert created_version["safe_policy"]["remove_white_balance"] is True
+    assert created_version["safe_policy"]["remove_exposure"] is False
 
     get_version_response = client.get(f"/styles/{style_id}/versions/v1")
     assert get_version_response.status_code == 200

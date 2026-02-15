@@ -1,6 +1,6 @@
 import hashlib
 
-from app.core.models import SafePolicySpec, Style, StyleSpec, StyleVersion
+from app.core.models import SafePolicy, Style, StyleSpec, StyleVersion
 from app.storage.fs_store import FSStore
 
 
@@ -18,7 +18,7 @@ def _build_style_version(style_id: str, version: str = "1") -> StyleVersion:
         style_id=style_id,
         version=version,
         style_spec=spec,
-        safe_policy=SafePolicySpec(),
+        safe_policy=SafePolicy(),
     )
 
 
