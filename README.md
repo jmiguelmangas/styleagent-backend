@@ -28,6 +28,11 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
+## Configuration
+
+Environment variables:
+- `CORS_ALLOW_ORIGINS` (comma-separated list, default allows `http://localhost:5173` and `http://127.0.0.1:5173`)
+
 ## Lint
 
 ```bash
