@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import get_store
-from app.core.models import SafePolicySpec, Style, StyleCreate, StyleVersion, StyleVersionCreate
+from app.core.models import SafePolicy, Style, StyleCreate, StyleVersion, StyleVersionCreate
 from app.storage.fs_store import FSStore
 
 router = APIRouter(prefix="/styles", tags=["styles"])
@@ -31,7 +31,7 @@ def create_style_version(
     payload: StyleVersionCreate,
     store: FSStore = Depends(get_store),
 ) -> StyleVersion:
-    safe_policy = payload.safe_policy or SafePolicySpec.model_validate(
+    safe_policy = payload.safe_policy or SafePolicy.model_validate(
         payload.style_spec.safe.model_dump()
     )
 
