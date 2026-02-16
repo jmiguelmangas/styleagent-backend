@@ -109,3 +109,7 @@ Storage root is `data/`.
 GitHub Actions workflow is in `.github/workflows/ci.yml` and runs:
 - `ruff check .`
 - `pytest -q`
+
+Additional automation:
+- `.github/dependabot.yml` for weekly dependency update PRs
+- `.github/workflows/sbom.yml` for CycloneDX SBOM generation
