@@ -101,7 +101,7 @@ Service URL:
 - `POST /runner/jobs/{job_id}/claim`
 - `POST /runner/jobs/{job_id}/heartbeat`
 - `POST /runner/jobs/{job_id}/complete`
-- `POST /ai/generate-style-spec` (provider-based generation via `STYLEAGENT_AI_PROVIDER`; supports `mock` and local `ollama`)
+- `POST /ai/generate-style-spec` (provider-based generation via `STYLEAGENT_AI_PROVIDER`; supports `mock` and local `ollama`; enforces a richer default Capture One key set so presets include color/tonal controls)
 - `GET /ai/generations?limit=20` (lists persisted AI generation history records, newest first)
 - `POST /ai/chat/sessions` (creates conversational AI session with base StyleSpec state)
 - `GET /ai/chat/sessions/{session_id}` (returns session + turns)

@@ -9,6 +9,21 @@ from app.core.ai.mock_generator import MockStyleGenerator
 from app.core.models.ai import GeneratedStyleSpecResponse, PromptGenerateRequest
 from app.core.models.style_spec import StyleSpec
 
+_RICH_PRESET_DEFAULTS: dict[str, str | int | float] = {
+    "Exposure": 0.1,
+    "Contrast": 8,
+    "Saturation": 6,
+    "Clarity": 8,
+    "Highlights": -8,
+    "Shadows": 10,
+    "WhiteBalanceTemperature": 5600,
+    "WhiteBalanceTint": 2,
+    "ColorBalanceRed": 3,
+    "ColorBalanceGreen": 0,
+    "ColorBalanceBlue": -2,
+    "ToneCurve": "Film Standard",
+}
+
 
 class OllamaStyleGenerator:
     """Ollama-backed generator with safe fallback to mock generation."""
@@ -88,7 +103,41 @@ class OllamaStyleGenerator:
         if payload.intent and "intent" not in candidate:
             candidate["intent"] = payload.intent
 
-        return StyleSpec.model_validate(candidate)
+        style_spec = StyleSpec.model_validate(candidate)
+        if self._is_chat_delta_mode(payload):
+            return style_spec
+        return self._enrich_rich_preset(style_spec, payload)
+
+    def _is_chat_delta_mode(self, payload: PromptGenerateRequest) -> bool:
+        constraints = payload.constraints
+        if not isinstance(constraints, dict):
+            return False
+        return constraints.get("mode") == "chat_turn_delta"
+
+    def _enrich_rich_preset(self, style_spec: StyleSpec, payload: PromptGenerateRequest) -> StyleSpec:
+        updated = style_spec.model_copy(deep=True)
+        keys = dict(updated.captureone.keys)
+
+        for key, default_value in _RICH_PRESET_DEFAULTS.items():
+            keys.setdefault(key, default_value)
+
+        prompt = payload.prompt.lower()
+        if "warm" in prompt:
+            keys["WhiteBalanceTemperature"] = max(2000, min(12000, int(float(keys["WhiteBalanceTemperature"])) + 350))
+            keys["WhiteBalanceTint"] = max(-50, min(50, int(float(keys["WhiteBalanceTint"])) + 2))
+            keys["ColorBalanceRed"] = max(-50, min(50, int(float(keys["ColorBalanceRed"])) + 1))
+        if "cool" in prompt:
+            keys["WhiteBalanceTemperature"] = max(2000, min(12000, int(float(keys["WhiteBalanceTemperature"])) - 350))
+            keys["ColorBalanceBlue"] = max(-50, min(50, int(float(keys["ColorBalanceBlue"])) + 1))
+        if "teal" in prompt:
+            keys["ColorBalanceBlue"] = max(-50, min(50, int(float(keys["ColorBalanceBlue"])) + 3))
+            keys["Saturation"] = max(-100, min(100, int(float(keys["Saturation"])) + 1))
+        if "portrait" in prompt:
+            keys["Highlights"] = max(-100, min(100, int(float(keys["Highlights"])) - 2))
+            keys["Shadows"] = max(-100, min(100, int(float(keys["Shadows"])) + 2))
+
+        updated.captureone.keys = keys
+        return updated
 
     def _build_generation_prompt(self, payload: PromptGenerateRequest) -> str:
         intent = payload.intent or []
@@ -105,15 +154,26 @@ class OllamaStyleGenerator:
         return (
             "You generate Capture One style specs.\n"
             "Return only valid JSON, no markdown.\n"
+            "Do not include any explanation text outside JSON.\n"
             "JSON schema:\n"
             "{"
             '"name": "string", '
             '"intent": ["string"], '
-            '"captureone": {"keys": {"Exposure": 0.2, "Contrast": 8}, "notes": "string optional"}'
+            '"captureone": {"keys": {"Exposure": 0.2, "Contrast": 8, "Saturation": 6, "Clarity": 8, '
+            '"Highlights": -8, "Shadows": 10, "WhiteBalanceTemperature": 5600, "WhiteBalanceTint": 2, '
+            '"ColorBalanceRed": 3, "ColorBalanceGreen": 0, "ColorBalanceBlue": -2, "ToneCurve": "Film Standard"}, '
+            '"notes": "string optional"}'
             "}\n"
             "Constraints:\n"
             "- captureone.keys must contain at least one key.\n"
             "- values in captureone.keys must be string, int, or float.\n"
             "- prefer conservative edits suitable for reusable presets.\n"
+            "- for full preset generation, include ALL of these keys: Exposure, Contrast, Saturation, Clarity, "
+            "Highlights, Shadows, WhiteBalanceTemperature, WhiteBalanceTint, ColorBalanceRed, ColorBalanceGreen, "
+            "ColorBalanceBlue, ToneCurve.\n"
+            "- keep values inside realistic ranges:\n"
+            "  Exposure [-4,4], Contrast/Saturation/Clarity/Highlights/Shadows [-100,100], "
+            "WhiteBalanceTemperature [2000,12000], WhiteBalanceTint [-50,50], "
+            "ColorBalanceRed/Green/Blue [-50,50].\n"
             f"Input payload: {payload_json}"
         )
