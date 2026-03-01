@@ -1,13 +1,20 @@
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.utils import generate_id
 
 RunnerJobType = Literal["compile_captureone"]
 RunnerJobStatus = Literal["pending", "picked_up", "running", "succeeded", "failed"]
 RunnerExecutionMode = Literal["api", "host"]
+HostErrorCode = Literal[
+    "APP_NOT_INSTALLED",
+    "APPLE_EVENT_DENIED",
+    "OPEN_TIMEOUT",
+    "IMPORT_DIR_NOT_WRITABLE",
+    "DOWNLOAD_FAILED",
+]
 
 
 class RunnerCompilePayload(BaseModel):
@@ -24,6 +31,30 @@ class RunnerJobCreate(BaseModel):
     payload: RunnerCompilePayload = Field(description="Runner job payload.")
 
 
+class HostIntegrationResult(BaseModel):
+    mode: Literal["host"] = Field(description="Host execution mode marker.")
+    captureone_app_path: str | None = Field(default=None, description="Capture One application path.")
+    imported_costyle_path: str | None = Field(default=None, description="Local imported .costyle path.")
+    error_code: HostErrorCode | None = Field(default=None, description="Host integration error code.")
+    error_message: str | None = Field(default=None, description="Host integration error message.")
+    error_details: dict[str, Any] | None = Field(
+        default=None,
+        description="Optional structured diagnostics for host integration failures.",
+    )
+
+
+class RunnerJobResult(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    artifact_id: str | None = Field(default=None, description="Compiled artifact identifier.")
+    sha256: str | None = Field(default=None, description="Compiled artifact SHA256.")
+    download_url: str | None = Field(default=None, description="Compiled artifact download URL.")
+    host_integration: HostIntegrationResult | None = Field(
+        default=None,
+        description="Optional host-mode integration result details.",
+    )
+
+
 class RunnerJob(BaseModel):
     job_id: str = Field(default_factory=generate_id, description="Unique runner job id.")
     job_type: RunnerJobType = Field(description="Runner job type.")
@@ -35,7 +66,7 @@ class RunnerJob(BaseModel):
         description="Lease expiration timestamp in UTC for in-progress jobs.",
     )
     attempt: int = Field(default=0, ge=0, description="Number of processing attempts.")
-    result: dict[str, Any] | None = Field(default=None, description="Optional execution result payload.")
+    result: RunnerJobResult | None = Field(default=None, description="Optional execution result payload.")
     error: str | None = Field(default=None, description="Optional execution error.")
     logs: list[dict[str, Any]] = Field(default_factory=list, description="Structured execution logs.")
     created_at: datetime = Field(
@@ -54,6 +85,6 @@ class RunnerJobHeartbeat(BaseModel):
 
 class RunnerJobComplete(BaseModel):
     status: Literal["succeeded", "failed"] = Field(description="Final job status.")
-    result: dict[str, Any] | None = Field(default=None, description="Execution result.")
+    result: RunnerJobResult | None = Field(default=None, description="Execution result.")
     error: str | None = Field(default=None, description="Execution error message.")
     logs: list[dict[str, Any]] = Field(default_factory=list, description="Execution logs.")

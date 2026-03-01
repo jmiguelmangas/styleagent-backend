@@ -109,7 +109,7 @@ def complete_runner_job(
     updated = store.update_runner_job(
         job_id,
         status=payload.status,
-        result=payload.result,
+        result=None if payload.result is None else payload.result.model_dump(mode="python"),
         error=payload.error,
         logs=payload.logs,
     )
