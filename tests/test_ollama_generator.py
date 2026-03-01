@@ -27,6 +27,7 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
         assert json["stream"] is False
         assert json["format"] == "json"
         assert json["keep_alive"] == "10m"
+        assert "Reference examples" in json["prompt"]
         assert timeout == 20.0
         return _FakeResponse(
             {
@@ -140,3 +141,29 @@ def test_ollama_generator_keeps_chat_delta_payload_sparse(monkeypatch) -> None:
     )
 
     assert set(response.style_spec.captureone.keys.keys()) == {"Contrast"}
+
+
+def test_ollama_generator_respects_max_prompt_examples(monkeypatch) -> None:
+    captured_prompt = {"value": ""}
+
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        captured_prompt["value"] = json["prompt"]
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"name":"AI Test","intent":["cinematic"],'
+                    '"captureone":{"keys":{"Contrast":7}}}'
+                )
+            }
+        )
+
+    monkeypatch.setenv("STYLEAGENT_AI_MAX_PROMPT_EXAMPLES", "2")
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    generator.generate_style_spec(PromptGenerateRequest(prompt="warm moody cinematic landscape"))
+
+    marker = "Reference examples (real styles, use as aesthetic guidance):\n"
+    assert marker in captured_prompt["value"]
+    section = captured_prompt["value"].split(marker, 1)[1].split("\nInput payload:", 1)[0]
+    assert section.count('"source"') <= 2

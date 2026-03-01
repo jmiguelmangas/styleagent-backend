@@ -1,0 +1,157 @@
+[
+  {
+    "source": "Mastin Labs Fujicolor Everyday / 1b. Fujicolor C200.costyle",
+    "prompt": "fujicolor c200 everyday warm film look with soft highlight recovery",
+    "tags": ["fujicolor", "film", "warm", "everyday", "portrait"],
+    "style_spec": {
+      "name": "Fujicolor C200 Inspired",
+      "intent": ["film", "warm", "portrait"],
+      "captureone": {
+        "keys": {
+          "Contrast": 0,
+          "Saturation": 10.19,
+          "Highlights": -30,
+          "Shadows": 11.45,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Mastin Labs Fujicolor Everyday / 1c. Superia 400.costyle",
+    "prompt": "fujicolor superia 400 balanced color film look",
+    "tags": ["fujicolor", "film", "balanced", "everyday"],
+    "style_spec": {
+      "name": "Superia 400 Inspired",
+      "intent": ["film", "balanced"],
+      "captureone": {
+        "keys": {
+          "Contrast": 0.29,
+          "Saturation": 8.17,
+          "Highlights": -25.49,
+          "Shadows": 11.2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Mastin Labs Fujicolor Everyday / 2a. Daylight.costyle",
+    "prompt": "daylight white balance natural neutral color",
+    "tags": ["daylight", "white balance", "natural", "neutral"],
+    "style_spec": {
+      "name": "Daylight WB",
+      "intent": ["natural"],
+      "captureone": {
+        "keys": {
+          "WhiteBalanceTemperature": 4940.82,
+          "WhiteBalanceTint": -0.87,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Mastin Labs Fujicolor Everyday / 2d. Tungsten.costyle",
+    "prompt": "tungsten indoor cool white balance correction",
+    "tags": ["tungsten", "indoor", "cool", "white balance"],
+    "style_spec": {
+      "name": "Tungsten WB",
+      "intent": ["cool"],
+      "captureone": {
+        "keys": {
+          "WhiteBalanceTemperature": 3097.15,
+          "WhiteBalanceTint": -1.67,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Northlandscapes Moody Landscapes / Autumn Colors.costyle",
+    "prompt": "autumn landscape earthy moody contrast with muted saturation",
+    "tags": ["landscape", "autumn", "earthy", "moody", "warm"],
+    "style_spec": {
+      "name": "Autumn Colors Inspired",
+      "intent": ["landscape", "moody"],
+      "captureone": {
+        "keys": {
+          "Contrast": 14.8,
+          "Saturation": -11,
+          "Clarity": 10,
+          "ColorBalanceRed": 6,
+          "ColorBalanceGreen": 7,
+          "ColorBalanceBlue": 5,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Northlandscapes Moody Landscapes / Moody Days.costyle",
+    "prompt": "dark moody day cinematic landscape with deep shadows",
+    "tags": ["landscape", "moody", "dark", "cinematic", "cool"],
+    "style_spec": {
+      "name": "Moody Days Inspired",
+      "intent": ["landscape", "moody", "cinematic"],
+      "captureone": {
+        "keys": {
+          "Contrast": 10,
+          "Saturation": -32,
+          "Clarity": 20,
+          "Shadows": 44,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 3,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Northlandscapes Moody Landscapes / Winter Blues.costyle",
+    "prompt": "winter blue landscape cool tones with crisp clarity",
+    "tags": ["landscape", "winter", "blue", "cool", "crisp"],
+    "style_spec": {
+      "name": "Winter Blues Inspired",
+      "intent": ["landscape", "cool"],
+      "captureone": {
+        "keys": {
+          "Contrast": 12.8,
+          "Saturation": 8,
+          "Clarity": 8,
+          "Shadows": 20,
+          "ColorBalanceRed": 5,
+          "ColorBalanceGreen": 6,
+          "ColorBalanceBlue": 8,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "nolan-warm-v1.costyle (user sample)",
+    "prompt": "warm cinematic portrait preset balanced skin tones",
+    "tags": ["portrait", "warm", "cinematic", "balanced"],
+    "style_spec": {
+      "name": "Nolan Warm v1",
+      "intent": ["cinematic", "warm", "portrait"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.3,
+          "Contrast": 9,
+          "Saturation": 6,
+          "Clarity": 8,
+          "WhiteBalanceTemperature": 5900,
+          "WhiteBalanceTint": 2,
+          "Highlights": -8,
+          "Shadows": 10,
+          "ColorBalanceRed": 3,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  }
+]

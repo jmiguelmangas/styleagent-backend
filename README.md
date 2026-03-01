@@ -41,6 +41,7 @@ Environment variables:
 - `STYLEAGENT_AI_BASE_URL` (only for `ollama`, default `http://localhost:11434`)
 - `STYLEAGENT_AI_TIMEOUT_SECONDS` (ollama request timeout, default `20`)
 - `STYLEAGENT_AI_COLD_START_TIMEOUT_SECONDS` (retry timeout for first model load/cold start, default `90`)
+- `STYLEAGENT_AI_MAX_PROMPT_EXAMPLES` (max in-context reference examples injected into Ollama prompt, default `4`, bounded to `1..8`)
 - `STYLEAGENT_AI_RATE_LIMIT_PER_MINUTE` (in-memory per-IP limit for `/ai/generate-style-spec`, default `30`, `0` disables)
 
 AI generation history persistence:
@@ -141,9 +142,14 @@ export STYLEAGENT_AI_MODEL=llama3.1:8b
 export STYLEAGENT_AI_BASE_URL=http://localhost:11434
 export STYLEAGENT_AI_TIMEOUT_SECONDS=20
 export STYLEAGENT_AI_COLD_START_TIMEOUT_SECONDS=90
+export STYLEAGENT_AI_MAX_PROMPT_EXAMPLES=4
 export STYLEAGENT_AI_RATE_LIMIT_PER_MINUTE=30
 uvicorn app.main:app --reload
 ```
+
+Reference examples:
+- Ollama prompt generation includes bundled examples derived from user-provided style packs (Fujicolor, Northlandscapes, Nolan sample).
+- These are used as few-shot guidance to increase aesthetic consistency and richer parameter coverage.
 
 ## Storage Layout (Filesystem)
 
