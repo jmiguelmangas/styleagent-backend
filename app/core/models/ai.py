@@ -44,3 +44,11 @@ class GeneratedStyleSpecResponse(BaseModel):
     )
     provider: str = Field(description="Provider identifier used for generation.")
     model: str = Field(description="Model identifier used for generation.")
+    generation_ms: int | None = Field(
+        default=None,
+        description="Generation latency in milliseconds (best effort).",
+    )
+    fallback_used: bool = Field(
+        default=False,
+        description="Whether provider generation fell back to mock behavior.",
+    )
