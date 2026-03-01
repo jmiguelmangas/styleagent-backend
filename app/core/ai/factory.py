@@ -15,7 +15,7 @@ def get_ai_generator_instance() -> AIStyleGenerator:
 
     if provider == "ollama":
         ollama_base_url = os.getenv("STYLEAGENT_AI_BASE_URL", "http://localhost:11434").strip()
-        effective_model = model or "llama3.1:8b-instruct"
+        effective_model = model or "llama3.1:8b"
         return OllamaStyleGenerator(base_url=ollama_base_url, model=effective_model)
 
     # Fallback-safe default for unknown or missing providers.

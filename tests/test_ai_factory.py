@@ -17,14 +17,14 @@ def test_ai_factory_defaults_to_mock(monkeypatch) -> None:
 
 def test_ai_factory_selects_ollama(monkeypatch) -> None:
     monkeypatch.setenv("STYLEAGENT_AI_PROVIDER", "ollama")
-    monkeypatch.setenv("STYLEAGENT_AI_MODEL", "llama3.1:8b-instruct")
+    monkeypatch.setenv("STYLEAGENT_AI_MODEL", "llama3.1:8b")
     monkeypatch.setenv("STYLEAGENT_AI_BASE_URL", "http://localhost:11434")
 
     get_ai_generator_instance.cache_clear()
     generator = get_ai_generator_instance()
 
     assert isinstance(generator, OllamaStyleGenerator)
-    assert generator.model == "llama3.1:8b-instruct"
+    assert generator.model == "llama3.1:8b"
     assert generator.base_url == "http://localhost:11434"
 
 

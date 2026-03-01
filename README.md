@@ -37,7 +37,7 @@ Environment variables:
 - `STYLEAGENT_DATA_DIR` (filesystem base dir, default `data`)
 - `RUNNER_JOB_LOCK_TTL_SECONDS` (runner job lease duration, default `60`)
 - `STYLEAGENT_AI_PROVIDER` (AI provider selection: `mock` default, `ollama` scaffolded for next phase)
-- `STYLEAGENT_AI_MODEL` (model id used by selected provider; defaults: `mock-v1` for mock, `llama3.1:8b-instruct` for ollama)
+- `STYLEAGENT_AI_MODEL` (model id used by selected provider; defaults: `mock-v1` for mock, `llama3.1:8b` for ollama)
 - `STYLEAGENT_AI_BASE_URL` (only for `ollama`, default `http://localhost:11434`)
 
 ## Lint
@@ -94,7 +94,41 @@ Service URL:
 - `POST /runner/jobs/{job_id}/claim`
 - `POST /runner/jobs/{job_id}/heartbeat`
 - `POST /runner/jobs/{job_id}/complete`
-- `POST /ai/generate-style-spec` (provider-based generation via `STYLEAGENT_AI_PROVIDER`; `mock` fully implemented, `ollama` scaffold placeholder)
+- `POST /ai/generate-style-spec` (provider-based generation via `STYLEAGENT_AI_PROVIDER`; supports `mock` and local `ollama`)
+
+## AI Provider: Ollama (Local)
+
+Install Ollama locally:
+
+```bash
+brew install ollama
+```
+
+Start Ollama service (if not already running):
+
+```bash
+ollama serve
+```
+
+Recommended model by machine profile:
+- Apple Silicon 8-16 GB unified memory: `llama3.2:3b` (fastest) or `qwen2.5:3b`
+- Apple Silicon 16-32 GB unified memory: `llama3.1:8b` (recommended baseline quality/speed)
+- 32+ GB RAM or stronger GPU workstation: `qwen2.5:14b` or `llama3.1:8b` for lower latency
+
+Pull model locally:
+
+```bash
+ollama pull llama3.1:8b
+```
+
+Run backend with Ollama provider:
+
+```bash
+export STYLEAGENT_AI_PROVIDER=ollama
+export STYLEAGENT_AI_MODEL=llama3.1:8b
+export STYLEAGENT_AI_BASE_URL=http://localhost:11434
+uvicorn app.main:app --reload
+```
 
 ## Storage Layout (Filesystem)
 

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/ai", tags=["ai"])
     summary="Generate StyleSpec From Prompt",
     description=(
         "Generate a Capture One-compatible `StyleSpec` from a natural-language prompt. "
-        "Phase 1 implementation uses a deterministic mock provider."
+        "Provider is selected through backend configuration (`mock` or local `ollama`)."
     ),
     response_description="Generated style specification and generation metadata.",
 )
