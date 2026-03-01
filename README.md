@@ -43,6 +43,10 @@ Environment variables:
 - `STYLEAGENT_AI_COLD_START_TIMEOUT_SECONDS` (retry timeout for first model load/cold start, default `90`)
 - `STYLEAGENT_AI_RATE_LIMIT_PER_MINUTE` (in-memory per-IP limit for `/ai/generate-style-spec`, default `30`, `0` disables)
 
+AI generation history persistence:
+- With `MongoStore`, generation audit records are saved in collection `ai_generations`.
+- Without Mongo, records are saved in filesystem index `data/index/ai_generations.json`.
+
 ## Lint
 
 ```bash

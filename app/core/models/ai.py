@@ -1,8 +1,10 @@
+from datetime import datetime, timezone
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
 from app.core.models.style_spec import StyleSpec
+from app.core.utils import generate_id
 
 
 class PromptGenerateRequest(BaseModel):
@@ -47,6 +49,44 @@ class GeneratedStyleSpecResponse(BaseModel):
     generation_ms: int | None = Field(
         default=None,
         description="Generation latency in milliseconds (best effort).",
+    )
+    fallback_used: bool = Field(
+        default=False,
+        description="Whether provider generation fell back to mock behavior.",
+    )
+
+
+class AIGenerationRecord(BaseModel):
+    generation_id: str = Field(default_factory=generate_id, description="Unique AI generation identifier.")
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        description="Creation timestamp in UTC.",
+    )
+    client_key: str = Field(min_length=1, description="Client identifier used for rate-limiting/audit.")
+    prompt: str = Field(min_length=1, description="Input natural-language prompt.")
+    intent: list[str] | None = Field(
+        default=None,
+        description="Optional intent tags submitted by client.",
+    )
+    constraints: dict[str, Any] | None = Field(
+        default=None,
+        description="Optional constraints submitted by client.",
+    )
+    target: Literal["captureone"] = Field(description="Generation target.")
+    style_spec: StyleSpec = Field(description="Generated style specification payload.")
+    rationale: str | None = Field(
+        default=None,
+        description="Optional model rationale.",
+    )
+    warnings: list[str] = Field(
+        default_factory=list,
+        description="Generation warnings.",
+    )
+    provider: str = Field(description="Provider identifier used for generation.")
+    model: str = Field(description="Model identifier used for generation.")
+    generation_ms: int | None = Field(
+        default=None,
+        description="Generation latency in milliseconds.",
     )
     fallback_used: bool = Field(
         default=False,

@@ -1,6 +1,6 @@
 import hashlib
 
-from app.core.models import SafePolicy, Style, StyleSpec, StyleVersion
+from app.core.models import AIGenerationRecord, SafePolicy, Style, StyleSpec, StyleVersion
 from app.storage.fs_store import FSStore
 
 
@@ -131,3 +131,44 @@ def test_list_artifacts_can_filter_by_style(tmp_path) -> None:
     assert len(artifacts_b) == 1
     assert artifacts_a[0].style_id == style_a.style_id
     assert artifacts_b[0].style_id == style_b.style_id
+
+
+def test_create_and_list_ai_generations(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+    first = store.create_ai_generation(
+        AIGenerationRecord(
+            client_key="client-a",
+            prompt="warm cinematic preset",
+            target="captureone",
+            style_spec=StyleSpec(
+                name="AI Warm",
+                intent=["warm"],
+                captureone={"keys": {"Contrast": 8}},
+            ),
+            provider="mock",
+            model="mock-v1",
+        )
+    )
+    second = store.create_ai_generation(
+        AIGenerationRecord(
+            client_key="client-b",
+            prompt="neutral editorial preset",
+            target="captureone",
+            style_spec=StyleSpec(
+                name="AI Neutral",
+                intent=["editorial"],
+                captureone={"keys": {"Saturation": -2}},
+            ),
+            provider="mock",
+            model="mock-v1",
+        )
+    )
+
+    all_records = store.list_ai_generations()
+    assert len(all_records) == 2
+    assert all_records[0].generation_id == second.generation_id
+    assert all_records[1].generation_id == first.generation_id
+
+    limited_records = store.list_ai_generations(limit=1)
+    assert len(limited_records) == 1
+    assert limited_records[0].generation_id == second.generation_id

@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal, Protocol
 
-from app.core.models import Artifact, RunnerJob, Style, StyleVersion
+from app.core.models import AIGenerationRecord, Artifact, RunnerJob, Style, StyleVersion
 
 
 class Store(Protocol):
@@ -49,3 +49,6 @@ class Store(Protocol):
         logs: list[dict] | None = None,
     ) -> RunnerJob | None: ...
     def claim_runner_job(self, job_id: str, *, claimed_by: str = "runner") -> RunnerJob | None: ...
+
+    def create_ai_generation(self, record: AIGenerationRecord) -> AIGenerationRecord: ...
+    def list_ai_generations(self, *, limit: int | None = None) -> list[AIGenerationRecord]: ...

@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
-from app.core.models import Artifact, RunnerJob, Style, StyleVersion
+from app.core.models import AIGenerationRecord, Artifact, RunnerJob, Style, StyleVersion
 
 
 class FSStore:
@@ -18,6 +18,7 @@ class FSStore:
         self.styles_index_path = self.index_dir / "styles.json"
         self.artifacts_index_path = self.index_dir / "artifacts.json"
         self.runner_jobs_index_path = self.index_dir / "runner_jobs.json"
+        self.ai_generations_index_path = self.index_dir / "ai_generations.json"
 
     def create_style(self, style: Style) -> Style:
         self._ensure_layout()
@@ -222,6 +223,21 @@ class FSStore:
             attempt_inc=1,
         )
 
+    def create_ai_generation(self, record: AIGenerationRecord) -> AIGenerationRecord:
+        self._ensure_layout()
+        generations_index = self._read_json(self.ai_generations_index_path)
+        generations_index[record.generation_id] = record.model_dump(mode="json")
+        self._write_json(self.ai_generations_index_path, generations_index)
+        return record
+
+    def list_ai_generations(self, *, limit: int | None = None) -> list[AIGenerationRecord]:
+        generations_index = self._read_json(self.ai_generations_index_path)
+        generations = [AIGenerationRecord.model_validate(raw) for raw in generations_index.values()]
+        generations = sorted(generations, key=lambda record: record.created_at, reverse=True)
+        if limit is not None:
+            generations = generations[:limit]
+        return generations
+
     def _style_dir(self, slug: str) -> Path:
         return self.styles_dir / slug
 
@@ -237,6 +253,8 @@ class FSStore:
             self._write_json(self.artifacts_index_path, {})
         if not self.runner_jobs_index_path.exists():
             self._write_json(self.runner_jobs_index_path, {})
+        if not self.ai_generations_index_path.exists():
+            self._write_json(self.ai_generations_index_path, {})
 
     def _read_json(self, path: Path) -> dict:
         if not path.exists():
@@ -322,6 +340,14 @@ def update_runner_job(
 
 def claim_runner_job(job_id: str, *, claimed_by: str = "runner") -> RunnerJob | None:
     return _default_store.claim_runner_job(job_id, claimed_by=claimed_by)
+
+
+def create_ai_generation(record: AIGenerationRecord) -> AIGenerationRecord:
+    return _default_store.create_ai_generation(record)
+
+
+def list_ai_generations(*, limit: int | None = None) -> list[AIGenerationRecord]:
+    return _default_store.list_ai_generations(limit=limit)
 
 
 def _runner_lock_ttl() -> timedelta:
