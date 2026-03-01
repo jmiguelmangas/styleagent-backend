@@ -48,6 +48,9 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
     assert response.model == "llama3.1:8b"
     assert response.warnings == []
     assert response.style_spec.captureone.keys["Contrast"] == 10
+    assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5600
+    assert "Highlights" in response.style_spec.captureone.keys
+    assert "ColorBalanceBlue" in response.style_spec.captureone.keys
 
 
 def test_ollama_generator_retries_with_cold_start_timeout(monkeypatch) -> None:
@@ -109,3 +112,31 @@ def test_ollama_generator_fallback_when_http_error(monkeypatch) -> None:
     assert response.model == "llama3.1:8b"
     assert any("fallback mock used" in warning for warning in response.warnings)
     assert response.style_spec.captureone.keys
+
+
+def test_ollama_generator_keeps_chat_delta_payload_sparse(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"name":"AI Chat Delta","intent":["portrait"],'
+                    '"captureone":{"keys":{"Contrast":7}}}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="add contrast only",
+            intent=["portrait"],
+            constraints={
+                "mode": "chat_turn_delta",
+                "allowed_keys": ["Contrast", "Exposure"],
+            },
+        )
+    )
+
+    assert set(response.style_spec.captureone.keys.keys()) == {"Contrast"}
