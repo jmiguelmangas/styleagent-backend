@@ -181,6 +181,8 @@ def test_ai_chat_session_turn_and_apply_flow(client: TestClient) -> None:
     payload = turn_response.json()
     assert payload["turn"]["applied"] is False
     assert len(payload["turn"]["proposed_changes"]) >= 1
+    assert payload["turn"]["guidance"]["reasoning_summary"]
+    assert len(payload["turn"]["guidance"]["suggested_next_messages"]) >= 1
     turn_id = payload["turn"]["turn_id"]
 
     apply_response = client.post(f"/ai/chat/sessions/{session_id}/turns/{turn_id}/apply")
@@ -224,3 +226,4 @@ def test_ai_chat_guardrail_blocks_exposure_when_safe_policy_disables_it(client: 
     keys = [change["key"] for change in payload["turn"]["proposed_changes"]]
     assert "Exposure" not in keys
     assert any("safe policy" in warning.lower() for warning in payload["turn"]["warnings"])
+    assert "increase_brightness" in payload["turn"]["guidance"]["detected_goals"]

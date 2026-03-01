@@ -1,6 +1,15 @@
 import hashlib
 
-from app.core.models import AIGenerationRecord, AIChatSession, AIChatTurn, SafePolicy, Style, StyleSpec, StyleVersion
+from app.core.models import (
+    AIGenerationRecord,
+    AIChatSession,
+    AIChatTurn,
+    AIConversationGuidance,
+    SafePolicy,
+    Style,
+    StyleSpec,
+    StyleVersion,
+)
 from app.storage.fs_store import FSStore
 
 
@@ -192,6 +201,11 @@ def test_ai_chat_session_and_turn_roundtrip(tmp_path) -> None:
             user_message="add contrast",
             assistant_message="proposed contrast increase",
             proposed_changes=[],
+            guidance=AIConversationGuidance(
+                detected_goals=["contrast_tuning"],
+                reasoning_summary="Contrast tuning goal detected.",
+                suggested_next_messages=["increase contrast more"],
+            ),
         )
     )
 

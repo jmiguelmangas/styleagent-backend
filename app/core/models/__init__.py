@@ -1,5 +1,6 @@
 from app.core.models.ai import AIGenerationRecord, GeneratedStyleSpecResponse, PromptGenerateRequest
 from app.core.models.ai_chat import (
+    AIConversationGuidance,
     AIChatSession,
     AIChatSessionCreateRequest,
     AIChatSessionDetail,
@@ -35,6 +36,7 @@ __all__ = [
     "AIChatTurn",
     "AIChatTurnCreateRequest",
     "AIChatTurnResponse",
+    "AIConversationGuidance",
     "AIParameterChange",
     "CompileResponse",
     "GeneratedStyleSpecResponse",

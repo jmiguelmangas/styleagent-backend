@@ -17,6 +17,7 @@ from app.core.models import (
     AIChatTurn,
     AIChatTurnCreateRequest,
     AIChatTurnResponse,
+    AIConversationGuidance,
     AIParameterChange,
     StyleSpec,
 )
@@ -132,6 +133,44 @@ def _derive_change_intents(message: str) -> dict[str, float]:
         suggestions["Contrast"] = 1.0
 
     return suggestions
+
+
+def _detect_conversation_goals(message: str) -> list[str]:
+    text = message.lower()
+    goals: list[str] = []
+    if any(token in text for token in ("bright", "brighter", "lighter", "exposure up")):
+        goals.append("increase_brightness")
+    if any(token in text for token in ("dark", "darker", "moody", "less exposure")):
+        goals.append("decrease_brightness")
+    if any(token in text for token in ("contrast", "punchy")):
+        goals.append("contrast_tuning")
+    if any(token in text for token in ("vibrant", "colorful", "saturation", "muted", "desaturated")):
+        goals.append("color_intensity_tuning")
+    if "cinematic" in text:
+        goals.append("cinematic_look")
+    if "portrait" in text:
+        goals.append("portrait_balance")
+    if not goals:
+        goals.append("micro_adjustment")
+    return goals
+
+
+def _guidance_for_turn(goals: list[str], warnings: list[str], changes: list[AIParameterChange]) -> AIConversationGuidance:
+    constrained = " with guard-rail constraints applied" if warnings else ""
+    reasoning_summary = (
+        f"Detected goals: {', '.join(goals)}. "
+        f"Proposed {len(changes)} parameter changes{constrained}."
+    )
+    suggested_next_messages = [
+        "make skin tones more natural",
+        "reduce highlights and keep contrast",
+        "add a softer cinematic finish",
+    ]
+    return AIConversationGuidance(
+        detected_goals=goals,
+        reasoning_summary=reasoning_summary,
+        suggested_next_messages=suggested_next_messages,
+    )
 
 
 def _guardrail_changes(spec: StyleSpec, suggestions: dict[str, float]) -> tuple[list[AIParameterChange], list[str]]:
@@ -316,6 +355,8 @@ def create_ai_chat_turn(
 
     suggestions = _derive_change_intents(payload.message)
     proposed_changes, warnings = _guardrail_changes(session.style_spec, suggestions)
+    goals = _detect_conversation_goals(payload.message)
+    guidance = _guidance_for_turn(goals, warnings, proposed_changes)
     assistant_message = (
         "I analyzed your request and prepared guard-railed parameter updates. "
         "Review or apply the proposed changes."
@@ -326,6 +367,7 @@ def create_ai_chat_turn(
         assistant_message=assistant_message,
         proposed_changes=proposed_changes,
         warnings=warnings,
+        guidance=guidance,
         applied=False,
     )
 
