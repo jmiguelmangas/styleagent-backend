@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 import httpx
@@ -23,6 +24,7 @@ _RICH_PRESET_DEFAULTS: dict[str, str | int | float] = {
     "ColorBalanceBlue": -2,
     "ToneCurve": "Film Standard",
 }
+_PROMPT_EXAMPLES_PATH = os.path.join(os.path.dirname(__file__), "prompt_examples.json")
 
 
 class OllamaStyleGenerator:
@@ -151,6 +153,7 @@ class OllamaStyleGenerator:
             },
             ensure_ascii=True,
         )
+        examples_json = json.dumps(self._select_prompt_examples(payload), ensure_ascii=True)
         return (
             "You generate Capture One style specs.\n"
             "Return only valid JSON, no markdown.\n"
@@ -175,5 +178,52 @@ class OllamaStyleGenerator:
             "  Exposure [-4,4], Contrast/Saturation/Clarity/Highlights/Shadows [-100,100], "
             "WhiteBalanceTemperature [2000,12000], WhiteBalanceTint [-50,50], "
             "ColorBalanceRed/Green/Blue [-50,50].\n"
+            "Reference examples (real styles, use as aesthetic guidance):\n"
+            f"{examples_json}\n"
             f"Input payload: {payload_json}"
         )
+
+    def _select_prompt_examples(self, payload: PromptGenerateRequest) -> list[dict[str, Any]]:
+        all_examples = _load_prompt_examples()
+        if not all_examples:
+            return []
+
+        max_examples_raw = os.getenv("STYLEAGENT_AI_MAX_PROMPT_EXAMPLES", "4").strip()
+        try:
+            max_examples = max(1, min(8, int(max_examples_raw)))
+        except ValueError:
+            max_examples = 4
+
+        prompt_tokens = set(payload.prompt.lower().replace("-", " ").split())
+        intent_tokens = {token.lower() for token in (payload.intent or [])}
+
+        scored: list[tuple[int, dict[str, Any]]] = []
+        for example in all_examples:
+            tags = {str(tag).lower() for tag in example.get("tags", [])}
+            prompt_text = str(example.get("prompt", "")).lower()
+            prompt_matches = sum(1 for token in prompt_tokens if token in prompt_text or token in tags)
+            intent_matches = sum(2 for token in intent_tokens if token in tags)
+            score = prompt_matches + intent_matches
+            scored.append((score, example))
+
+        scored.sort(key=lambda item: item[0], reverse=True)
+        selected = [example for _, example in scored[:max_examples]]
+        return [
+            {
+                "source": example.get("source"),
+                "prompt": example.get("prompt"),
+                "style_spec": example.get("style_spec"),
+            }
+            for example in selected
+        ]
+
+
+def _load_prompt_examples() -> list[dict[str, Any]]:
+    try:
+        with open(_PROMPT_EXAMPLES_PATH, encoding="utf-8") as handle:
+            loaded = json.load(handle)
+    except Exception:  # noqa: BLE001
+        return []
+    if not isinstance(loaded, list):
+        return []
+    return [item for item in loaded if isinstance(item, dict)]
