@@ -7,9 +7,10 @@ import time
 from collections import defaultdict, deque
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
-from app.api.deps import get_ai_generator
+from app.api.deps import get_ai_generator, get_store
 from app.core.ai.base import AIStyleGenerator
-from app.core.models.ai import GeneratedStyleSpecResponse, PromptGenerateRequest
+from app.core.models.ai import AIGenerationRecord, GeneratedStyleSpecResponse, PromptGenerateRequest
+from app.storage.base import Store
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 logger = logging.getLogger("styleagent.backend.ai")
@@ -80,6 +81,7 @@ def generate_style_spec(
     request: Request,
     payload: PromptGenerateRequest = Body(..., description="Prompt-based generation payload."),
     generator: AIStyleGenerator = Depends(get_ai_generator),
+    store: Store = Depends(get_store),
 ) -> GeneratedStyleSpecResponse:
     client_key = _request_client_key(request)
     if not _rate_limiter.allow(client_key, _rate_limit_per_minute(), window_seconds=60):
@@ -104,4 +106,26 @@ def generate_style_spec(
         fallback_used,
         len(response.warnings),
     )
+
+    try:
+        store.create_ai_generation(
+            AIGenerationRecord(
+                client_key=client_key,
+                prompt=payload.prompt,
+                intent=payload.intent,
+                constraints=payload.constraints,
+                target=payload.target,
+                style_spec=response.style_spec,
+                rationale=response.rationale,
+                warnings=response.warnings,
+                provider=response.provider,
+                model=response.model,
+                generation_ms=response.generation_ms,
+                fallback_used=response.fallback_used,
+            )
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("ai.generate persistence_failed client=%s", client_key)
+        response.warnings.append("Generation saved failed; result returned without history persistence.")
+
     return response

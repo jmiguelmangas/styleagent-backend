@@ -9,7 +9,7 @@ from typing import Any, Literal
 from pymongo import ASCENDING, DESCENDING, MongoClient, ReturnDocument
 from pymongo.collection import Collection
 
-from app.core.models import Artifact, RunnerJob, Style, StyleVersion
+from app.core.models import AIGenerationRecord, Artifact, RunnerJob, Style, StyleVersion
 from app.storage.fs_store import FSStore
 
 
@@ -21,6 +21,7 @@ class MongoStore(FSStore):
     - style_versions
     - artifacts metadata
     - runner jobs
+    - ai generation history
 
     Filesystem stores:
     - artifact bytes (.costyle)
@@ -42,6 +43,7 @@ class MongoStore(FSStore):
         self._style_versions: Collection = self._db["style_versions"]
         self._artifacts: Collection = self._db["artifacts"]
         self._runner_jobs: Collection = self._db["runner_jobs"]
+        self._ai_generations: Collection = self._db["ai_generations"]
         self._indexes_ready = False
 
     def create_style(self, style: Style) -> Style:
@@ -229,6 +231,18 @@ class MongoStore(FSStore):
         )
         return None if doc is None else RunnerJob.model_validate(_without_id(doc))
 
+    def create_ai_generation(self, record: AIGenerationRecord) -> AIGenerationRecord:
+        self._ensure_indexes()
+        self._ai_generations.insert_one(record.model_dump(mode="python"))
+        return record
+
+    def list_ai_generations(self, *, limit: int | None = None) -> list[AIGenerationRecord]:
+        self._ensure_indexes()
+        cursor = self._ai_generations.find({}).sort("created_at", DESCENDING)
+        if limit is not None:
+            cursor = cursor.limit(limit)
+        return [AIGenerationRecord.model_validate(_without_id(doc)) for doc in cursor]
+
     def _ensure_indexes(self) -> None:
         if self._indexes_ready:
             return
@@ -241,6 +255,8 @@ class MongoStore(FSStore):
             [("status", ASCENDING), ("locked_until", ASCENDING), ("updated_at", DESCENDING)]
         )
         self._runner_jobs.create_index("job_id", unique=True)
+        self._ai_generations.create_index("generation_id", unique=True)
+        self._ai_generations.create_index("created_at", DESCENDING)
         self._indexes_ready = True
 
 
@@ -255,4 +271,3 @@ def _runner_lock_ttl() -> timedelta:
     except ValueError:
         seconds = 60
     return timedelta(seconds=seconds)
-

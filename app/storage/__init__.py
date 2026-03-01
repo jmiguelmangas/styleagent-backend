@@ -12,8 +12,10 @@ from app.storage.fs_store import (
     save_artifact,
     create_runner_job,
     claim_runner_job,
+    create_ai_generation,
     get_runner_job,
     update_runner_job,
+    list_ai_generations,
 )
 from app.storage.mongo_store import MongoStore
 from app.storage.store_factory import get_store_instance
@@ -33,7 +35,9 @@ __all__ = [
     "save_artifact",
     "create_runner_job",
     "claim_runner_job",
+    "create_ai_generation",
     "get_runner_job",
     "update_runner_job",
+    "list_ai_generations",
     "get_store_instance",
 ]
