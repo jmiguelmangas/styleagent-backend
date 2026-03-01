@@ -39,6 +39,13 @@ def _build_mock_captureone_keys(prompt: str) -> dict[str, str | int | float]:
         "Contrast": 8,
         "Saturation": 6,
         "Clarity": 8,
+        "Highlights": -6,
+        "Shadows": 8,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
         "ToneCurve": "Film Standard",
     }
 
@@ -52,8 +59,19 @@ def _build_mock_captureone_keys(prompt: str) -> dict[str, str | int | float]:
         keys["Saturation"] = 7
 
     if "warm" in normalized:
+        keys["WhiteBalanceTemperature"] = 6100
+        keys["WhiteBalanceTint"] = 4
         keys["ColorBalanceRed"] = 4
     elif "cool" in normalized:
+        keys["WhiteBalanceTemperature"] = 5000
+        keys["WhiteBalanceTint"] = -2
         keys["ColorBalanceBlue"] = 4
+
+    if "teal" in normalized:
+        keys["ColorBalanceBlue"] = 6
+        keys["Saturation"] = 8
+    if "portrait" in normalized:
+        keys["Highlights"] = -10
+        keys["Shadows"] = 12
 
     return keys

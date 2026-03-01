@@ -245,7 +245,7 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
             generated = StyleSpec(
                 name="AI Chat",
                 intent=payload.intent or [],
-                captureone={"keys": {"Exposure": 0.4, "Contrast": 7}},
+                captureone={"keys": {"Exposure": 0.4, "Contrast": 7, "WhiteBalanceTemperature": 5900}},
             )
             return GeneratedStyleSpecResponse(
                 style_spec=generated,
@@ -260,10 +260,15 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
     create_response = client.post(
         "/ai/chat/sessions",
         json={
-            "style_spec": {
-                "name": "Base",
-                "intent": ["portrait"],
-                "captureone": {"keys": {"Exposure": 0.0, "Contrast": 2}},
+                "style_spec": {
+                    "name": "Base",
+                    "intent": ["portrait"],
+                    "captureone": {"keys": {"Exposure": 0.0, "Contrast": 2, "WhiteBalanceTemperature": 5600}},
+                    "safe": {
+                        "remove_lens_light_falloff": True,
+                        "remove_white_balance": False,
+                    "remove_exposure": False,
+                },
             },
         },
     )
@@ -285,6 +290,8 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
     assert "Contrast" in changes
     assert changes["Contrast"]["from_value"] == 2.0
     assert changes["Contrast"]["to_value"] == 7.0
+    assert "WhiteBalanceTemperature" in changes
+    assert changes["WhiteBalanceTemperature"]["to_value"] == 5900.0
 
 
 def test_ai_chat_turn_falls_back_to_heuristic_when_model_has_no_supported_deltas(client: TestClient) -> None:
@@ -332,3 +339,34 @@ def test_ai_chat_turn_falls_back_to_heuristic_when_model_has_no_supported_deltas
     keys = [change["key"] for change in payload["turn"]["proposed_changes"]]
     assert "Exposure" in keys
     assert any("heuristic fallback" in warning.lower() for warning in payload["turn"]["warnings"])
+
+
+def test_ai_chat_guardrail_blocks_white_balance_when_safe_policy_disables_it(client: TestClient) -> None:
+    create_response = client.post(
+        "/ai/chat/sessions",
+        json={
+            "style_spec": {
+                "name": "Safe WB Session",
+                "intent": [],
+                "captureone": {"keys": {"WhiteBalanceTemperature": 5600, "WhiteBalanceTint": 0}},
+                "safe": {
+                    "remove_lens_light_falloff": True,
+                    "remove_white_balance": True,
+                    "remove_exposure": False,
+                },
+            },
+        },
+    )
+    assert create_response.status_code == 201
+    session_id = create_response.json()["session_id"]
+
+    turn_response = client.post(
+        f"/ai/chat/sessions/{session_id}/turns",
+        json={"message": "make it warmer and adjust tint"},
+    )
+    assert turn_response.status_code == 201
+    payload = turn_response.json()
+    keys = [change["key"] for change in payload["turn"]["proposed_changes"]]
+    assert "WhiteBalanceTemperature" not in keys
+    assert "WhiteBalanceTint" not in keys
+    assert any("safe policy" in warning.lower() for warning in payload["turn"]["warnings"])
