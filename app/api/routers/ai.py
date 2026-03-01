@@ -60,6 +60,13 @@ _PARAMETER_GUARDRAILS: dict[str, dict[str, float]] = {
     "Saturation": {"min": -100.0, "max": 100.0, "max_delta": 12.0},
     "Clarity": {"min": -100.0, "max": 100.0, "max_delta": 12.0},
     "Brightness": {"min": -100.0, "max": 100.0, "max_delta": 15.0},
+    "Highlights": {"min": -100.0, "max": 100.0, "max_delta": 15.0},
+    "Shadows": {"min": -100.0, "max": 100.0, "max_delta": 15.0},
+    "WhiteBalanceTemperature": {"min": 2000.0, "max": 12000.0, "max_delta": 400.0},
+    "WhiteBalanceTint": {"min": -50.0, "max": 50.0, "max_delta": 10.0},
+    "ColorBalanceRed": {"min": -50.0, "max": 50.0, "max_delta": 8.0},
+    "ColorBalanceGreen": {"min": -50.0, "max": 50.0, "max_delta": 8.0},
+    "ColorBalanceBlue": {"min": -50.0, "max": 50.0, "max_delta": 8.0},
 }
 
 
@@ -125,9 +132,21 @@ def _derive_change_intents(message: str) -> dict[str, float]:
         suggestions["Contrast"] = suggestions.get("Contrast", 0.0) + 2.0
         suggestions["Saturation"] = suggestions.get("Saturation", 0.0) - 2.0
     if "warm" in text:
-        suggestions["Brightness"] = suggestions.get("Brightness", 0.0) + 2.0
+        suggestions["WhiteBalanceTemperature"] = suggestions.get("WhiteBalanceTemperature", 0.0) + 180.0
+        suggestions["ColorBalanceRed"] = suggestions.get("ColorBalanceRed", 0.0) + 2.0
     if "cool" in text:
-        suggestions["Brightness"] = suggestions.get("Brightness", 0.0) - 2.0
+        suggestions["WhiteBalanceTemperature"] = suggestions.get("WhiteBalanceTemperature", 0.0) - 180.0
+        suggestions["ColorBalanceBlue"] = suggestions.get("ColorBalanceBlue", 0.0) + 2.0
+    if any(token in text for token in ("teal", "cyan")):
+        suggestions["ColorBalanceBlue"] = suggestions.get("ColorBalanceBlue", 0.0) + 4.0
+    if any(token in text for token in ("magenta", "pink")):
+        suggestions["WhiteBalanceTint"] = suggestions.get("WhiteBalanceTint", 0.0) + 3.0
+    if any(token in text for token in ("green tint", "green cast")):
+        suggestions["WhiteBalanceTint"] = suggestions.get("WhiteBalanceTint", 0.0) - 3.0
+    if any(token in text for token in ("recover highlights", "reduce highlights")):
+        suggestions["Highlights"] = suggestions.get("Highlights", 0.0) - 5.0
+    if any(token in text for token in ("lift shadows", "open shadows", "more shadow detail")):
+        suggestions["Shadows"] = suggestions.get("Shadows", 0.0) + 5.0
 
     if not suggestions:
         suggestions["Contrast"] = 1.0
@@ -192,6 +211,8 @@ def _detect_conversation_goals(message: str) -> list[str]:
         goals.append("contrast_tuning")
     if any(token in text for token in ("vibrant", "colorful", "saturation", "muted", "desaturated")):
         goals.append("color_intensity_tuning")
+    if any(token in text for token in ("warm", "cool", "temperature", "tint", "teal", "magenta")):
+        goals.append("color_balance_tuning")
     if "cinematic" in text:
         goals.append("cinematic_look")
     if "portrait" in text:
@@ -211,6 +232,7 @@ def _guidance_for_turn(goals: list[str], warnings: list[str], changes: list[AIPa
         "make skin tones more natural",
         "reduce highlights and keep contrast",
         "add a softer cinematic finish",
+        "cool shadows and keep warm skin tones",
     ]
     return AIConversationGuidance(
         detected_goals=goals,
