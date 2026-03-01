@@ -135,3 +135,74 @@ def test_complete_runner_job_rejects_invalid_host_error_code(client: TestClient)
         },
     )
     assert complete_response.status_code == 422
+
+
+def test_complete_runner_job_accepts_host_launch_method(client: TestClient) -> None:
+    create_response = client.post(
+        "/runner/jobs",
+        json={
+            "job_type": "compile_captureone",
+            "payload": {"style_id": "style_1", "version": "v1", "execution_mode": "host"},
+        },
+    )
+    assert create_response.status_code == 201
+    job_id = create_response.json()["job_id"]
+
+    claim_response = client.post(f"/runner/jobs/{job_id}/claim")
+    assert claim_response.status_code == 200
+
+    complete_response = client.post(
+        f"/runner/jobs/{job_id}/complete",
+        json={
+            "status": "succeeded",
+            "result": {
+                "artifact_id": "artifact_1",
+                "sha256": "abc",
+                "download_url": "/artifacts/artifact_1",
+                "host_integration": {
+                    "mode": "host",
+                    "launch_method": "cli",
+                    "captureone_app_path": "/Applications/Capture One.app",
+                    "imported_costyle_path": "/tmp/artifact_1.costyle",
+                },
+            },
+            "error": None,
+            "logs": [{"event": "job_succeeded"}],
+        },
+    )
+    assert complete_response.status_code == 200
+    completed = complete_response.json()
+    assert completed["result"]["host_integration"]["launch_method"] == "cli"
+
+
+def test_complete_runner_job_rejects_invalid_host_launch_method(client: TestClient) -> None:
+    create_response = client.post(
+        "/runner/jobs",
+        json={
+            "job_type": "compile_captureone",
+            "payload": {"style_id": "style_1", "version": "v1", "execution_mode": "host"},
+        },
+    )
+    assert create_response.status_code == 201
+    job_id = create_response.json()["job_id"]
+
+    claim_response = client.post(f"/runner/jobs/{job_id}/claim")
+    assert claim_response.status_code == 200
+
+    complete_response = client.post(
+        f"/runner/jobs/{job_id}/complete",
+        json={
+            "status": "failed",
+            "result": {
+                "host_integration": {
+                    "mode": "host",
+                    "launch_method": "manual",
+                    "error_code": "APPLE_EVENT_DENIED",
+                    "error_message": "no automation permission",
+                }
+            },
+            "error": "no automation permission",
+            "logs": [{"event": "job_failed"}],
+        },
+    )
+    assert complete_response.status_code == 422
