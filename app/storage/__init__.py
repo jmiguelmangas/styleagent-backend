@@ -13,9 +13,16 @@ from app.storage.fs_store import (
     create_runner_job,
     claim_runner_job,
     create_ai_generation,
+    create_ai_chat_session,
+    create_ai_chat_turn,
     get_runner_job,
+    get_ai_chat_session,
+    get_ai_chat_turn,
     update_runner_job,
+    update_ai_chat_session,
+    update_ai_chat_turn,
     list_ai_generations,
+    list_ai_chat_turns,
 )
 from app.storage.mongo_store import MongoStore
 from app.storage.store_factory import get_store_instance
@@ -36,8 +43,15 @@ __all__ = [
     "create_runner_job",
     "claim_runner_job",
     "create_ai_generation",
+    "create_ai_chat_session",
+    "create_ai_chat_turn",
     "get_runner_job",
+    "get_ai_chat_session",
+    "get_ai_chat_turn",
     "update_runner_job",
+    "update_ai_chat_session",
+    "update_ai_chat_turn",
     "list_ai_generations",
+    "list_ai_chat_turns",
     "get_store_instance",
 ]

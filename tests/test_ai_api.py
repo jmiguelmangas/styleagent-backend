@@ -155,3 +155,72 @@ def test_list_ai_generations_returns_newest_first(client: TestClient) -> None:
     assert payload[0]["prompt"] == "second prompt"
     assert payload[0]["target"] == "captureone"
     assert payload[0]["provider"] == "mock"
+
+
+def test_ai_chat_session_turn_and_apply_flow(client: TestClient) -> None:
+    create_response = client.post(
+        "/ai/chat/sessions",
+        json={
+            "title": "Portrait Iteration",
+            "style_spec": {
+                "name": "Base Portrait",
+                "intent": ["portrait"],
+                "captureone": {"keys": {"Exposure": 0.0, "Contrast": 2, "Saturation": 1}},
+            },
+        },
+    )
+    assert create_response.status_code == 201
+    session = create_response.json()
+    session_id = session["session_id"]
+
+    turn_response = client.post(
+        f"/ai/chat/sessions/{session_id}/turns",
+        json={"message": "make it brighter and more contrast", "auto_apply": False},
+    )
+    assert turn_response.status_code == 201
+    payload = turn_response.json()
+    assert payload["turn"]["applied"] is False
+    assert len(payload["turn"]["proposed_changes"]) >= 1
+    turn_id = payload["turn"]["turn_id"]
+
+    apply_response = client.post(f"/ai/chat/sessions/{session_id}/turns/{turn_id}/apply")
+    assert apply_response.status_code == 200
+    applied_payload = apply_response.json()
+    assert applied_payload["turn"]["applied"] is True
+
+    detail = client.get(f"/ai/chat/sessions/{session_id}")
+    assert detail.status_code == 200
+    detail_payload = detail.json()
+    assert detail_payload["session"]["session_id"] == session_id
+    assert len(detail_payload["turns"]) == 1
+
+
+def test_ai_chat_guardrail_blocks_exposure_when_safe_policy_disables_it(client: TestClient) -> None:
+    create_response = client.post(
+        "/ai/chat/sessions",
+        json={
+            "style_spec": {
+                "name": "Safe Session",
+                "intent": [],
+                "captureone": {"keys": {"Exposure": 0.0, "Contrast": 0}},
+                "safe": {
+                    "remove_lens_light_falloff": True,
+                    "remove_white_balance": True,
+                    "remove_exposure": True,
+                },
+            },
+        },
+    )
+    assert create_response.status_code == 201
+    session_id = create_response.json()["session_id"]
+
+    turn_response = client.post(
+        f"/ai/chat/sessions/{session_id}/turns",
+        json={"message": "increase exposure and make it brighter"},
+    )
+    assert turn_response.status_code == 201
+    payload = turn_response.json()
+
+    keys = [change["key"] for change in payload["turn"]["proposed_changes"]]
+    assert "Exposure" not in keys
+    assert any("safe policy" in warning.lower() for warning in payload["turn"]["warnings"])

@@ -1,6 +1,6 @@
 import hashlib
 
-from app.core.models import AIGenerationRecord, SafePolicy, Style, StyleSpec, StyleVersion
+from app.core.models import AIGenerationRecord, AIChatSession, AIChatTurn, SafePolicy, Style, StyleSpec, StyleVersion
 from app.storage.fs_store import FSStore
 
 
@@ -172,3 +172,36 @@ def test_create_and_list_ai_generations(tmp_path) -> None:
     limited_records = store.list_ai_generations(limit=1)
     assert len(limited_records) == 1
     assert limited_records[0].generation_id == second.generation_id
+
+
+def test_ai_chat_session_and_turn_roundtrip(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+    session = store.create_ai_chat_session(
+        AIChatSession(
+            title="Session 1",
+            style_spec=StyleSpec(
+                name="Base",
+                intent=["portrait"],
+                captureone={"keys": {"Exposure": 0.0, "Contrast": 0}},
+            ),
+        )
+    )
+    turn = store.create_ai_chat_turn(
+        AIChatTurn(
+            session_id=session.session_id,
+            user_message="add contrast",
+            assistant_message="proposed contrast increase",
+            proposed_changes=[],
+        )
+    )
+
+    loaded_session = store.get_ai_chat_session(session.session_id)
+    loaded_turn = store.get_ai_chat_turn(session.session_id, turn.turn_id)
+    turns = store.list_ai_chat_turns(session.session_id)
+
+    assert loaded_session is not None
+    assert loaded_session.session_id == session.session_id
+    assert loaded_turn is not None
+    assert loaded_turn.turn_id == turn.turn_id
+    assert len(turns) == 1
+    assert turns[0].turn_id == turn.turn_id
