@@ -102,6 +102,7 @@ Service URL:
 - `POST /runner/jobs/{job_id}/heartbeat`
 - `POST /runner/jobs/{job_id}/complete`
 - `POST /ai/generate-style-spec` (provider-based generation via `STYLEAGENT_AI_PROVIDER`; supports `mock` and local `ollama`)
+- `GET /ai/generations?limit=20` (lists persisted AI generation history records, newest first)
 
 ## AI Provider: Ollama (Local)
 

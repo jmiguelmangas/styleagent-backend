@@ -6,7 +6,7 @@ import threading
 import time
 from collections import defaultdict, deque
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
 from app.api.deps import get_ai_generator, get_store
 from app.core.ai.base import AIStyleGenerator
 from app.core.models.ai import AIGenerationRecord, GeneratedStyleSpecResponse, PromptGenerateRequest
@@ -129,3 +129,22 @@ def generate_style_spec(
         response.warnings.append("Generation saved failed; result returned without history persistence.")
 
     return response
+
+
+@router.get(
+    "/generations",
+    response_model=list[AIGenerationRecord],
+    summary="List AI Generations",
+    description="Return persisted AI generation history records, newest first.",
+    response_description="AI generation history records.",
+)
+def list_ai_generations(
+    limit: int = Query(
+        default=20,
+        ge=1,
+        le=200,
+        description="Maximum number of generation records to return.",
+    ),
+    store: Store = Depends(get_store),
+) -> list[AIGenerationRecord]:
+    return store.list_ai_generations(limit=limit)
