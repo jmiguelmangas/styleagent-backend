@@ -15,6 +15,7 @@ HostErrorCode = Literal[
     "IMPORT_DIR_NOT_WRITABLE",
     "DOWNLOAD_FAILED",
 ]
+HostLaunchMethod = Literal["open", "cli"]
 
 
 class RunnerCompilePayload(BaseModel):
@@ -33,6 +34,10 @@ class RunnerJobCreate(BaseModel):
 
 class HostIntegrationResult(BaseModel):
     mode: Literal["host"] = Field(description="Host execution mode marker.")
+    launch_method: HostLaunchMethod | None = Field(
+        default=None,
+        description="Method used to trigger Capture One import (`open` or `cli`).",
+    )
     captureone_app_path: str | None = Field(default=None, description="Capture One application path.")
     imported_costyle_path: str | None = Field(default=None, description="Local imported .costyle path.")
     error_code: HostErrorCode | None = Field(default=None, description="Host integration error code.")
