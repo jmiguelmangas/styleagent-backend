@@ -36,6 +36,9 @@ Environment variables:
 - `MONGO_DB_NAME` (Mongo database name, default `styleagent`)
 - `STYLEAGENT_DATA_DIR` (filesystem base dir, default `data`)
 - `RUNNER_JOB_LOCK_TTL_SECONDS` (runner job lease duration, default `60`)
+- `STYLEAGENT_AI_PROVIDER` (AI provider selection: `mock` default, `ollama` scaffolded for next phase)
+- `STYLEAGENT_AI_MODEL` (model id used by selected provider; defaults: `mock-v1` for mock, `llama3.1:8b-instruct` for ollama)
+- `STYLEAGENT_AI_BASE_URL` (only for `ollama`, default `http://localhost:11434`)
 
 ## Lint
 
@@ -91,7 +94,7 @@ Service URL:
 - `POST /runner/jobs/{job_id}/claim`
 - `POST /runner/jobs/{job_id}/heartbeat`
 - `POST /runner/jobs/{job_id}/complete`
-- `POST /ai/generate-style-spec` (Phase 1 mock provider: prompt -> StyleSpec)
+- `POST /ai/generate-style-spec` (provider-based generation via `STYLEAGENT_AI_PROVIDER`; `mock` fully implemented, `ollama` scaffold placeholder)
 
 ## Storage Layout (Filesystem)
 
