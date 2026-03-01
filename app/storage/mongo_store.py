@@ -256,7 +256,7 @@ class MongoStore(FSStore):
         )
         self._runner_jobs.create_index("job_id", unique=True)
         self._ai_generations.create_index("generation_id", unique=True)
-        self._ai_generations.create_index("created_at", DESCENDING)
+        self._ai_generations.create_index([("created_at", DESCENDING)])
         self._indexes_ready = True
 
 
