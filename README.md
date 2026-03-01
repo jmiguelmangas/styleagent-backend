@@ -91,6 +91,7 @@ Service URL:
 - `POST /runner/jobs/{job_id}/claim`
 - `POST /runner/jobs/{job_id}/heartbeat`
 - `POST /runner/jobs/{job_id}/complete`
+- `POST /ai/generate-style-spec` (Phase 1 mock provider: prompt -> StyleSpec)
 
 ## Storage Layout (Filesystem)
 

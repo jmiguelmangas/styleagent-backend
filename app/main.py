@@ -8,7 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routers import artifacts_router, runner_router, styles_router
+from app.api.routers import ai_router, artifacts_router, runner_router, styles_router
 
 app = FastAPI(
     title="StyleAgent Backend API",
@@ -116,6 +116,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 app.include_router(styles_router)
 app.include_router(artifacts_router)
 app.include_router(runner_router)
+app.include_router(ai_router)
 
 app.add_middleware(
     CORSMiddleware,

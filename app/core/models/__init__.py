@@ -1,3 +1,4 @@
+from app.core.models.ai import GeneratedStyleSpecResponse, PromptGenerateRequest
 from app.core.models.runner_jobs import (
     RunnerCompilePayload,
     RunnerJob,
@@ -19,7 +20,9 @@ from app.core.models.style_spec import CaptureOneSpec, StyleSpec
 __all__ = [
     "Artifact",
     "CompileResponse",
+    "GeneratedStyleSpecResponse",
     "CaptureOneSpec",
+    "PromptGenerateRequest",
     "RunnerCompilePayload",
     "RunnerJob",
     "RunnerJobComplete",
