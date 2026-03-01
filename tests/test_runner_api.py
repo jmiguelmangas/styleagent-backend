@@ -26,13 +26,14 @@ def test_runner_job_lifecycle_endpoints(client: TestClient) -> None:
         "/runner/jobs",
         json={
             "job_type": "compile_captureone",
-            "payload": {"style_id": "style_1", "version": "v1"},
+            "payload": {"style_id": "style_1", "version": "v1", "execution_mode": "host"},
         },
     )
     assert create_response.status_code == 201
     created = create_response.json()
     job_id = created["job_id"]
     assert created["status"] == "pending"
+    assert created["payload"]["execution_mode"] == "host"
 
     list_response = client.get("/runner/jobs?status=pending&limit=1")
     assert list_response.status_code == 200
@@ -91,3 +92,14 @@ def test_runner_job_endpoints_return_404_for_missing_job(client: TestClient) -> 
     assert claim_response.status_code == 404
     assert heartbeat_response.status_code == 404
     assert complete_response.status_code == 404
+
+
+def test_create_runner_job_rejects_invalid_execution_mode(client: TestClient) -> None:
+    response = client.post(
+        "/runner/jobs",
+        json={
+            "job_type": "compile_captureone",
+            "payload": {"style_id": "style_1", "version": "v1", "execution_mode": "desktop"},
+        },
+    )
+    assert response.status_code == 422

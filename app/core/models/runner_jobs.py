@@ -7,11 +7,16 @@ from app.core.utils import generate_id
 
 RunnerJobType = Literal["compile_captureone"]
 RunnerJobStatus = Literal["pending", "picked_up", "running", "succeeded", "failed"]
+RunnerExecutionMode = Literal["api", "host"]
 
 
 class RunnerCompilePayload(BaseModel):
     style_id: str = Field(min_length=1, description="Target style identifier.")
     version: str = Field(min_length=1, description="Target style version.")
+    execution_mode: RunnerExecutionMode = Field(
+        default="api",
+        description="Runner execution mode. `api` keeps backend-only compile, `host` enables desktop app integration.",
+    )
 
 
 class RunnerJobCreate(BaseModel):
