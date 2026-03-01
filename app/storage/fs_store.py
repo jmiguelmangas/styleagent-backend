@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
-from app.core.models import AIGenerationRecord, Artifact, RunnerJob, Style, StyleVersion
+from app.core.models import AIGenerationRecord, AIChatSession, AIChatTurn, Artifact, RunnerJob, Style, StyleVersion
 
 
 class FSStore:
@@ -19,6 +19,8 @@ class FSStore:
         self.artifacts_index_path = self.index_dir / "artifacts.json"
         self.runner_jobs_index_path = self.index_dir / "runner_jobs.json"
         self.ai_generations_index_path = self.index_dir / "ai_generations.json"
+        self.ai_chat_sessions_index_path = self.index_dir / "ai_chat_sessions.json"
+        self.ai_chat_turns_index_path = self.index_dir / "ai_chat_turns.json"
 
     def create_style(self, style: Style) -> Style:
         self._ensure_layout()
@@ -238,6 +240,62 @@ class FSStore:
             generations = generations[:limit]
         return generations
 
+    def create_ai_chat_session(self, session: AIChatSession) -> AIChatSession:
+        self._ensure_layout()
+        sessions_index = self._read_json(self.ai_chat_sessions_index_path)
+        sessions_index[session.session_id] = session.model_dump(mode="json")
+        self._write_json(self.ai_chat_sessions_index_path, sessions_index)
+        return session
+
+    def get_ai_chat_session(self, session_id: str) -> AIChatSession | None:
+        sessions_index = self._read_json(self.ai_chat_sessions_index_path)
+        raw = sessions_index.get(session_id)
+        if raw is None:
+            return None
+        return AIChatSession.model_validate(raw)
+
+    def update_ai_chat_session(self, session: AIChatSession) -> AIChatSession | None:
+        sessions_index = self._read_json(self.ai_chat_sessions_index_path)
+        if session.session_id not in sessions_index:
+            return None
+        sessions_index[session.session_id] = session.model_dump(mode="json")
+        self._write_json(self.ai_chat_sessions_index_path, sessions_index)
+        return session
+
+    def create_ai_chat_turn(self, turn: AIChatTurn) -> AIChatTurn:
+        self._ensure_layout()
+        turns_index = self._read_json(self.ai_chat_turns_index_path)
+        turns_index[turn.turn_id] = turn.model_dump(mode="json")
+        self._write_json(self.ai_chat_turns_index_path, turns_index)
+        return turn
+
+    def get_ai_chat_turn(self, session_id: str, turn_id: str) -> AIChatTurn | None:
+        turns_index = self._read_json(self.ai_chat_turns_index_path)
+        raw = turns_index.get(turn_id)
+        if raw is None:
+            return None
+        turn = AIChatTurn.model_validate(raw)
+        if turn.session_id != session_id:
+            return None
+        return turn
+
+    def list_ai_chat_turns(self, session_id: str, *, limit: int | None = None) -> list[AIChatTurn]:
+        turns_index = self._read_json(self.ai_chat_turns_index_path)
+        turns = [AIChatTurn.model_validate(raw) for raw in turns_index.values()]
+        turns = [turn for turn in turns if turn.session_id == session_id]
+        turns = sorted(turns, key=lambda turn: turn.created_at)
+        if limit is not None:
+            turns = turns[:limit]
+        return turns
+
+    def update_ai_chat_turn(self, turn: AIChatTurn) -> AIChatTurn | None:
+        turns_index = self._read_json(self.ai_chat_turns_index_path)
+        if turn.turn_id not in turns_index:
+            return None
+        turns_index[turn.turn_id] = turn.model_dump(mode="json")
+        self._write_json(self.ai_chat_turns_index_path, turns_index)
+        return turn
+
     def _style_dir(self, slug: str) -> Path:
         return self.styles_dir / slug
 
@@ -255,6 +313,10 @@ class FSStore:
             self._write_json(self.runner_jobs_index_path, {})
         if not self.ai_generations_index_path.exists():
             self._write_json(self.ai_generations_index_path, {})
+        if not self.ai_chat_sessions_index_path.exists():
+            self._write_json(self.ai_chat_sessions_index_path, {})
+        if not self.ai_chat_turns_index_path.exists():
+            self._write_json(self.ai_chat_turns_index_path, {})
 
     def _read_json(self, path: Path) -> dict:
         if not path.exists():
@@ -348,6 +410,34 @@ def create_ai_generation(record: AIGenerationRecord) -> AIGenerationRecord:
 
 def list_ai_generations(*, limit: int | None = None) -> list[AIGenerationRecord]:
     return _default_store.list_ai_generations(limit=limit)
+
+
+def create_ai_chat_session(session: AIChatSession) -> AIChatSession:
+    return _default_store.create_ai_chat_session(session)
+
+
+def get_ai_chat_session(session_id: str) -> AIChatSession | None:
+    return _default_store.get_ai_chat_session(session_id)
+
+
+def update_ai_chat_session(session: AIChatSession) -> AIChatSession | None:
+    return _default_store.update_ai_chat_session(session)
+
+
+def create_ai_chat_turn(turn: AIChatTurn) -> AIChatTurn:
+    return _default_store.create_ai_chat_turn(turn)
+
+
+def get_ai_chat_turn(session_id: str, turn_id: str) -> AIChatTurn | None:
+    return _default_store.get_ai_chat_turn(session_id, turn_id)
+
+
+def list_ai_chat_turns(session_id: str, *, limit: int | None = None) -> list[AIChatTurn]:
+    return _default_store.list_ai_chat_turns(session_id, limit=limit)
+
+
+def update_ai_chat_turn(turn: AIChatTurn) -> AIChatTurn | None:
+    return _default_store.update_ai_chat_turn(turn)
 
 
 def _runner_lock_ttl() -> timedelta:

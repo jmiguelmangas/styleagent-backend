@@ -103,6 +103,10 @@ Service URL:
 - `POST /runner/jobs/{job_id}/complete`
 - `POST /ai/generate-style-spec` (provider-based generation via `STYLEAGENT_AI_PROVIDER`; supports `mock` and local `ollama`)
 - `GET /ai/generations?limit=20` (lists persisted AI generation history records, newest first)
+- `POST /ai/chat/sessions` (creates conversational AI session with base StyleSpec state)
+- `GET /ai/chat/sessions/{session_id}` (returns session + turns)
+- `POST /ai/chat/sessions/{session_id}/turns` (creates turn with guard-railed proposed parameter changes)
+- `POST /ai/chat/sessions/{session_id}/turns/{turn_id}/apply` (applies proposed changes to session state)
 
 ## AI Provider: Ollama (Local)
 

@@ -5,10 +5,21 @@ import os
 import threading
 import time
 from collections import defaultdict, deque
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
 from app.api.deps import get_ai_generator, get_store
 from app.core.ai.base import AIStyleGenerator
+from app.core.models import (
+    AIChatSession,
+    AIChatSessionCreateRequest,
+    AIChatSessionDetail,
+    AIChatTurn,
+    AIChatTurnCreateRequest,
+    AIChatTurnResponse,
+    AIParameterChange,
+    StyleSpec,
+)
 from app.core.models.ai import AIGenerationRecord, GeneratedStyleSpecResponse, PromptGenerateRequest
 from app.storage.base import Store
 
@@ -42,6 +53,13 @@ class _SlidingWindowRateLimiter:
 
 
 _rate_limiter = _SlidingWindowRateLimiter()
+_PARAMETER_GUARDRAILS: dict[str, dict[str, float]] = {
+    "Exposure": {"min": -4.0, "max": 4.0, "max_delta": 0.6},
+    "Contrast": {"min": -100.0, "max": 100.0, "max_delta": 12.0},
+    "Saturation": {"min": -100.0, "max": 100.0, "max_delta": 12.0},
+    "Clarity": {"min": -100.0, "max": 100.0, "max_delta": 12.0},
+    "Brightness": {"min": -100.0, "max": 100.0, "max_delta": 15.0},
+}
 
 
 def _rate_limit_per_minute() -> int:
@@ -65,6 +83,104 @@ def _request_client_key(request: Request) -> str:
 
 def reset_ai_rate_limiter_for_tests() -> None:
     _rate_limiter.reset()
+
+
+def _clamp(value: float, min_value: float, max_value: float) -> float:
+    return max(min_value, min(max_value, value))
+
+
+def _blocked_by_safe_policy(spec: StyleSpec, key: str) -> bool:
+    safe = spec.safe
+    if safe.remove_exposure and key == "Exposure":
+        return True
+    if safe.remove_white_balance and key in {"WhiteBalance", "WhiteBalanceTemperature", "WhiteBalanceTint"}:
+        return True
+    if safe.remove_lens_light_falloff and key == "LensLightFallOff":
+        return True
+    return False
+
+
+def _derive_change_intents(message: str) -> dict[str, float]:
+    text = message.lower()
+    suggestions: dict[str, float] = {}
+
+    if any(token in text for token in ("bright", "brighter", "lighter", "exposure up", "more exposure")):
+        suggestions["Exposure"] = suggestions.get("Exposure", 0.0) + 0.2
+    if any(token in text for token in ("dark", "darker", "moody", "less exposure")):
+        suggestions["Exposure"] = suggestions.get("Exposure", 0.0) - 0.2
+    if any(token in text for token in ("more contrast", "high contrast", "punchy")):
+        suggestions["Contrast"] = suggestions.get("Contrast", 0.0) + 4.0
+    if any(token in text for token in ("less contrast", "soft", "flat")):
+        suggestions["Contrast"] = suggestions.get("Contrast", 0.0) - 4.0
+    if any(token in text for token in ("vibrant", "colorful", "more saturation", "richer color")):
+        suggestions["Saturation"] = suggestions.get("Saturation", 0.0) + 4.0
+    if any(token in text for token in ("muted", "desaturated", "less saturation")):
+        suggestions["Saturation"] = suggestions.get("Saturation", 0.0) - 4.0
+    if any(token in text for token in ("crisp", "clear", "clarity up")):
+        suggestions["Clarity"] = suggestions.get("Clarity", 0.0) + 3.0
+    if any(token in text for token in ("softer texture", "less clarity", "clarity down")):
+        suggestions["Clarity"] = suggestions.get("Clarity", 0.0) - 3.0
+    if "cinematic" in text:
+        suggestions["Contrast"] = suggestions.get("Contrast", 0.0) + 2.0
+        suggestions["Saturation"] = suggestions.get("Saturation", 0.0) - 2.0
+    if "warm" in text:
+        suggestions["Brightness"] = suggestions.get("Brightness", 0.0) + 2.0
+    if "cool" in text:
+        suggestions["Brightness"] = suggestions.get("Brightness", 0.0) - 2.0
+
+    if not suggestions:
+        suggestions["Contrast"] = 1.0
+
+    return suggestions
+
+
+def _guardrail_changes(spec: StyleSpec, suggestions: dict[str, float]) -> tuple[list[AIParameterChange], list[str]]:
+    changes: list[AIParameterChange] = []
+    warnings: list[str] = []
+    keys = spec.captureone.keys
+
+    for key, delta in suggestions.items():
+        guardrail = _PARAMETER_GUARDRAILS.get(key)
+        if guardrail is None:
+            warnings.append(f"Skipped unsupported key: {key}")
+            continue
+        if _blocked_by_safe_policy(spec, key):
+            warnings.append(f"Skipped {key} due to safe policy.")
+            continue
+
+        current_raw = keys.get(key, 0.0)
+        if not isinstance(current_raw, (int, float)):
+            warnings.append(f"Skipped {key}; current value is non-numeric.")
+            continue
+
+        adjusted_delta = float(delta)
+        max_delta = guardrail["max_delta"]
+        if abs(adjusted_delta) > max_delta:
+            adjusted_delta = max_delta if adjusted_delta > 0 else -max_delta
+            warnings.append(f"Capped {key} delta to {adjusted_delta}.")
+
+        target = float(current_raw) + adjusted_delta
+        clamped = _clamp(target, guardrail["min"], guardrail["max"])
+        if clamped != target:
+            warnings.append(f"Clamped {key} to allowed range [{guardrail['min']}, {guardrail['max']}].")
+
+        changes.append(
+            AIParameterChange(
+                key=key,
+                from_value=float(current_raw),
+                to_value=clamped,
+                reason="Conversation-guided adjustment",
+            )
+        )
+
+    return changes, warnings
+
+
+def _apply_parameter_changes(spec: StyleSpec, changes: list[AIParameterChange]) -> StyleSpec:
+    updated = spec.model_copy(deep=True)
+    for change in changes:
+        updated.captureone.keys[change.key] = change.to_value
+    return updated
 
 
 @router.post(
@@ -148,3 +264,104 @@ def list_ai_generations(
     store: Store = Depends(get_store),
 ) -> list[AIGenerationRecord]:
     return store.list_ai_generations(limit=limit)
+
+
+@router.post(
+    "/chat/sessions",
+    response_model=AIChatSession,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create AI Chat Session",
+    description="Create a chat-guided AI session starting from a base style spec.",
+)
+def create_ai_chat_session(
+    payload: AIChatSessionCreateRequest = Body(..., description="AI chat session create payload."),
+    store: Store = Depends(get_store),
+) -> AIChatSession:
+    session = AIChatSession(title=payload.title, style_spec=payload.style_spec)
+    return store.create_ai_chat_session(session)
+
+
+@router.get(
+    "/chat/sessions/{session_id}",
+    response_model=AIChatSessionDetail,
+    summary="Get AI Chat Session",
+    description="Fetch a chat session with all turns in ascending chronological order.",
+)
+def get_ai_chat_session(
+    session_id: str,
+    store: Store = Depends(get_store),
+) -> AIChatSessionDetail:
+    session = store.get_ai_chat_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ai chat session not found")
+    turns = store.list_ai_chat_turns(session_id)
+    return AIChatSessionDetail(session=session, turns=turns)
+
+
+@router.post(
+    "/chat/sessions/{session_id}/turns",
+    response_model=AIChatTurnResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create AI Chat Turn",
+    description="Create a new conversation turn with guard-railed parameter proposals.",
+)
+def create_ai_chat_turn(
+    session_id: str,
+    payload: AIChatTurnCreateRequest = Body(..., description="AI chat turn payload."),
+    store: Store = Depends(get_store),
+) -> AIChatTurnResponse:
+    session = store.get_ai_chat_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ai chat session not found")
+
+    suggestions = _derive_change_intents(payload.message)
+    proposed_changes, warnings = _guardrail_changes(session.style_spec, suggestions)
+    assistant_message = (
+        "I analyzed your request and prepared guard-railed parameter updates. "
+        "Review or apply the proposed changes."
+    )
+    turn = AIChatTurn(
+        session_id=session.session_id,
+        user_message=payload.message,
+        assistant_message=assistant_message,
+        proposed_changes=proposed_changes,
+        warnings=warnings,
+        applied=False,
+    )
+
+    if payload.auto_apply:
+        session.style_spec = _apply_parameter_changes(session.style_spec, proposed_changes)
+        session.updated_at = datetime.now(timezone.utc)
+        turn.applied = True
+        store.update_ai_chat_session(session)
+
+    store.create_ai_chat_turn(turn)
+    return AIChatTurnResponse(session=session, turn=turn)
+
+
+@router.post(
+    "/chat/sessions/{session_id}/turns/{turn_id}/apply",
+    response_model=AIChatTurnResponse,
+    summary="Apply AI Chat Turn",
+    description="Apply a previously proposed turn to the session style spec (idempotent).",
+)
+def apply_ai_chat_turn(
+    session_id: str,
+    turn_id: str,
+    store: Store = Depends(get_store),
+) -> AIChatTurnResponse:
+    session = store.get_ai_chat_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ai chat session not found")
+    turn = store.get_ai_chat_turn(session_id, turn_id)
+    if turn is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ai chat turn not found")
+
+    if not turn.applied:
+        session.style_spec = _apply_parameter_changes(session.style_spec, turn.proposed_changes)
+        session.updated_at = datetime.now(timezone.utc)
+        turn.applied = True
+        store.update_ai_chat_session(session)
+        store.update_ai_chat_turn(turn)
+
+    return AIChatTurnResponse(session=session, turn=turn)

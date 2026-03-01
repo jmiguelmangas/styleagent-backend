@@ -1,4 +1,13 @@
 from app.core.models.ai import AIGenerationRecord, GeneratedStyleSpecResponse, PromptGenerateRequest
+from app.core.models.ai_chat import (
+    AIChatSession,
+    AIChatSessionCreateRequest,
+    AIChatSessionDetail,
+    AIChatTurn,
+    AIChatTurnCreateRequest,
+    AIChatTurnResponse,
+    AIParameterChange,
+)
 from app.core.models.runner_jobs import (
     RunnerCompilePayload,
     RunnerJob,
@@ -20,6 +29,13 @@ from app.core.models.style_spec import CaptureOneSpec, StyleSpec
 __all__ = [
     "Artifact",
     "AIGenerationRecord",
+    "AIChatSession",
+    "AIChatSessionCreateRequest",
+    "AIChatSessionDetail",
+    "AIChatTurn",
+    "AIChatTurnCreateRequest",
+    "AIChatTurnResponse",
+    "AIParameterChange",
     "CompileResponse",
     "GeneratedStyleSpecResponse",
     "CaptureOneSpec",

@@ -9,7 +9,7 @@ from typing import Any, Literal
 from pymongo import ASCENDING, DESCENDING, MongoClient, ReturnDocument
 from pymongo.collection import Collection
 
-from app.core.models import AIGenerationRecord, Artifact, RunnerJob, Style, StyleVersion
+from app.core.models import AIGenerationRecord, AIChatSession, AIChatTurn, Artifact, RunnerJob, Style, StyleVersion
 from app.storage.fs_store import FSStore
 
 
@@ -22,6 +22,7 @@ class MongoStore(FSStore):
     - artifacts metadata
     - runner jobs
     - ai generation history
+    - ai chat sessions and turns
 
     Filesystem stores:
     - artifact bytes (.costyle)
@@ -44,6 +45,8 @@ class MongoStore(FSStore):
         self._artifacts: Collection = self._db["artifacts"]
         self._runner_jobs: Collection = self._db["runner_jobs"]
         self._ai_generations: Collection = self._db["ai_generations"]
+        self._ai_chat_sessions: Collection = self._db["ai_chat_sessions"]
+        self._ai_chat_turns: Collection = self._db["ai_chat_turns"]
         self._indexes_ready = False
 
     def create_style(self, style: Style) -> Style:
@@ -243,6 +246,51 @@ class MongoStore(FSStore):
             cursor = cursor.limit(limit)
         return [AIGenerationRecord.model_validate(_without_id(doc)) for doc in cursor]
 
+    def create_ai_chat_session(self, session: AIChatSession) -> AIChatSession:
+        self._ensure_indexes()
+        self._ai_chat_sessions.insert_one(session.model_dump(mode="python"))
+        return session
+
+    def get_ai_chat_session(self, session_id: str) -> AIChatSession | None:
+        self._ensure_indexes()
+        doc = self._ai_chat_sessions.find_one({"session_id": session_id})
+        return None if doc is None else AIChatSession.model_validate(_without_id(doc))
+
+    def update_ai_chat_session(self, session: AIChatSession) -> AIChatSession | None:
+        self._ensure_indexes()
+        doc = self._ai_chat_sessions.find_one_and_update(
+            {"session_id": session.session_id},
+            {"$set": session.model_dump(mode="python")},
+            return_document=ReturnDocument.AFTER,
+        )
+        return None if doc is None else AIChatSession.model_validate(_without_id(doc))
+
+    def create_ai_chat_turn(self, turn: AIChatTurn) -> AIChatTurn:
+        self._ensure_indexes()
+        self._ai_chat_turns.insert_one(turn.model_dump(mode="python"))
+        return turn
+
+    def get_ai_chat_turn(self, session_id: str, turn_id: str) -> AIChatTurn | None:
+        self._ensure_indexes()
+        doc = self._ai_chat_turns.find_one({"session_id": session_id, "turn_id": turn_id})
+        return None if doc is None else AIChatTurn.model_validate(_without_id(doc))
+
+    def list_ai_chat_turns(self, session_id: str, *, limit: int | None = None) -> list[AIChatTurn]:
+        self._ensure_indexes()
+        cursor = self._ai_chat_turns.find({"session_id": session_id}).sort("created_at", ASCENDING)
+        if limit is not None:
+            cursor = cursor.limit(limit)
+        return [AIChatTurn.model_validate(_without_id(doc)) for doc in cursor]
+
+    def update_ai_chat_turn(self, turn: AIChatTurn) -> AIChatTurn | None:
+        self._ensure_indexes()
+        doc = self._ai_chat_turns.find_one_and_update(
+            {"session_id": turn.session_id, "turn_id": turn.turn_id},
+            {"$set": turn.model_dump(mode="python")},
+            return_document=ReturnDocument.AFTER,
+        )
+        return None if doc is None else AIChatTurn.model_validate(_without_id(doc))
+
     def _ensure_indexes(self) -> None:
         if self._indexes_ready:
             return
@@ -257,6 +305,10 @@ class MongoStore(FSStore):
         self._runner_jobs.create_index("job_id", unique=True)
         self._ai_generations.create_index("generation_id", unique=True)
         self._ai_generations.create_index([("created_at", DESCENDING)])
+        self._ai_chat_sessions.create_index("session_id", unique=True)
+        self._ai_chat_sessions.create_index([("updated_at", DESCENDING)])
+        self._ai_chat_turns.create_index("turn_id", unique=True)
+        self._ai_chat_turns.create_index([("session_id", ASCENDING), ("created_at", ASCENDING)])
         self._indexes_ready = True
 
 
