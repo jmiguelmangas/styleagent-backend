@@ -16,6 +16,20 @@ class AIParameterChange(BaseModel):
     reason: str | None = Field(default=None, description="Optional short rationale for this specific change.")
 
 
+class AIConversationGuidance(BaseModel):
+    detected_goals: list[str] = Field(
+        default_factory=list,
+        description="Goals inferred from the user message (for example: brighter, more contrast).",
+    )
+    reasoning_summary: str = Field(
+        description="Short assistant rationale that explains how proposals were chosen under guard rails."
+    )
+    suggested_next_messages: list[str] = Field(
+        default_factory=list,
+        description="Suggested follow-up prompts to continue iterating the style.",
+    )
+
+
 class AIChatSession(BaseModel):
     session_id: str = Field(default_factory=generate_id, description="Unique AI chat session identifier.")
     title: str | None = Field(default=None, description="Optional user-facing session title.")
@@ -41,6 +55,7 @@ class AIChatTurn(BaseModel):
         description="Guard-railed parameter changes proposed for this turn.",
     )
     warnings: list[str] = Field(default_factory=list, description="Guard-rail warnings for skipped/adjusted changes.")
+    guidance: AIConversationGuidance = Field(description="Guided conversation metadata for the UI.")
     applied: bool = Field(default=False, description="Whether this turn was applied to session style spec.")
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
