@@ -134,3 +134,24 @@ def test_generate_style_spec_warns_when_history_persistence_fails(client: TestCl
     assert response.status_code == 200
     payload = response.json()
     assert "Generation saved failed; result returned without history persistence." in payload["warnings"]
+
+
+def test_list_ai_generations_returns_newest_first(client: TestClient) -> None:
+    first = client.post(
+        "/ai/generate-style-spec",
+        json={"prompt": "first prompt", "intent": ["warm"]},
+    )
+    second = client.post(
+        "/ai/generate-style-spec",
+        json={"prompt": "second prompt", "intent": ["cool"]},
+    )
+    assert first.status_code == 200
+    assert second.status_code == 200
+
+    response = client.get("/ai/generations?limit=1")
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload) == 1
+    assert payload[0]["prompt"] == "second prompt"
+    assert payload[0]["target"] == "captureone"
+    assert payload[0]["provider"] == "mock"
