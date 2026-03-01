@@ -135,6 +135,52 @@ def _derive_change_intents(message: str) -> dict[str, float]:
     return suggestions
 
 
+def _derive_change_intents_from_ai(
+    message: str,
+    spec: StyleSpec,
+    goals: list[str],
+    generator: AIStyleGenerator,
+) -> tuple[dict[str, float], list[str], str, str]:
+    constraints = {
+        "mode": "chat_turn_delta",
+        "allowed_keys": sorted(_PARAMETER_GUARDRAILS.keys()),
+        "current_keys": {
+            key: float(value)
+            for key, value in spec.captureone.keys.items()
+            if key in _PARAMETER_GUARDRAILS and isinstance(value, (int, float))
+        },
+    }
+    payload = PromptGenerateRequest(
+        prompt=message,
+        intent=goals or None,
+        constraints=constraints,
+        target="captureone",
+    )
+    response = generator.generate_style_spec(payload)
+
+    suggestions: dict[str, float] = {}
+    warnings = list(response.warnings)
+    for key, value in response.style_spec.captureone.keys.items():
+        if key not in _PARAMETER_GUARDRAILS:
+            continue
+        if not isinstance(value, (int, float)):
+            warnings.append(f"Skipped non-numeric AI value for {key}.")
+            continue
+        current_raw = spec.captureone.keys.get(key, 0.0)
+        if not isinstance(current_raw, (int, float)):
+            warnings.append(f"Skipped {key}; current value is non-numeric.")
+            continue
+        delta = float(value) - float(current_raw)
+        if delta != 0.0:
+            suggestions[key] = delta
+
+    if not suggestions:
+        warnings.append("AI chat produced no supported deltas; heuristic fallback used.")
+        return _derive_change_intents(message), warnings, response.provider, response.model
+
+    return suggestions, warnings, response.provider, response.model
+
+
 def _detect_conversation_goals(message: str) -> list[str]:
     text = message.lower()
     goals: list[str] = []
@@ -347,18 +393,25 @@ def get_ai_chat_session(
 def create_ai_chat_turn(
     session_id: str,
     payload: AIChatTurnCreateRequest = Body(..., description="AI chat turn payload."),
+    generator: AIStyleGenerator = Depends(get_ai_generator),
     store: Store = Depends(get_store),
 ) -> AIChatTurnResponse:
     session = store.get_ai_chat_session(session_id)
     if session is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ai chat session not found")
 
-    suggestions = _derive_change_intents(payload.message)
-    proposed_changes, warnings = _guardrail_changes(session.style_spec, suggestions)
     goals = _detect_conversation_goals(payload.message)
+    suggestions, ai_warnings, provider, model = _derive_change_intents_from_ai(
+        payload.message,
+        session.style_spec,
+        goals,
+        generator,
+    )
+    proposed_changes, warnings = _guardrail_changes(session.style_spec, suggestions)
+    warnings = [*ai_warnings, *warnings]
     guidance = _guidance_for_turn(goals, warnings, proposed_changes)
     assistant_message = (
-        "I analyzed your request and prepared guard-railed parameter updates. "
+        f"I analyzed your request with {provider}/{model} and prepared guard-railed parameter updates. "
         "Review or apply the proposed changes."
     )
     turn = AIChatTurn(
