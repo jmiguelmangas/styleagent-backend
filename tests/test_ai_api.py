@@ -2,9 +2,11 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from app.api.deps import get_store
+from app.api.deps import get_ai_generator, get_store
 from app.api.routers.ai import reset_ai_rate_limiter_for_tests
 from app.core.ai.factory import get_ai_generator_instance
+from app.core.models import GeneratedStyleSpecResponse, StyleSpec
+from app.core.models.ai import PromptGenerateRequest
 from app.main import app
 from app.storage.fs_store import FSStore
 
@@ -17,10 +19,12 @@ def store(tmp_path) -> FSStore:
 @pytest.fixture
 def client(store: FSStore) -> TestClient:
     app.dependency_overrides[get_store] = lambda: store
+    get_ai_generator_instance.cache_clear()
     reset_ai_rate_limiter_for_tests()
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+    get_ai_generator_instance.cache_clear()
     reset_ai_rate_limiter_for_tests()
 
 
@@ -227,3 +231,104 @@ def test_ai_chat_guardrail_blocks_exposure_when_safe_policy_disables_it(client: 
     assert "Exposure" not in keys
     assert any("safe policy" in warning.lower() for warning in payload["turn"]["warnings"])
     assert "increase_brightness" in payload["turn"]["guidance"]["detected_goals"]
+
+
+def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient) -> None:
+    class _FakeChatGenerator:
+        def __init__(self) -> None:
+            self.provider = "fake"
+            self.model = "fake-v1"
+
+        def generate_style_spec(self, payload: PromptGenerateRequest) -> GeneratedStyleSpecResponse:
+            assert payload.constraints is not None
+            assert payload.constraints["mode"] == "chat_turn_delta"
+            generated = StyleSpec(
+                name="AI Chat",
+                intent=payload.intent or [],
+                captureone={"keys": {"Exposure": 0.4, "Contrast": 7}},
+            )
+            return GeneratedStyleSpecResponse(
+                style_spec=generated,
+                rationale="fake",
+                warnings=[],
+                provider=self.provider,
+                model=self.model,
+            )
+
+    app.dependency_overrides[get_ai_generator] = lambda: _FakeChatGenerator()
+
+    create_response = client.post(
+        "/ai/chat/sessions",
+        json={
+            "style_spec": {
+                "name": "Base",
+                "intent": ["portrait"],
+                "captureone": {"keys": {"Exposure": 0.0, "Contrast": 2}},
+            },
+        },
+    )
+    assert create_response.status_code == 201
+    session_id = create_response.json()["session_id"]
+
+    turn_response = client.post(
+        f"/ai/chat/sessions/{session_id}/turns",
+        json={"message": "make it brighter and punchy"},
+    )
+    assert turn_response.status_code == 201
+    payload = turn_response.json()
+    assert payload["turn"]["assistant_message"].startswith("I analyzed your request with fake/fake-v1")
+
+    changes = {item["key"]: item for item in payload["turn"]["proposed_changes"]}
+    assert "Exposure" in changes
+    assert changes["Exposure"]["from_value"] == 0.0
+    assert changes["Exposure"]["to_value"] == 0.4
+    assert "Contrast" in changes
+    assert changes["Contrast"]["from_value"] == 2.0
+    assert changes["Contrast"]["to_value"] == 7.0
+
+
+def test_ai_chat_turn_falls_back_to_heuristic_when_model_has_no_supported_deltas(client: TestClient) -> None:
+    class _NoDeltaGenerator:
+        def __init__(self) -> None:
+            self.provider = "fake"
+            self.model = "fake-v1"
+
+        def generate_style_spec(self, _payload: PromptGenerateRequest) -> GeneratedStyleSpecResponse:
+            generated = StyleSpec(
+                name="AI Chat",
+                intent=[],
+                captureone={"keys": {"ToneCurve": "Film Standard"}},
+            )
+            return GeneratedStyleSpecResponse(
+                style_spec=generated,
+                rationale="fake",
+                warnings=[],
+                provider=self.provider,
+                model=self.model,
+            )
+
+    app.dependency_overrides[get_ai_generator] = lambda: _NoDeltaGenerator()
+
+    create_response = client.post(
+        "/ai/chat/sessions",
+        json={
+            "style_spec": {
+                "name": "Base",
+                "intent": [],
+                "captureone": {"keys": {"Exposure": 0.0, "Contrast": 0}},
+            },
+        },
+    )
+    assert create_response.status_code == 201
+    session_id = create_response.json()["session_id"]
+
+    turn_response = client.post(
+        f"/ai/chat/sessions/{session_id}/turns",
+        json={"message": "make it brighter"},
+    )
+    assert turn_response.status_code == 201
+    payload = turn_response.json()
+
+    keys = [change["key"] for change in payload["turn"]["proposed_changes"]]
+    assert "Exposure" in keys
+    assert any("heuristic fallback" in warning.lower() for warning in payload["turn"]["warnings"])
