@@ -19,11 +19,13 @@ class OllamaStyleGenerator:
         base_url: str = "http://localhost:11434",
         model: str = "llama3.1:8b",
         timeout_seconds: float = 20.0,
+        cold_start_timeout_seconds: float = 90.0,
     ) -> None:
         self.provider = "ollama"
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
+        self.cold_start_timeout_seconds = cold_start_timeout_seconds
         self._fallback = MockStyleGenerator(model=model)
 
     def generate_style_spec(self, payload: PromptGenerateRequest) -> GeneratedStyleSpecResponse:
@@ -46,16 +48,27 @@ class OllamaStyleGenerator:
 
     def _generate_raw(self, payload: PromptGenerateRequest) -> str:
         prompt = self._build_generation_prompt(payload)
-        response = httpx.post(
-            f"{self.base_url}/api/generate",
-            json={
-                "model": self.model,
-                "prompt": prompt,
-                "stream": False,
-                "format": "json",
-            },
-            timeout=self.timeout_seconds,
-        )
+        request_body = {
+            "model": self.model,
+            "prompt": prompt,
+            "stream": False,
+            "format": "json",
+            # Keep model resident for subsequent calls to reduce cold starts.
+            "keep_alive": "10m",
+        }
+        try:
+            response = httpx.post(
+                f"{self.base_url}/api/generate",
+                json=request_body,
+                timeout=self.timeout_seconds,
+            )
+        except (httpx.ReadTimeout, httpx.ConnectTimeout):
+            # Retry once with a longer timeout for first-load cold start.
+            response = httpx.post(
+                f"{self.base_url}/api/generate",
+                json=request_body,
+                timeout=self.cold_start_timeout_seconds,
+            )
         response.raise_for_status()
         data = response.json()
         raw = data.get("response")

@@ -26,6 +26,7 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
         assert url == "http://localhost:11434/api/generate"
         assert json["stream"] is False
         assert json["format"] == "json"
+        assert json["keep_alive"] == "10m"
         assert timeout == 20.0
         return _FakeResponse(
             {
@@ -47,6 +48,37 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
     assert response.model == "llama3.1:8b"
     assert response.warnings == []
     assert response.style_spec.captureone.keys["Contrast"] == 10
+
+
+def test_ollama_generator_retries_with_cold_start_timeout(monkeypatch) -> None:
+    calls: list[float] = []
+
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        calls.append(timeout)
+        if len(calls) == 1:
+            raise httpx.ReadTimeout("cold start timeout")
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"name":"AI Retry Success","intent":["cinematic"],'
+                    '"captureone":{"keys":{"Contrast":9},"notes":"Retry worked"}}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(
+        base_url="http://localhost:11434",
+        model="llama3.1:8b",
+        timeout_seconds=2.0,
+        cold_start_timeout_seconds=15.0,
+    )
+
+    response = generator.generate_style_spec(PromptGenerateRequest(prompt="cinematic style"))
+
+    assert calls == [2.0, 15.0]
+    assert response.warnings == []
+    assert response.style_spec.captureone.keys["Contrast"] == 9
 
 
 def test_ollama_generator_fallback_when_invalid_json(monkeypatch) -> None:

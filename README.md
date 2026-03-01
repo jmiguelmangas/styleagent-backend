@@ -36,9 +36,11 @@ Environment variables:
 - `MONGO_DB_NAME` (Mongo database name, default `styleagent`)
 - `STYLEAGENT_DATA_DIR` (filesystem base dir, default `data`)
 - `RUNNER_JOB_LOCK_TTL_SECONDS` (runner job lease duration, default `60`)
-- `STYLEAGENT_AI_PROVIDER` (AI provider selection: `mock` default, `ollama` scaffolded for next phase)
+- `STYLEAGENT_AI_PROVIDER` (AI provider selection: `mock` default, `ollama` local provider)
 - `STYLEAGENT_AI_MODEL` (model id used by selected provider; defaults: `mock-v1` for mock, `llama3.1:8b` for ollama)
 - `STYLEAGENT_AI_BASE_URL` (only for `ollama`, default `http://localhost:11434`)
+- `STYLEAGENT_AI_TIMEOUT_SECONDS` (ollama request timeout, default `20`)
+- `STYLEAGENT_AI_COLD_START_TIMEOUT_SECONDS` (retry timeout for first model load/cold start, default `90`)
 
 ## Lint
 
@@ -127,6 +129,8 @@ Run backend with Ollama provider:
 export STYLEAGENT_AI_PROVIDER=ollama
 export STYLEAGENT_AI_MODEL=llama3.1:8b
 export STYLEAGENT_AI_BASE_URL=http://localhost:11434
+export STYLEAGENT_AI_TIMEOUT_SECONDS=20
+export STYLEAGENT_AI_COLD_START_TIMEOUT_SECONDS=90
 uvicorn app.main:app --reload
 ```
 
