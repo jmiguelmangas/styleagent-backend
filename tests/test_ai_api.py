@@ -3,6 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.deps import get_store
+from app.api.routers.ai import reset_ai_rate_limiter_for_tests
 from app.core.ai.factory import get_ai_generator_instance
 from app.main import app
 from app.storage.fs_store import FSStore
@@ -12,9 +13,11 @@ from app.storage.fs_store import FSStore
 def client(tmp_path) -> TestClient:
     store = FSStore(base_dir=tmp_path / "data")
     app.dependency_overrides[get_store] = lambda: store
+    reset_ai_rate_limiter_for_tests()
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+    reset_ai_rate_limiter_for_tests()
 
 
 def test_generate_style_spec_returns_mock_payload(client: TestClient) -> None:
@@ -32,6 +35,8 @@ def test_generate_style_spec_returns_mock_payload(client: TestClient) -> None:
     assert payload["provider"] == "mock"
     assert payload["model"] == "mock-v1"
     assert payload["rationale"]
+    assert isinstance(payload["generation_ms"], int)
+    assert payload["fallback_used"] is False
 
     style_spec = payload["style_spec"]
     assert style_spec["name"].startswith("AI ")
@@ -93,3 +98,16 @@ def test_generate_style_spec_with_ollama_provider(client: TestClient, monkeypatc
     assert payload["provider"] == "ollama"
     assert payload["model"] == "llama3.1:8b"
     assert payload["warnings"] == []
+    assert payload["fallback_used"] is False
+
+
+def test_generate_style_spec_rate_limited(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setenv("STYLEAGENT_AI_RATE_LIMIT_PER_MINUTE", "1")
+
+    first = client.post("/ai/generate-style-spec", json={"prompt": "first request"})
+    second = client.post("/ai/generate-style-spec", json={"prompt": "second request"})
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+    payload = second.json()
+    assert payload["error_id"] == "rate_limited"
