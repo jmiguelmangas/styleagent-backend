@@ -92,3 +92,17 @@ class AIGenerationRecord(BaseModel):
         default=False,
         description="Whether provider generation fell back to mock behavior.",
     )
+
+
+class AIPromptPreviewResponse(BaseModel):
+    provider: str = Field(description="Provider identifier used for preview.")
+    model: str = Field(description="Model identifier used for preview.")
+    prompt: str = Field(description="Rendered provider prompt that would be sent to the model.")
+    examples_count: int = Field(
+        ge=0,
+        description="Number of in-context examples injected into the prompt.",
+    )
+    examples: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Selected in-context examples used to build the prompt.",
+    )

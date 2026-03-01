@@ -1,4 +1,9 @@
-from app.core.models.ai import AIGenerationRecord, GeneratedStyleSpecResponse, PromptGenerateRequest
+from app.core.models.ai import (
+    AIGenerationRecord,
+    AIPromptPreviewResponse,
+    GeneratedStyleSpecResponse,
+    PromptGenerateRequest,
+)
 from app.core.models.ai_chat import (
     AIConversationGuidance,
     AIChatSession,
@@ -30,6 +35,7 @@ from app.core.models.style_spec import CaptureOneSpec, StyleSpec
 __all__ = [
     "Artifact",
     "AIGenerationRecord",
+    "AIPromptPreviewResponse",
     "AIChatSession",
     "AIChatSessionCreateRequest",
     "AIChatSessionDetail",

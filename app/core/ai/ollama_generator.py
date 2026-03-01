@@ -7,7 +7,11 @@ from typing import Any
 import httpx
 
 from app.core.ai.mock_generator import MockStyleGenerator
-from app.core.models.ai import GeneratedStyleSpecResponse, PromptGenerateRequest
+from app.core.models.ai import (
+    AIPromptPreviewResponse,
+    GeneratedStyleSpecResponse,
+    PromptGenerateRequest,
+)
 from app.core.models.style_spec import StyleSpec
 
 _RICH_PRESET_DEFAULTS: dict[str, str | int | float] = {
@@ -63,8 +67,18 @@ class OllamaStyleGenerator:
             fallback.warnings.append(f"Ollama generation failed; fallback mock used: {exc}")
             return fallback
 
+    def preview_prompt(self, payload: PromptGenerateRequest) -> AIPromptPreviewResponse:
+        rendered_prompt, selected_examples = self._build_generation_prompt(payload)
+        return AIPromptPreviewResponse(
+            provider=self.provider,
+            model=self.model,
+            prompt=rendered_prompt,
+            examples_count=len(selected_examples),
+            examples=selected_examples,
+        )
+
     def _generate_raw(self, payload: PromptGenerateRequest) -> str:
-        prompt = self._build_generation_prompt(payload)
+        prompt, _ = self._build_generation_prompt(payload)
         request_body = {
             "model": self.model,
             "prompt": prompt,
@@ -141,7 +155,7 @@ class OllamaStyleGenerator:
         updated.captureone.keys = keys
         return updated
 
-    def _build_generation_prompt(self, payload: PromptGenerateRequest) -> str:
+    def _build_generation_prompt(self, payload: PromptGenerateRequest) -> tuple[str, list[dict[str, Any]]]:
         intent = payload.intent or []
         constraints = payload.constraints or {}
         payload_json = json.dumps(
@@ -153,8 +167,9 @@ class OllamaStyleGenerator:
             },
             ensure_ascii=True,
         )
-        examples_json = json.dumps(self._select_prompt_examples(payload), ensure_ascii=True)
-        return (
+        selected_examples = self._select_prompt_examples(payload)
+        examples_json = json.dumps(selected_examples, ensure_ascii=True)
+        prompt = (
             "You generate Capture One style specs.\n"
             "Return only valid JSON, no markdown.\n"
             "Do not include any explanation text outside JSON.\n"
@@ -182,6 +197,7 @@ class OllamaStyleGenerator:
             f"{examples_json}\n"
             f"Input payload: {payload_json}"
         )
+        return prompt, selected_examples
 
     def _select_prompt_examples(self, payload: PromptGenerateRequest) -> list[dict[str, Any]]:
         all_examples = _load_prompt_examples()

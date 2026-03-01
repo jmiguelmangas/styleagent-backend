@@ -128,6 +128,43 @@ def test_generate_style_spec_rate_limited(client: TestClient, monkeypatch) -> No
     assert payload["error_id"] == "rate_limited"
 
 
+def test_preview_prompt_with_mock_provider(client: TestClient) -> None:
+    response = client.post(
+        "/ai/debug/prompt-preview",
+        json={"prompt": "warm cinematic portrait"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["provider"] == "mock"
+    assert payload["model"] == "mock-v1"
+    assert payload["examples_count"] == 0
+    assert payload["examples"] == []
+    assert "Mock provider does not call an external model" in payload["prompt"]
+
+
+def test_preview_prompt_with_ollama_provider_includes_examples(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setenv("STYLEAGENT_AI_PROVIDER", "ollama")
+    monkeypatch.setenv("STYLEAGENT_AI_MODEL", "llama3.1:8b")
+    monkeypatch.setenv("STYLEAGENT_AI_MAX_PROMPT_EXAMPLES", "2")
+    get_ai_generator_instance.cache_clear()
+
+    response = client.post(
+        "/ai/debug/prompt-preview",
+        json={"prompt": "moody landscape in winter", "intent": ["landscape", "moody"]},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["provider"] == "ollama"
+    assert payload["examples_count"] <= 2
+    assert payload["examples_count"] >= 1
+    assert "Reference examples (real styles, use as aesthetic guidance):" in payload["prompt"]
+    assert len(payload["examples"]) == payload["examples_count"]
+
+    get_ai_generator_instance.cache_clear()
+
+
 def test_generate_style_spec_warns_when_history_persistence_fails(client: TestClient, store: FSStore) -> None:
     def _boom(*_args, **_kwargs):  # noqa: ANN002, ANN003
         raise RuntimeError("storage failure")

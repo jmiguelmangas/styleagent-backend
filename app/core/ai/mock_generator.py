@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from app.core.models.ai import GeneratedStyleSpecResponse, PromptGenerateRequest
+from app.core.models.ai import (
+    AIPromptPreviewResponse,
+    GeneratedStyleSpecResponse,
+    PromptGenerateRequest,
+)
 from app.core.models.style_spec import StyleSpec
 
 
@@ -29,6 +33,19 @@ class MockStyleGenerator:
             warnings=[],
             provider=self.provider,
             model=self.model,
+        )
+
+    def preview_prompt(self, payload: PromptGenerateRequest) -> AIPromptPreviewResponse:
+        rendered = (
+            "Mock provider does not call an external model. "
+            f"Prompt received: {payload.prompt!r}. Intents: {payload.intent or []}."
+        )
+        return AIPromptPreviewResponse(
+            provider=self.provider,
+            model=self.model,
+            prompt=rendered,
+            examples_count=0,
+            examples=[],
         )
 
 

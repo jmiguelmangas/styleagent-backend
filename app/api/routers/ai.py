@@ -18,6 +18,7 @@ from app.core.models import (
     AIChatTurnCreateRequest,
     AIChatTurnResponse,
     AIConversationGuidance,
+    AIPromptPreviewResponse,
     AIParameterChange,
     StyleSpec,
 )
@@ -371,6 +372,23 @@ def list_ai_generations(
     store: Store = Depends(get_store),
 ) -> list[AIGenerationRecord]:
     return store.list_ai_generations(limit=limit)
+
+
+@router.post(
+    "/debug/prompt-preview",
+    response_model=AIPromptPreviewResponse,
+    summary="Preview AI Provider Prompt",
+    description=(
+        "Render the provider-specific prompt that would be sent for a generation request, "
+        "including selected in-context examples."
+    ),
+    response_description="Prompt preview and selected example metadata.",
+)
+def preview_ai_prompt(
+    payload: PromptGenerateRequest = Body(..., description="Prompt payload to preview."),
+    generator: AIStyleGenerator = Depends(get_ai_generator),
+) -> AIPromptPreviewResponse:
+    return generator.preview_prompt(payload)
 
 
 @router.post(
