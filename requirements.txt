@@ -3,6 +3,6 @@ uvicorn[standard]==0.40.0
 pydantic==2.12.5
 pytest==9.0.2
 pytest-cov==7.0.0
-ruff==0.15.1
+ruff==0.15.6
 httpx==0.28.1
 pymongo==4.16.0
