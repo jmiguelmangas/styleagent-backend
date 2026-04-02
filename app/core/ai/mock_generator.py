@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.models.ai import (
+    AIHealthResponse,
     AIPromptPreviewResponse,
     GeneratedStyleSpecResponse,
     PromptGenerateRequest,
@@ -46,6 +47,15 @@ class MockStyleGenerator:
             prompt=rendered,
             examples_count=0,
             examples=[],
+        )
+
+    def health_check(self) -> AIHealthResponse:
+        return AIHealthResponse(
+            status="available",
+            available=True,
+            provider=self.provider,
+            model=self.model,
+            message="Mock provider is available locally.",
         )
 
 

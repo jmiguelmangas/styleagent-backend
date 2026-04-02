@@ -1,4 +1,5 @@
 from app.core.models.ai import (
+    AIHealthResponse,
     AIGenerationRecord,
     AIPromptPreviewResponse,
     GeneratedStyleSpecResponse,
@@ -34,6 +35,7 @@ from app.core.models.style_spec import CaptureOneSpec, StyleSpec
 
 __all__ = [
     "Artifact",
+    "AIHealthResponse",
     "AIGenerationRecord",
     "AIPromptPreviewResponse",
     "AIChatSession",

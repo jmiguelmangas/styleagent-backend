@@ -143,6 +143,104 @@ def test_preview_prompt_with_mock_provider(client: TestClient) -> None:
     assert "Mock provider does not call an external model" in payload["prompt"]
 
 
+def test_ai_health_with_mock_provider(client: TestClient) -> None:
+    response = client.get("/ai/health")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload == {
+        "status": "available",
+        "available": True,
+        "provider": "mock",
+        "model": "mock-v1",
+        "message": "Mock provider is available locally.",
+    }
+
+
+def test_ai_health_with_ollama_provider_when_model_is_available(client: TestClient, monkeypatch) -> None:
+    class _FakeResponse:
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            return {
+                "models": [
+                    {"name": "llama3.1:8b"},
+                    {"name": "qwen2.5:7b"},
+                ]
+            }
+
+    def _fake_get(url: str, timeout: float):  # noqa: ANN001
+        assert url.endswith("/api/tags")
+        assert timeout <= 10.0
+        return _FakeResponse()
+
+    monkeypatch.setenv("STYLEAGENT_AI_PROVIDER", "ollama")
+    monkeypatch.setenv("STYLEAGENT_AI_MODEL", "llama3.1:8b")
+    monkeypatch.setenv("STYLEAGENT_AI_BASE_URL", "http://localhost:11434")
+    monkeypatch.setattr(httpx, "get", _fake_get)
+    get_ai_generator_instance.cache_clear()
+
+    response = client.get("/ai/health")
+    get_ai_generator_instance.cache_clear()
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "available"
+    assert payload["available"] is True
+    assert payload["provider"] == "ollama"
+    assert payload["model"] == "llama3.1:8b"
+    assert "is installed" in payload["message"]
+
+
+def test_ai_health_with_ollama_provider_when_model_is_missing(client: TestClient, monkeypatch) -> None:
+    class _FakeResponse:
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            return {"models": [{"name": "qwen2.5:7b"}]}
+
+    monkeypatch.setenv("STYLEAGENT_AI_PROVIDER", "ollama")
+    monkeypatch.setenv("STYLEAGENT_AI_MODEL", "llama3.1:8b")
+    monkeypatch.setattr(httpx, "get", lambda *_args, **_kwargs: _FakeResponse())
+    get_ai_generator_instance.cache_clear()
+
+    response = client.get("/ai/health")
+    get_ai_generator_instance.cache_clear()
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "degraded"
+    assert payload["available"] is False
+    assert payload["provider"] == "ollama"
+    assert payload["model"] == "llama3.1:8b"
+    assert "not installed" in payload["message"]
+
+
+def test_ai_health_with_unreachable_ollama_provider(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setenv("STYLEAGENT_AI_PROVIDER", "ollama")
+    monkeypatch.setenv("STYLEAGENT_AI_MODEL", "llama3.1:8b")
+    monkeypatch.setenv("STYLEAGENT_AI_BASE_URL", "http://localhost:11434")
+
+    def _boom(*_args, **_kwargs):  # noqa: ANN002, ANN003
+        raise httpx.ConnectError("connection refused")
+
+    monkeypatch.setattr(httpx, "get", _boom)
+    get_ai_generator_instance.cache_clear()
+
+    response = client.get("/ai/health")
+    get_ai_generator_instance.cache_clear()
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "unavailable"
+    assert payload["available"] is False
+    assert payload["provider"] == "ollama"
+    assert payload["model"] == "llama3.1:8b"
+    assert "unreachable" in payload["message"]
+
+
 def test_preview_prompt_with_ollama_provider_includes_examples(client: TestClient, monkeypatch) -> None:
     monkeypatch.setenv("STYLEAGENT_AI_PROVIDER", "ollama")
     monkeypatch.setenv("STYLEAGENT_AI_MODEL", "llama3.1:8b")

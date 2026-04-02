@@ -8,6 +8,7 @@ import httpx
 
 from app.core.ai.mock_generator import MockStyleGenerator
 from app.core.models.ai import (
+    AIHealthResponse,
     AIPromptPreviewResponse,
     GeneratedStyleSpecResponse,
     PromptGenerateRequest,
@@ -75,6 +76,48 @@ class OllamaStyleGenerator:
             prompt=rendered_prompt,
             examples_count=len(selected_examples),
             examples=selected_examples,
+        )
+
+    def health_check(self) -> AIHealthResponse:
+        try:
+            response = httpx.get(
+                f"{self.base_url}/api/tags",
+                timeout=min(self.timeout_seconds, 10.0),
+            )
+            response.raise_for_status()
+            payload = response.json()
+        except Exception as exc:  # noqa: BLE001
+            return AIHealthResponse(
+                status="unavailable",
+                available=False,
+                provider=self.provider,
+                model=self.model,
+                message=f"Ollama is unreachable at {self.base_url}: {exc}",
+            )
+
+        models = payload.get("models", [])
+        available_models = {
+            str(model.get("name", "")).strip()
+            for model in models
+            if isinstance(model, dict) and str(model.get("name", "")).strip()
+        }
+        if self.model in available_models:
+            return AIHealthResponse(
+                status="available",
+                available=True,
+                provider=self.provider,
+                model=self.model,
+                message=f"Ollama is reachable and model {self.model} is installed.",
+            )
+
+        return AIHealthResponse(
+            status="degraded",
+            available=False,
+            provider=self.provider,
+            model=self.model,
+            message=(
+                f"Ollama is reachable at {self.base_url}, but model {self.model} is not installed."
+            ),
         )
 
     def _generate_raw(self, payload: PromptGenerateRequest) -> str:

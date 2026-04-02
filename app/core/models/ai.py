@@ -106,3 +106,18 @@ class AIPromptPreviewResponse(BaseModel):
         default_factory=list,
         description="Selected in-context examples used to build the prompt.",
     )
+
+
+class AIHealthResponse(BaseModel):
+    status: Literal["available", "degraded", "unavailable"] = Field(
+        description="Operational status of the configured AI provider.",
+    )
+    available: bool = Field(
+        description="Whether the configured AI provider is currently usable for generation.",
+    )
+    provider: str = Field(description="Configured AI provider identifier.")
+    model: str = Field(description="Configured AI model identifier.")
+    message: str | None = Field(
+        default=None,
+        description="Optional human-readable health summary.",
+    )

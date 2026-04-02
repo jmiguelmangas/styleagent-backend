@@ -11,6 +11,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, sta
 from app.api.deps import get_ai_generator, get_store
 from app.core.ai.base import AIStyleGenerator
 from app.core.models import (
+    AIHealthResponse,
     AIChatSession,
     AIChatSessionCreateRequest,
     AIChatSessionDetail,
@@ -353,6 +354,22 @@ def generate_style_spec(
         response.warnings.append("Generation saved failed; result returned without history persistence.")
 
     return response
+
+
+@router.get(
+    "/health",
+    response_model=AIHealthResponse,
+    summary="AI Provider Health",
+    description=(
+        "Check the currently configured AI provider, whether it is reachable, "
+        "and which effective model is configured for generation."
+    ),
+    response_description="AI provider availability and effective model metadata.",
+)
+def get_ai_health(
+    generator: AIStyleGenerator = Depends(get_ai_generator),
+) -> AIHealthResponse:
+    return generator.health_check()
 
 
 @router.get(
