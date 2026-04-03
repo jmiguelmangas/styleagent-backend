@@ -1078,10 +1078,16 @@ def apply_creative_direction(
     prompt: str,
     constraints: dict | None = None,
 ) -> dict[str, str | int | float]:
-    normalized = prompt.lower()
     intensity = infer_intensity(prompt, constraints)
-    matched_profiles = _matched_profiles(normalized)
+    matched_profiles = _matched_profiles(prompt.lower())
     plan = build_generation_plan(prompt, intensity, matched_profiles)
+    return apply_generation_plan(keys, plan)
+
+
+def apply_generation_plan(
+    keys: dict[str, str | int | float],
+    plan: GenerationPlan,
+) -> dict[str, str | int | float]:
     effective_base_keys = _resolve_base_keys_for_plan(keys, plan)
     return execute_generation_plan(
         base_keys=effective_base_keys,
@@ -1127,6 +1133,44 @@ def infer_intensity(prompt: str, constraints: dict | None = None) -> Intensity:
     if any(marker in normalized_prompt for marker in bold_markers):
         return "bold"
     return "balanced"
+
+
+def build_generation_plan_from_selection(
+    prompt: str,
+    intensity: Intensity,
+    family_id: str | None = None,
+    refinement_ids: list[str] | tuple[str, ...] | None = None,
+) -> GenerationPlan:
+    baselines = _baseline_registry()
+    refinements = _refinement_registry()
+    normalized_family_id = family_id if family_id in baselines else None
+
+    deduped_refinements: list[str] = []
+    for refinement_id in refinement_ids or ():
+        if refinement_id in refinements and refinement_id not in deduped_refinements:
+            deduped_refinements.append(refinement_id)
+
+    matched_profile_names: list[str] = []
+    if normalized_family_id:
+        matched_profile_names.append(normalized_family_id)
+    matched_profile_names.extend(deduped_refinements)
+
+    return GenerationPlan(
+        prompt=prompt,
+        intensity=intensity,
+        family_id=normalized_family_id,
+        fallback_mode="family_baseline" if normalized_family_id else "generic",
+        refinement_ids=tuple(deduped_refinements),
+        matched_profile_names=tuple(matched_profile_names),
+    )
+
+
+def known_family_ids() -> tuple[str, ...]:
+    return tuple(profile.name for profile in _MAIN_PROFILES)
+
+
+def known_refinement_ids() -> tuple[str, ...]:
+    return tuple(variant.name for profile in _MAIN_PROFILES for variant in profile.variants)
 
 
 def build_generation_plan(

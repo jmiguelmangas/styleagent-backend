@@ -27,13 +27,14 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
         assert json["stream"] is False
         assert json["format"] == "json"
         assert json["keep_alive"] == "10m"
+        assert "Allowed families" in json["prompt"]
         assert "Reference examples" in json["prompt"]
         assert timeout == 20.0
         return _FakeResponse(
             {
                 "response": (
-                    '{"name":"AI Cinematic Warm","intent":["cinematic","warm"],'
-                    '"captureone":{"keys":{"Contrast":10,"Exposure":0.2},"notes":"Generated"}}'
+                    '{"family":"cinematic_portrait","refinements":["warm_skin","soft_rolloff"],'
+                    '"intensity":"balanced","name":"AI Cinematic Warm","notes":"Generated"}'
                 )
             }
         )
@@ -48,6 +49,7 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
     assert response.provider == "ollama"
     assert response.model == "llama3.1:8b"
     assert response.warnings == []
+    assert response.style_spec.name == "AI Cinematic Warm"
     assert response.style_spec.captureone.keys["Contrast"] >= 10
     assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5400
     assert "Highlights" in response.style_spec.captureone.keys
@@ -64,8 +66,8 @@ def test_ollama_generator_retries_with_cold_start_timeout(monkeypatch) -> None:
         return _FakeResponse(
             {
                 "response": (
-                    '{"name":"AI Retry Success","intent":["cinematic"],'
-                    '"captureone":{"keys":{"Contrast":9},"notes":"Retry worked"}}'
+                    '{"family":"cinematic_portrait","refinements":["cool_teal"],'
+                    '"intensity":"balanced","name":"AI Retry Success","notes":"Retry worked"}'
                 )
             }
         )
@@ -117,6 +119,7 @@ def test_ollama_generator_fallback_when_http_error(monkeypatch) -> None:
 
 def test_ollama_generator_keeps_chat_delta_payload_sparse(monkeypatch) -> None:
     def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        assert "Do not output Capture One key values directly." not in json["prompt"]
         return _FakeResponse(
             {
                 "response": (
@@ -151,8 +154,8 @@ def test_ollama_generator_respects_max_prompt_examples(monkeypatch) -> None:
         return _FakeResponse(
             {
                 "response": (
-                    '{"name":"AI Test","intent":["cinematic"],'
-                    '"captureone":{"keys":{"Contrast":7}}}'
+                    '{"family":"cinematic_portrait","refinements":["soft_rolloff"],'
+                    '"intensity":"balanced","name":"AI Test"}'
                 )
             }
         )
@@ -167,6 +170,7 @@ def test_ollama_generator_respects_max_prompt_examples(monkeypatch) -> None:
     assert marker in captured_prompt["value"]
     section = captured_prompt["value"].split(marker, 1)[1].split("\nInput payload:", 1)[0]
     assert section.count('"source"') <= 2
+    assert "Allowed families" in captured_prompt["value"]
 
 
 def test_ollama_generator_uses_semantic_example_for_seasonal_landscape_prompt() -> None:
@@ -191,8 +195,8 @@ def test_ollama_generator_expands_named_style_reference_into_richer_traits(monke
         return _FakeResponse(
             {
                 "response": (
-                    '{"name":"AI Gothic Portrait","intent":["portrait"],'
-                    '"captureone":{"keys":{"Exposure":0.0,"Contrast":6},"notes":"Generated"}}'
+                    '{"family":"gothic_fantasy","refinements":["porcelain_skin","moonlit_blue"],'
+                    '"intensity":"bold","name":"AI Gothic Portrait","notes":"Generated"}'
                 )
             }
         )
@@ -209,3 +213,23 @@ def test_ollama_generator_expands_named_style_reference_into_richer_traits(monke
     assert keys["ColorBalanceBlue"] >= 1
     assert keys["ColorBalanceGreen"] >= 1
     assert keys["ToneCurve"] == "Film Extra Shadow"
+
+
+def test_ollama_generator_falls_back_when_planner_selects_unknown_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"unknown_family","refinements":["soft_rolloff"],'
+                    '"intensity":"balanced","name":"Broken Plan"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(PromptGenerateRequest(prompt="cinematic portrait"))
+
+    assert response.provider == "ollama"
+    assert any("fallback mock used" in warning for warning in response.warnings)
