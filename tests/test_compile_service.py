@@ -52,3 +52,46 @@ def test_compile_style_version_is_deterministic_for_same_inputs(tmp_path) -> Non
     second = compile_style_version(store=store, style_id=style.style_id, version="v1")
 
     assert first.sha256 == second.sha256
+
+
+def test_compile_style_version_includes_richer_captureone_keys(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+    style = store.create_style(Style(name="Editorial Rich", slug="editorial-rich"))
+    spec = StyleSpec(
+        name="Editorial Rich",
+        intent=["cinematic", "portrait"],
+        captureone={
+            "keys": {
+                "Exposure": 0.15,
+                "Contrast": 14,
+                "Saturation": 5,
+                "Clarity": 10,
+                "Highlights": -12,
+                "Shadows": 14,
+                "WhiteBalanceTemperature": 5900,
+                "WhiteBalanceTint": 3,
+                "ColorBalanceRed": 7,
+                "ColorBalanceGreen": 1,
+                "ColorBalanceBlue": -2,
+                "ToneCurve": "Film Standard",
+            }
+        },
+    )
+    version = StyleVersion(
+        style_id=style.style_id,
+        version="v1",
+        style_spec=spec,
+        safe_policy=SafePolicy(remove_white_balance=False),
+    )
+    store.create_version(style.style_id, version)
+
+    artifact = compile_style_version(store=store, style_id=style.style_id, version="v1")
+    _, content = store.get_artifact(artifact.artifact_id)
+    text = content.decode("utf-8")
+
+    assert '<E K="Saturation" V="5"/>' in text
+    assert '<E K="Clarity" V="10"/>' in text
+    assert '<E K="Highlights" V="-12"/>' in text
+    assert '<E K="WhiteBalanceTemperature" V="5900"/>' in text
+    assert '<E K="ColorBalanceRed" V="7"/>' in text
+    assert '<E K="ToneCurve" V="Film Standard"/>' in text

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from app.core.ai.look_profiles import apply_creative_direction, expand_style_references
 from app.core.models.ai import (
     AIHealthResponse,
     AIPromptPreviewResponse,
@@ -15,9 +16,13 @@ class MockStyleGenerator:
         self.model = model
 
     def generate_style_spec(self, payload: PromptGenerateRequest) -> GeneratedStyleSpecResponse:
-        prompt = payload.prompt.strip()
-        intents = payload.intent if payload.intent else ["cinematic", "balanced"]
-        keys = _build_mock_captureone_keys(prompt)
+        expansion = expand_style_references(payload.prompt.strip(), payload.intent)
+        prompt = expansion.expanded_prompt
+        intents = list(payload.intent) if payload.intent else ["cinematic", "balanced"]
+        for intent in expansion.added_intents:
+            if intent not in intents:
+                intents.append(intent)
+        keys = _build_mock_captureone_keys(prompt, payload.constraints)
 
         generated = StyleSpec(
             name=f"AI {prompt[:40]}".strip(),
@@ -59,7 +64,9 @@ class MockStyleGenerator:
         )
 
 
-def _build_mock_captureone_keys(prompt: str) -> dict[str, str | int | float]:
+def _build_mock_captureone_keys(
+    prompt: str, constraints: dict | None = None
+) -> dict[str, str | int | float]:
     normalized = prompt.lower()
     keys: dict[str, str | int | float] = {
         "Exposure": 0.2,
@@ -101,4 +108,4 @@ def _build_mock_captureone_keys(prompt: str) -> dict[str, str | int | float]:
         keys["Highlights"] = -10
         keys["Shadows"] = 12
 
-    return keys
+    return apply_creative_direction(keys, prompt, constraints)

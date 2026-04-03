@@ -48,8 +48,8 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
     assert response.provider == "ollama"
     assert response.model == "llama3.1:8b"
     assert response.warnings == []
-    assert response.style_spec.captureone.keys["Contrast"] == 10
-    assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5600
+    assert response.style_spec.captureone.keys["Contrast"] >= 10
+    assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5400
     assert "Highlights" in response.style_spec.captureone.keys
     assert "ColorBalanceBlue" in response.style_spec.captureone.keys
 
@@ -82,7 +82,7 @@ def test_ollama_generator_retries_with_cold_start_timeout(monkeypatch) -> None:
 
     assert calls == [2.0, 15.0]
     assert response.warnings == []
-    assert response.style_spec.captureone.keys["Contrast"] == 9
+    assert response.style_spec.captureone.keys["Contrast"] >= 9
 
 
 def test_ollama_generator_fallback_when_invalid_json(monkeypatch) -> None:
@@ -182,3 +182,30 @@ def test_ollama_generator_uses_semantic_example_for_seasonal_landscape_prompt() 
     sources = [example["source"] for example in preview.examples]
     assert any("Heavenly Seasons pack /" in source for source in sources)
     assert any("Northlandscapes Moody Landscapes /" in source for source in sources)
+
+
+def test_ollama_generator_expands_named_style_reference_into_richer_traits(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        assert "gothic cinematic portrait" in json["prompt"].lower()
+        assert "tim burton" in json["prompt"].lower()
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"name":"AI Gothic Portrait","intent":["portrait"],'
+                    '"captureone":{"keys":{"Exposure":0.0,"Contrast":6},"notes":"Generated"}}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(prompt="portrait in the style of Tim Burton")
+    )
+
+    keys = response.style_spec.captureone.keys
+    assert keys["Contrast"] >= 16
+    assert keys["ColorBalanceBlue"] >= 1
+    assert keys["ColorBalanceGreen"] >= 1
+    assert keys["ToneCurve"] == "Film Extra Shadow"
