@@ -108,8 +108,8 @@ def test_generate_style_spec_with_ollama_provider(client: TestClient, monkeypatc
         def json(self) -> dict:
             return {
                 "response": (
-                    '{"name":"AI Editorial Clean","intent":["editorial"],'
-                    '"captureone":{"keys":{"Exposure":0.1,"Contrast":6}}}'
+                    '{"family":"clean_commercial","refinements":["studio_clean"],'
+                    '"intensity":"balanced","name":"AI Editorial Clean"}'
                 )
             }
 
