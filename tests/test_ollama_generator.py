@@ -182,3 +182,30 @@ def test_ollama_generator_uses_semantic_example_for_seasonal_landscape_prompt() 
     sources = [example["source"] for example in preview.examples]
     assert any("Heavenly Seasons pack /" in source for source in sources)
     assert any("Northlandscapes Moody Landscapes /" in source for source in sources)
+
+
+def test_ollama_generator_expands_named_style_reference_into_richer_traits(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        assert "gothic cinematic portrait" in json["prompt"].lower()
+        assert "tim burton" in json["prompt"].lower()
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"name":"AI Gothic Portrait","intent":["portrait"],'
+                    '"captureone":{"keys":{"Exposure":0.0,"Contrast":6},"notes":"Generated"}}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(prompt="portrait in the style of Tim Burton")
+    )
+
+    keys = response.style_spec.captureone.keys
+    assert keys["Contrast"] >= 16
+    assert keys["ColorBalanceBlue"] >= 1
+    assert keys["ColorBalanceGreen"] >= 1
+    assert keys["ToneCurve"] == "Film Extra Shadow"

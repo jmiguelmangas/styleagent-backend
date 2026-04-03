@@ -6,6 +6,7 @@ from typing import Any
 
 import httpx
 
+from app.core.ai.look_profiles import apply_creative_direction, expand_style_references
 from app.core.ai.mock_generator import MockStyleGenerator
 from app.core.models.ai import (
     AIHealthResponse,
@@ -185,7 +186,7 @@ class OllamaStyleGenerator:
         for key, default_value in _RICH_PRESET_DEFAULTS.items():
             keys.setdefault(key, default_value)
 
-        prompt = payload.prompt.lower()
+        prompt = expand_style_references(payload.prompt, payload.intent).expanded_prompt.lower()
         if "warm" in prompt:
             keys["WhiteBalanceTemperature"] = max(2000, min(12000, int(float(keys["WhiteBalanceTemperature"])) + 350))
             keys["WhiteBalanceTint"] = max(-50, min(50, int(float(keys["WhiteBalanceTint"])) + 2))
@@ -200,22 +201,33 @@ class OllamaStyleGenerator:
             keys["Highlights"] = max(-100, min(100, int(float(keys["Highlights"])) - 2))
             keys["Shadows"] = max(-100, min(100, int(float(keys["Shadows"])) + 2))
 
-        updated.captureone.keys = keys
+        updated.captureone.keys = apply_creative_direction(keys, prompt)
         return updated
 
     def _build_generation_prompt(self, payload: PromptGenerateRequest) -> tuple[str, list[dict[str, Any]]]:
-        intent = payload.intent or []
+        expansion = expand_style_references(payload.prompt, payload.intent)
+        intent = list(payload.intent or [])
+        for added_intent in expansion.added_intents:
+            if added_intent not in intent:
+                intent.append(added_intent)
         constraints = payload.constraints or {}
         payload_json = json.dumps(
             {
-                "prompt": payload.prompt,
+                "prompt": expansion.expanded_prompt,
                 "intent": intent,
                 "constraints": constraints,
                 "target": payload.target,
             },
             ensure_ascii=True,
         )
-        selected_examples = self._select_prompt_examples(payload)
+        selected_examples = self._select_prompt_examples(
+            PromptGenerateRequest(
+                prompt=expansion.expanded_prompt,
+                intent=intent or None,
+                constraints=payload.constraints,
+                target=payload.target,
+            )
+        )
         examples_json = json.dumps(selected_examples, ensure_ascii=True)
         prompt = (
             "You generate Capture One style specs.\n"

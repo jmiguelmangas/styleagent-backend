@@ -60,6 +60,27 @@ def test_generate_style_spec_returns_mock_payload(client: TestClient, store: FSS
     assert history[0].style_spec.name.startswith("AI ")
 
 
+def test_generate_style_spec_named_reference_is_translated_to_descriptive_traits(
+    client: TestClient,
+) -> None:
+    response = client.post(
+        "/ai/generate-style-spec",
+        json={
+            "prompt": "Create a portrait preset in the style of Steve McCurry",
+            "intent": ["portrait"],
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    keys = payload["style_spec"]["captureone"]["keys"]
+    intents = payload["style_spec"]["intent"]
+    assert "documentary" in intents
+    assert keys["Clarity"] >= 12
+    assert keys["ColorBalanceRed"] >= 8
+    assert keys["Contrast"] >= 14
+
+
 def test_generate_style_spec_rejects_blank_prompt(client: TestClient) -> None:
     response = client.post(
         "/ai/generate-style-spec",
