@@ -137,5 +137,64 @@
         }
       }
     }
+  },
+  {
+    "source": "CP Kodak Presets / Soft Highlights 3.xmp",
+    "prompt": "soft cinematic highlights with gentle rolloff and polished luminous skin",
+    "tags": [
+      "highlights",
+      "soft",
+      "portrait",
+      "cinematic",
+      "luminous"
+    ],
+    "style_spec": {
+      "name": "Soft Highlights Inspired",
+      "intent": [
+        "portrait",
+        "soft"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -3,
+          "Highlights": -18,
+          "Shadows": 6,
+          "Clarity": -2,
+          "WhiteBalanceTemperature": 5600,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "CP Kodak Presets / Expired Film 3.xmp",
+    "prompt": "expired film aesthetic with faded contrast, cool cast and imperfect nostalgic color",
+    "tags": [
+      "expired",
+      "film",
+      "nostalgic",
+      "faded",
+      "cool"
+    ],
+    "style_spec": {
+      "name": "Expired Film Inspired",
+      "intent": [
+        "film",
+        "nostalgic",
+        "cool"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -6,
+          "Saturation": -9,
+          "Highlights": -10,
+          "Shadows": 10,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": 4,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
   }
 ]

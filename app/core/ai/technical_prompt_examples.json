@@ -601,5 +601,175 @@
         }
       }
     }
+  },
+  {
+    "source": "Color Precision Kodak / Portra 400 +0EV Frontier.xmp",
+    "prompt": "kodak portra 400 frontier portrait film look with rich skin tones and restrained blues",
+    "tags": [
+      "kodak",
+      "portra",
+      "portrait",
+      "film",
+      "frontier",
+      "skin"
+    ],
+    "style_spec": {
+      "name": "Kodak Portra 400 Frontier Inspired",
+      "intent": [
+        "film",
+        "portrait",
+        "balanced"
+      ],
+      "captureone": {
+        "keys": {
+          "Saturation": 8,
+          "Highlights": -8,
+          "Shadows": 6,
+          "WhiteBalanceTemperature": 5650,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Color Precision Kodak / Ektar +0EV Frontier.xmp",
+    "prompt": "kodak ektar vivid landscape color with punchy reds, bright saturation and clean contrast",
+    "tags": [
+      "kodak",
+      "ektar",
+      "landscape",
+      "vivid",
+      "frontier",
+      "bold"
+    ],
+    "style_spec": {
+      "name": "Kodak Ektar Frontier Inspired",
+      "intent": [
+        "landscape",
+        "vivid",
+        "bold"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 12,
+          "Saturation": 14,
+          "Clarity": 8,
+          "Highlights": -6,
+          "Shadows": 4,
+          "ColorBalanceRed": 7,
+          "ColorBalanceGreen": -1,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Color Precision Kodak / Gold +1EV Noritsu.xmp",
+    "prompt": "kodak gold overexposed noritsu warm nostalgic family film with softened contrast",
+    "tags": [
+      "kodak",
+      "gold",
+      "warm",
+      "nostalgic",
+      "noritsu",
+      "overexposed"
+    ],
+    "style_spec": {
+      "name": "Kodak Gold Noritsu Inspired",
+      "intent": [
+        "film",
+        "warm",
+        "nostalgic"
+      ],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.2,
+          "Contrast": -4,
+          "Saturation": -2,
+          "Highlights": -10,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 6100,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 5,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": -3,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Color Precision Kodak / Ultramax +1EV Noritsu.xmp",
+    "prompt": "kodak ultramax bright casual color film with energetic warmth and consumer film punch",
+    "tags": [
+      "kodak",
+      "ultramax",
+      "warm",
+      "bright",
+      "noritsu",
+      "casual"
+    ],
+    "style_spec": {
+      "name": "Kodak Ultramax Noritsu Inspired",
+      "intent": [
+        "film",
+        "warm",
+        "bright"
+      ],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.15,
+          "Contrast": 4,
+          "Saturation": 10,
+          "Highlights": -6,
+          "Shadows": 7,
+          "WhiteBalanceTemperature": 5900,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Color Precision Kodak / Colorplus +0EV Frontier.xmp",
+    "prompt": "kodak colorplus affordable vintage color film with orange warmth and lively low-light color",
+    "tags": [
+      "kodak",
+      "colorplus",
+      "vintage",
+      "warm",
+      "frontier",
+      "everyday"
+    ],
+    "style_spec": {
+      "name": "Kodak ColorPlus Frontier Inspired",
+      "intent": [
+        "film",
+        "warm",
+        "everyday"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 3,
+          "Saturation": 12,
+          "Highlights": -4,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 6000,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 5,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
   }
 ]
