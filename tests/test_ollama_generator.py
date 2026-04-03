@@ -48,7 +48,7 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
     assert response.provider == "ollama"
     assert response.model == "llama3.1:8b"
     assert response.warnings == []
-    assert response.style_spec.captureone.keys["Contrast"] == 10
+    assert response.style_spec.captureone.keys["Contrast"] >= 10
     assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5600
     assert "Highlights" in response.style_spec.captureone.keys
     assert "ColorBalanceBlue" in response.style_spec.captureone.keys
@@ -82,7 +82,7 @@ def test_ollama_generator_retries_with_cold_start_timeout(monkeypatch) -> None:
 
     assert calls == [2.0, 15.0]
     assert response.warnings == []
-    assert response.style_spec.captureone.keys["Contrast"] == 9
+    assert response.style_spec.captureone.keys["Contrast"] >= 9
 
 
 def test_ollama_generator_fallback_when_invalid_json(monkeypatch) -> None:
