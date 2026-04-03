@@ -9,6 +9,9 @@ class PromptExpansion:
     added_intents: tuple[str, ...] = ()
 
 
+Intensity = str
+
+
 @dataclass(frozen=True)
 class VariantProfile:
     name: str
@@ -799,6 +802,26 @@ _STYLE_REFERENCE_ALIASES: dict[str, tuple[str, ...]] = {
     ),
 }
 
+_INTENSITY_LIMITS: dict[str, tuple[float, float]] = {
+    "Exposure": (-1.25, 1.25),
+    "Contrast": (-18.0, 24.0),
+    "Saturation": (-18.0, 22.0),
+    "Clarity": (-12.0, 20.0),
+    "Highlights": (-35.0, 12.0),
+    "Shadows": (-8.0, 24.0),
+    "WhiteBalanceTemperature": (4300.0, 6800.0),
+    "WhiteBalanceTint": (-10.0, 10.0),
+    "ColorBalanceRed": (-10.0, 14.0),
+    "ColorBalanceGreen": (-10.0, 10.0),
+    "ColorBalanceBlue": (-10.0, 16.0),
+}
+
+_INTENSITY_SCALES: dict[Intensity, float] = {
+    "subtle": 0.72,
+    "balanced": 0.88,
+    "bold": 1.0,
+}
+
 
 def profile_catalog() -> tuple[MainProfile, ...]:
     return _MAIN_PROFILES
@@ -835,6 +858,7 @@ def expand_style_references(prompt: str, intents: list[str] | None = None) -> Pr
 def apply_creative_direction(
     keys: dict[str, str | int | float],
     prompt: str,
+    constraints: dict | None = None,
 ) -> dict[str, str | int | float]:
     updated = dict(keys)
     normalized = prompt.lower()
@@ -851,7 +875,41 @@ def apply_creative_direction(
                 numeric_value += float(current)
             updated[key] = _clamp_key(key, numeric_value)
 
-    return updated
+    intensity = infer_intensity(prompt, constraints)
+    return _normalize_intensity(updated, matched_profiles, intensity)
+
+
+def infer_intensity(prompt: str, constraints: dict | None = None) -> Intensity:
+    if isinstance(constraints, dict):
+        raw = constraints.get("intensity")
+        if isinstance(raw, str):
+            normalized = raw.strip().lower()
+            if normalized in _INTENSITY_SCALES:
+                return normalized
+
+    normalized_prompt = prompt.lower()
+    subtle_markers = (
+        "subtle",
+        "gentle",
+        "light touch",
+        "restrained",
+        "natural",
+        "softly",
+    )
+    bold_markers = (
+        "bold",
+        "strong",
+        "dramatic",
+        "pushed",
+        "intense",
+        "stylized",
+    )
+
+    if any(marker in normalized_prompt for marker in subtle_markers):
+        return "subtle"
+    if any(marker in normalized_prompt for marker in bold_markers):
+        return "bold"
+    return "balanced"
 
 
 def _matched_profiles(prompt: str) -> list[MainProfile | VariantProfile]:
@@ -874,6 +932,40 @@ def _profile_intents(profile: MainProfile | VariantProfile) -> tuple[str, ...]:
 
 def _profile_adjustments(profile: MainProfile | VariantProfile) -> dict[str, str | int | float]:
     return profile.adjustments
+
+
+def _normalize_intensity(
+    keys: dict[str, str | int | float],
+    matched_profiles: list[MainProfile | VariantProfile],
+    intensity: Intensity,
+) -> dict[str, str | int | float]:
+    if not matched_profiles:
+        return keys
+
+    normalized = dict(keys)
+    profile_count = len(matched_profiles)
+
+    if profile_count <= 2:
+        profile_scale = 1.0
+    elif profile_count == 3:
+        profile_scale = 0.92
+    elif profile_count == 4:
+        profile_scale = 0.84
+    else:
+        profile_scale = 0.76
+
+    intensity_scale = _INTENSITY_SCALES.get(intensity, _INTENSITY_SCALES["balanced"])
+    scale = profile_scale * intensity_scale
+
+    for key, limits in _INTENSITY_LIMITS.items():
+        current = normalized.get(key)
+        if not isinstance(current, (int, float)):
+            continue
+        scaled = float(current) * scale
+        bounded = max(limits[0], min(limits[1], scaled))
+        normalized[key] = _clamp_key(key, bounded)
+
+    return normalized
 
 
 def _clamp_key(key: str, value: float) -> int | float:

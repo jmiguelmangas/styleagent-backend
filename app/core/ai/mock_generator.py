@@ -22,7 +22,7 @@ class MockStyleGenerator:
         for intent in expansion.added_intents:
             if intent not in intents:
                 intents.append(intent)
-        keys = _build_mock_captureone_keys(prompt)
+        keys = _build_mock_captureone_keys(prompt, payload.constraints)
 
         generated = StyleSpec(
             name=f"AI {prompt[:40]}".strip(),
@@ -64,7 +64,9 @@ class MockStyleGenerator:
         )
 
 
-def _build_mock_captureone_keys(prompt: str) -> dict[str, str | int | float]:
+def _build_mock_captureone_keys(
+    prompt: str, constraints: dict | None = None
+) -> dict[str, str | int | float]:
     normalized = prompt.lower()
     keys: dict[str, str | int | float] = {
         "Exposure": 0.2,
@@ -106,4 +108,4 @@ def _build_mock_captureone_keys(prompt: str) -> dict[str, str | int | float]:
         keys["Highlights"] = -10
         keys["Shadows"] = 12
 
-    return apply_creative_direction(keys, prompt)
+    return apply_creative_direction(keys, prompt, constraints)

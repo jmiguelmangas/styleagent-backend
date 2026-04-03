@@ -78,7 +78,7 @@ def test_generate_style_spec_named_reference_is_translated_to_descriptive_traits
     assert "documentary" in intents
     assert keys["Clarity"] >= 12
     assert keys["ColorBalanceRed"] >= 8
-    assert keys["Contrast"] >= 14
+    assert keys["Contrast"] >= 10
 
 
 def test_generate_style_spec_rejects_blank_prompt(client: TestClient) -> None:

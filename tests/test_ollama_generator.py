@@ -49,7 +49,7 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
     assert response.model == "llama3.1:8b"
     assert response.warnings == []
     assert response.style_spec.captureone.keys["Contrast"] >= 10
-    assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5600
+    assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5400
     assert "Highlights" in response.style_spec.captureone.keys
     assert "ColorBalanceBlue" in response.style_spec.captureone.keys
 

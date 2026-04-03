@@ -201,7 +201,7 @@ class OllamaStyleGenerator:
             keys["Highlights"] = max(-100, min(100, int(float(keys["Highlights"])) - 2))
             keys["Shadows"] = max(-100, min(100, int(float(keys["Shadows"])) + 2))
 
-        updated.captureone.keys = apply_creative_direction(keys, prompt)
+        updated.captureone.keys = apply_creative_direction(keys, prompt, payload.constraints)
         return updated
 
     def _build_generation_prompt(self, payload: PromptGenerateRequest) -> tuple[str, list[dict[str, Any]]]:
