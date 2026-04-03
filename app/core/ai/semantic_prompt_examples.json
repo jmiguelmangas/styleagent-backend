@@ -1,0 +1,141 @@
+[
+  {
+    "source": "Heavenly Seasons pack / Moody Light.lnp",
+    "prompt": "moody landscape light with forest atmosphere and subdued contrast",
+    "tags": [
+      "landscape",
+      "moody",
+      "forest",
+      "rural",
+      "light"
+    ],
+    "style_spec": {
+      "name": "Moody Light Inspired",
+      "intent": [
+        "landscape",
+        "moody"
+      ],
+      "captureone": {
+        "keys": {
+          "Exposure": -0.1,
+          "Contrast": 10,
+          "Saturation": -6,
+          "Clarity": 10,
+          "Highlights": -10,
+          "Shadows": 14,
+          "WhiteBalanceTemperature": 5200,
+          "WhiteBalanceTint": -1,
+          "ColorBalanceRed": 0,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": 3,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Heavenly Seasons pack / Magic Autumn Exposure.lnp",
+    "prompt": "magic autumn exposure with golden forest light and earthy warmth",
+    "tags": [
+      "autumn",
+      "landscape",
+      "forest",
+      "warm",
+      "sunlight"
+    ],
+    "style_spec": {
+      "name": "Magic Autumn Exposure Inspired",
+      "intent": [
+        "autumn",
+        "landscape",
+        "warm"
+      ],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.2,
+          "Contrast": 8,
+          "Saturation": 4,
+          "Clarity": 7,
+          "Highlights": -12,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 6100,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 5,
+          "ColorBalanceGreen": 3,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Heavenly Seasons pack / White Winter.lnp",
+    "prompt": "white winter landscape with clean snow, soft blue shadows and crisp air",
+    "tags": [
+      "winter",
+      "landscape",
+      "white",
+      "cool",
+      "snow"
+    ],
+    "style_spec": {
+      "name": "White Winter Inspired",
+      "intent": [
+        "winter",
+        "landscape",
+        "cool"
+      ],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.15,
+          "Contrast": 9,
+          "Saturation": -5,
+          "Clarity": 12,
+          "Highlights": -18,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 5,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Heavenly Seasons pack / Summer Sunrise.lnp",
+    "prompt": "summer sunrise landscape with warm sunlight and gentle morning haze",
+    "tags": [
+      "summer",
+      "sunrise",
+      "landscape",
+      "warm",
+      "sunlight"
+    ],
+    "style_spec": {
+      "name": "Summer Sunrise Inspired",
+      "intent": [
+        "summer",
+        "landscape",
+        "warm"
+      ],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.2,
+          "Contrast": 6,
+          "Saturation": 6,
+          "Clarity": 5,
+          "Highlights": -8,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 6200,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  }
+]

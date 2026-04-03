@@ -29,7 +29,12 @@ _RICH_PRESET_DEFAULTS: dict[str, str | int | float] = {
     "ColorBalanceBlue": -2,
     "ToneCurve": "Film Standard",
 }
-_PROMPT_EXAMPLES_PATH = os.path.join(os.path.dirname(__file__), "prompt_examples.json")
+_TECHNICAL_PROMPT_EXAMPLES_PATH = os.path.join(
+    os.path.dirname(__file__), "technical_prompt_examples.json"
+)
+_SEMANTIC_PROMPT_EXAMPLES_PATH = os.path.join(
+    os.path.dirname(__file__), "semantic_prompt_examples.json"
+)
 
 
 class OllamaStyleGenerator:
@@ -243,8 +248,9 @@ class OllamaStyleGenerator:
         return prompt, selected_examples
 
     def _select_prompt_examples(self, payload: PromptGenerateRequest) -> list[dict[str, Any]]:
-        all_examples = _load_prompt_examples()
-        if not all_examples:
+        technical_examples = _load_prompt_examples(_TECHNICAL_PROMPT_EXAMPLES_PATH)
+        semantic_examples = _load_prompt_examples(_SEMANTIC_PROMPT_EXAMPLES_PATH)
+        if not technical_examples and not semantic_examples:
             return []
 
         max_examples_raw = os.getenv("STYLEAGENT_AI_MAX_PROMPT_EXAMPLES", "4").strip()
@@ -256,8 +262,68 @@ class OllamaStyleGenerator:
         prompt_tokens = set(payload.prompt.lower().replace("-", " ").split())
         intent_tokens = {token.lower() for token in (payload.intent or [])}
 
+        technical_budget = max_examples
+        semantic_budget = 0
+        if semantic_examples and max_examples > 1:
+            semantic_budget = 1
+            technical_budget = max_examples - 1
+
+        selected: list[dict[str, Any]] = []
+        selected.extend(
+            self._score_and_select_examples(
+                examples=technical_examples,
+                prompt_tokens=prompt_tokens,
+                intent_tokens=intent_tokens,
+                limit=technical_budget,
+            )
+        )
+        if semantic_budget:
+            selected.extend(
+                self._score_and_select_examples(
+                    examples=semantic_examples,
+                    prompt_tokens=prompt_tokens,
+                    intent_tokens=intent_tokens,
+                    limit=semantic_budget,
+                )
+            )
+
+        if len(selected) < max_examples:
+            remaining_examples = [
+                example
+                for example in technical_examples + semantic_examples
+                if example not in selected
+            ]
+            selected.extend(
+                self._score_and_select_examples(
+                    examples=remaining_examples,
+                    prompt_tokens=prompt_tokens,
+                    intent_tokens=intent_tokens,
+                    limit=max_examples - len(selected),
+                )
+            )
+
+        return [
+            {
+                "source": example.get("source"),
+                "prompt": example.get("prompt"),
+                "style_spec": example.get("style_spec"),
+            }
+            for example in selected[:max_examples]
+        ]
+
+    def _score_and_select_examples(
+        self,
+        *,
+        examples: list[dict[str, Any]],
+        prompt_tokens: set[str],
+        intent_tokens: set[str],
+        limit: int,
+    ) -> list[dict[str, Any]]:
+        if limit <= 0 or not examples:
+            return []
+
         scored: list[tuple[int, dict[str, Any]]] = []
-        for example in all_examples:
+        for example in examples:
             tags = {str(tag).lower() for tag in example.get("tags", [])}
             prompt_text = str(example.get("prompt", "")).lower()
             prompt_matches = sum(1 for token in prompt_tokens if token in prompt_text or token in tags)
@@ -266,20 +332,12 @@ class OllamaStyleGenerator:
             scored.append((score, example))
 
         scored.sort(key=lambda item: item[0], reverse=True)
-        selected = [example for _, example in scored[:max_examples]]
-        return [
-            {
-                "source": example.get("source"),
-                "prompt": example.get("prompt"),
-                "style_spec": example.get("style_spec"),
-            }
-            for example in selected
-        ]
+        return [example for _, example in scored[:limit]]
 
 
-def _load_prompt_examples() -> list[dict[str, Any]]:
+def _load_prompt_examples(path: str) -> list[dict[str, Any]]:
     try:
-        with open(_PROMPT_EXAMPLES_PATH, encoding="utf-8") as handle:
+        with open(path, encoding="utf-8") as handle:
             loaded = json.load(handle)
     except Exception:  # noqa: BLE001
         return []

@@ -2,10 +2,20 @@
   {
     "source": "Mastin Labs Fujicolor Everyday / 1b. Fujicolor C200.costyle",
     "prompt": "fujicolor c200 everyday warm film look with soft highlight recovery",
-    "tags": ["fujicolor", "film", "warm", "everyday", "portrait"],
+    "tags": [
+      "fujicolor",
+      "film",
+      "warm",
+      "everyday",
+      "portrait"
+    ],
     "style_spec": {
       "name": "Fujicolor C200 Inspired",
-      "intent": ["film", "warm", "portrait"],
+      "intent": [
+        "film",
+        "warm",
+        "portrait"
+      ],
       "captureone": {
         "keys": {
           "Contrast": 0,
@@ -20,10 +30,18 @@
   {
     "source": "Mastin Labs Fujicolor Everyday / 1c. Superia 400.costyle",
     "prompt": "fujicolor superia 400 balanced color film look",
-    "tags": ["fujicolor", "film", "balanced", "everyday"],
+    "tags": [
+      "fujicolor",
+      "film",
+      "balanced",
+      "everyday"
+    ],
     "style_spec": {
       "name": "Superia 400 Inspired",
-      "intent": ["film", "balanced"],
+      "intent": [
+        "film",
+        "balanced"
+      ],
       "captureone": {
         "keys": {
           "Contrast": 0.29,
@@ -38,10 +56,17 @@
   {
     "source": "Mastin Labs Fujicolor Everyday / 2a. Daylight.costyle",
     "prompt": "daylight white balance natural neutral color",
-    "tags": ["daylight", "white balance", "natural", "neutral"],
+    "tags": [
+      "daylight",
+      "white balance",
+      "natural",
+      "neutral"
+    ],
     "style_spec": {
       "name": "Daylight WB",
-      "intent": ["natural"],
+      "intent": [
+        "natural"
+      ],
       "captureone": {
         "keys": {
           "WhiteBalanceTemperature": 4940.82,
@@ -54,10 +79,17 @@
   {
     "source": "Mastin Labs Fujicolor Everyday / 2d. Tungsten.costyle",
     "prompt": "tungsten indoor cool white balance correction",
-    "tags": ["tungsten", "indoor", "cool", "white balance"],
+    "tags": [
+      "tungsten",
+      "indoor",
+      "cool",
+      "white balance"
+    ],
     "style_spec": {
       "name": "Tungsten WB",
-      "intent": ["cool"],
+      "intent": [
+        "cool"
+      ],
       "captureone": {
         "keys": {
           "WhiteBalanceTemperature": 3097.15,
@@ -70,10 +102,19 @@
   {
     "source": "Northlandscapes Moody Landscapes / Autumn Colors.costyle",
     "prompt": "autumn landscape earthy moody contrast with muted saturation",
-    "tags": ["landscape", "autumn", "earthy", "moody", "warm"],
+    "tags": [
+      "landscape",
+      "autumn",
+      "earthy",
+      "moody",
+      "warm"
+    ],
     "style_spec": {
       "name": "Autumn Colors Inspired",
-      "intent": ["landscape", "moody"],
+      "intent": [
+        "landscape",
+        "moody"
+      ],
       "captureone": {
         "keys": {
           "Contrast": 14.8,
@@ -90,10 +131,20 @@
   {
     "source": "Northlandscapes Moody Landscapes / Moody Days.costyle",
     "prompt": "dark moody day cinematic landscape with deep shadows",
-    "tags": ["landscape", "moody", "dark", "cinematic", "cool"],
+    "tags": [
+      "landscape",
+      "moody",
+      "dark",
+      "cinematic",
+      "cool"
+    ],
     "style_spec": {
       "name": "Moody Days Inspired",
-      "intent": ["landscape", "moody", "cinematic"],
+      "intent": [
+        "landscape",
+        "moody",
+        "cinematic"
+      ],
       "captureone": {
         "keys": {
           "Contrast": 10,
@@ -111,10 +162,19 @@
   {
     "source": "Northlandscapes Moody Landscapes / Winter Blues.costyle",
     "prompt": "winter blue landscape cool tones with crisp clarity",
-    "tags": ["landscape", "winter", "blue", "cool", "crisp"],
+    "tags": [
+      "landscape",
+      "winter",
+      "blue",
+      "cool",
+      "crisp"
+    ],
     "style_spec": {
       "name": "Winter Blues Inspired",
-      "intent": ["landscape", "cool"],
+      "intent": [
+        "landscape",
+        "cool"
+      ],
       "captureone": {
         "keys": {
           "Contrast": 12.8,
@@ -132,10 +192,19 @@
   {
     "source": "nolan-warm-v1.costyle (user sample)",
     "prompt": "warm cinematic portrait preset balanced skin tones",
-    "tags": ["portrait", "warm", "cinematic", "balanced"],
+    "tags": [
+      "portrait",
+      "warm",
+      "cinematic",
+      "balanced"
+    ],
     "style_spec": {
       "name": "Nolan Warm v1",
-      "intent": ["cinematic", "warm", "portrait"],
+      "intent": [
+        "cinematic",
+        "warm",
+        "portrait"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.3,
@@ -157,10 +226,20 @@
   {
     "source": "Capture One Match Look Styles / Cinematic Portraits / 32. Cinematic - Warm.costyle",
     "prompt": "cinematic warm portrait with soft contrast rolloff and warm skin tones",
-    "tags": ["cinematic", "warm", "portrait", "skin", "film"],
+    "tags": [
+      "cinematic",
+      "warm",
+      "portrait",
+      "skin",
+      "film"
+    ],
     "style_spec": {
       "name": "Cinematic Warm Portrait Inspired",
-      "intent": ["cinematic", "warm", "portrait"],
+      "intent": [
+        "cinematic",
+        "warm",
+        "portrait"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.3,
@@ -182,10 +261,20 @@
   {
     "source": "Capture One Match Look Styles / Cinematic Portraits / 39. Cinematic - Cool Green.costyle",
     "prompt": "cinematic cool green portrait with restrained saturation and cool shadows",
-    "tags": ["cinematic", "cool", "green", "portrait", "editorial"],
+    "tags": [
+      "cinematic",
+      "cool",
+      "green",
+      "portrait",
+      "editorial"
+    ],
     "style_spec": {
       "name": "Cinematic Cool Green Inspired",
-      "intent": ["cinematic", "cool", "portrait"],
+      "intent": [
+        "cinematic",
+        "cool",
+        "portrait"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.2,
@@ -207,10 +296,19 @@
   {
     "source": "Capture One Styles / Film & Cine Looks / Cinema Cool.costyle",
     "prompt": "cinema cool grading with blue shadows and subtle desaturation",
-    "tags": ["cinema", "cinematic", "cool", "blue", "grading"],
+    "tags": [
+      "cinema",
+      "cinematic",
+      "cool",
+      "blue",
+      "grading"
+    ],
     "style_spec": {
       "name": "Cinema Cool Inspired",
-      "intent": ["cinematic", "cool"],
+      "intent": [
+        "cinematic",
+        "cool"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.0,
@@ -232,10 +330,19 @@
   {
     "source": "Capture One Styles / Film & Cine Looks / Cinema Warm.costyle",
     "prompt": "cinema warm grading with amber highlights and moderate clarity",
-    "tags": ["cinema", "cinematic", "warm", "amber", "grading"],
+    "tags": [
+      "cinema",
+      "cinematic",
+      "warm",
+      "amber",
+      "grading"
+    ],
     "style_spec": {
       "name": "Cinema Warm Inspired",
-      "intent": ["cinematic", "warm"],
+      "intent": [
+        "cinematic",
+        "warm"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.1,
@@ -257,10 +364,19 @@
   {
     "source": "Capture One Styles / Creative Edits / Cozy Fall.costyle",
     "prompt": "cozy fall edit with earthy warmth, gentle contrast and autumn color",
-    "tags": ["autumn", "fall", "earthy", "warm", "editorial"],
+    "tags": [
+      "autumn",
+      "fall",
+      "earthy",
+      "warm",
+      "editorial"
+    ],
     "style_spec": {
       "name": "Cozy Fall Inspired",
-      "intent": ["warm", "autumn"],
+      "intent": [
+        "warm",
+        "autumn"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.1,
@@ -282,10 +398,20 @@
   {
     "source": "Capture One Styles / Creative Edits / Crisp Winter.costyle",
     "prompt": "crisp winter look with cool whites, clean contrast and blue shadows",
-    "tags": ["winter", "cool", "crisp", "blue", "landscape"],
+    "tags": [
+      "winter",
+      "cool",
+      "crisp",
+      "blue",
+      "landscape"
+    ],
     "style_spec": {
       "name": "Crisp Winter Inspired",
-      "intent": ["cool", "winter", "landscape"],
+      "intent": [
+        "cool",
+        "winter",
+        "landscape"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.0,
@@ -307,10 +433,19 @@
   {
     "source": "Capture One Styles / Base Edits / Clear Contrast.costyle",
     "prompt": "clear contrast base edit with crisp microcontrast and recovered highlights",
-    "tags": ["contrast", "clarity", "base", "crisp", "clean"],
+    "tags": [
+      "contrast",
+      "clarity",
+      "base",
+      "crisp",
+      "clean"
+    ],
     "style_spec": {
       "name": "Clear Contrast Inspired",
-      "intent": ["contrast", "clean"],
+      "intent": [
+        "contrast",
+        "clean"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.0,
@@ -332,10 +467,19 @@
   {
     "source": "Capture One Cultural Heritage / Color Negative Film / Fujicolor Pro 160C.costyle",
     "prompt": "fujicolor pro 160c negative film scan look with soft pastel warmth",
-    "tags": ["fujicolor", "film", "negative", "warm", "pastel"],
+    "tags": [
+      "fujicolor",
+      "film",
+      "negative",
+      "warm",
+      "pastel"
+    ],
     "style_spec": {
       "name": "Fujicolor Pro 160C Inspired",
-      "intent": ["film", "warm"],
+      "intent": [
+        "film",
+        "warm"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.35,
@@ -357,10 +501,20 @@
   {
     "source": "Capture One Cultural Heritage / Color Slide Film / Fujichrome Velvia 100F.costyle",
     "prompt": "velvia vivid landscape look with punchy color and crisp cool contrast",
-    "tags": ["velvia", "film", "landscape", "vivid", "cool"],
+    "tags": [
+      "velvia",
+      "film",
+      "landscape",
+      "vivid",
+      "cool"
+    ],
     "style_spec": {
       "name": "Velvia 100F Inspired",
-      "intent": ["film", "landscape", "vivid"],
+      "intent": [
+        "film",
+        "landscape",
+        "vivid"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.0,
@@ -382,10 +536,19 @@
   {
     "source": "Capture One Nolan / Nolan_03_Cold_v1.costyle",
     "prompt": "cold nolan inspired edit with restrained exposure and subtle cool clarity",
-    "tags": ["nolan", "cold", "cool", "cinematic", "portrait"],
+    "tags": [
+      "nolan",
+      "cold",
+      "cool",
+      "cinematic",
+      "portrait"
+    ],
     "style_spec": {
       "name": "Nolan Cold Inspired",
-      "intent": ["cinematic", "cool"],
+      "intent": [
+        "cinematic",
+        "cool"
+      ],
       "captureone": {
         "keys": {
           "Exposure": -0.03,
@@ -407,10 +570,20 @@
   {
     "source": "Capture One Nolan / Nolan_07_Warm_Portrait_v1.costyle",
     "prompt": "warm portrait nolan look with richer skin tones and cinematic warmth",
-    "tags": ["nolan", "warm", "portrait", "cinematic", "skin"],
+    "tags": [
+      "nolan",
+      "warm",
+      "portrait",
+      "cinematic",
+      "skin"
+    ],
     "style_spec": {
       "name": "Nolan Warm Portrait Inspired",
-      "intent": ["cinematic", "warm", "portrait"],
+      "intent": [
+        "cinematic",
+        "warm",
+        "portrait"
+      ],
       "captureone": {
         "keys": {
           "Exposure": 0.15,
@@ -424,106 +597,6 @@
           "ColorBalanceRed": 4,
           "ColorBalanceGreen": 0,
           "ColorBalanceBlue": -2,
-          "ToneCurve": "Film Standard"
-        }
-      }
-    }
-  },
-  {
-    "source": "Heavenly Seasons pack / Moody Light.lnp",
-    "prompt": "moody landscape light with forest atmosphere and subdued contrast",
-    "tags": ["landscape", "moody", "forest", "rural", "light"],
-    "style_spec": {
-      "name": "Moody Light Inspired",
-      "intent": ["landscape", "moody"],
-      "captureone": {
-        "keys": {
-          "Exposure": -0.1,
-          "Contrast": 10,
-          "Saturation": -6,
-          "Clarity": 10,
-          "Highlights": -10,
-          "Shadows": 14,
-          "WhiteBalanceTemperature": 5200,
-          "WhiteBalanceTint": -1,
-          "ColorBalanceRed": 0,
-          "ColorBalanceGreen": 2,
-          "ColorBalanceBlue": 3,
-          "ToneCurve": "Film Standard"
-        }
-      }
-    }
-  },
-  {
-    "source": "Heavenly Seasons pack / Magic Autumn Exposure.lnp",
-    "prompt": "magic autumn exposure with golden forest light and earthy warmth",
-    "tags": ["autumn", "landscape", "forest", "warm", "sunlight"],
-    "style_spec": {
-      "name": "Magic Autumn Exposure Inspired",
-      "intent": ["autumn", "landscape", "warm"],
-      "captureone": {
-        "keys": {
-          "Exposure": 0.2,
-          "Contrast": 8,
-          "Saturation": 4,
-          "Clarity": 7,
-          "Highlights": -12,
-          "Shadows": 10,
-          "WhiteBalanceTemperature": 6100,
-          "WhiteBalanceTint": 1,
-          "ColorBalanceRed": 5,
-          "ColorBalanceGreen": 3,
-          "ColorBalanceBlue": -2,
-          "ToneCurve": "Film Standard"
-        }
-      }
-    }
-  },
-  {
-    "source": "Heavenly Seasons pack / White Winter.lnp",
-    "prompt": "white winter landscape with clean snow, soft blue shadows and crisp air",
-    "tags": ["winter", "landscape", "white", "cool", "snow"],
-    "style_spec": {
-      "name": "White Winter Inspired",
-      "intent": ["winter", "landscape", "cool"],
-      "captureone": {
-        "keys": {
-          "Exposure": 0.15,
-          "Contrast": 9,
-          "Saturation": -5,
-          "Clarity": 12,
-          "Highlights": -18,
-          "Shadows": 12,
-          "WhiteBalanceTemperature": 5000,
-          "WhiteBalanceTint": -2,
-          "ColorBalanceRed": -1,
-          "ColorBalanceGreen": 0,
-          "ColorBalanceBlue": 5,
-          "ToneCurve": "Film Standard"
-        }
-      }
-    }
-  },
-  {
-    "source": "Heavenly Seasons pack / Summer Sunrise.lnp",
-    "prompt": "summer sunrise landscape with warm sunlight and gentle morning haze",
-    "tags": ["summer", "sunrise", "landscape", "warm", "sunlight"],
-    "style_spec": {
-      "name": "Summer Sunrise Inspired",
-      "intent": ["summer", "landscape", "warm"],
-      "captureone": {
-        "keys": {
-          "Exposure": 0.2,
-          "Contrast": 6,
-          "Saturation": 6,
-          "Clarity": 5,
-          "Highlights": -8,
-          "Shadows": 8,
-          "WhiteBalanceTemperature": 6200,
-          "WhiteBalanceTint": 1,
-          "ColorBalanceRed": 4,
-          "ColorBalanceGreen": 2,
-          "ColorBalanceBlue": -1,
           "ToneCurve": "Film Standard"
         }
       }

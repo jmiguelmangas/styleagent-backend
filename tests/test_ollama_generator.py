@@ -167,3 +167,18 @@ def test_ollama_generator_respects_max_prompt_examples(monkeypatch) -> None:
     assert marker in captured_prompt["value"]
     section = captured_prompt["value"].split(marker, 1)[1].split("\nInput payload:", 1)[0]
     assert section.count('"source"') <= 2
+
+
+def test_ollama_generator_uses_semantic_example_for_seasonal_landscape_prompt() -> None:
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    preview = generator.preview_prompt(
+        PromptGenerateRequest(
+            prompt="moody autumn forest landscape with warm sunlight",
+            intent=["landscape", "moody", "autumn"],
+        )
+    )
+
+    sources = [example["source"] for example in preview.examples]
+    assert any("Heavenly Seasons pack /" in source for source in sources)
+    assert any("Northlandscapes Moody Landscapes /" in source for source in sources)
