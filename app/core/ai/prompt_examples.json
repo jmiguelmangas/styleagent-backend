@@ -153,5 +153,280 @@
         }
       }
     }
+  },
+  {
+    "source": "Capture One Match Look Styles / Cinematic Portraits / 32. Cinematic - Warm.costyle",
+    "prompt": "cinematic warm portrait with soft contrast rolloff and warm skin tones",
+    "tags": ["cinematic", "warm", "portrait", "skin", "film"],
+    "style_spec": {
+      "name": "Cinematic Warm Portrait Inspired",
+      "intent": ["cinematic", "warm", "portrait"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.3,
+          "Contrast": 9,
+          "Saturation": 4,
+          "Clarity": 8,
+          "Highlights": -12,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 6100,
+          "WhiteBalanceTint": 3,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Match Look Styles / Cinematic Portraits / 39. Cinematic - Cool Green.costyle",
+    "prompt": "cinematic cool green portrait with restrained saturation and cool shadows",
+    "tags": ["cinematic", "cool", "green", "portrait", "editorial"],
+    "style_spec": {
+      "name": "Cinematic Cool Green Inspired",
+      "intent": ["cinematic", "cool", "portrait"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.2,
+          "Contrast": 10,
+          "Saturation": -2,
+          "Clarity": 10,
+          "Highlights": -10,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -1,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 3,
+          "ColorBalanceBlue": 5,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Styles / Film & Cine Looks / Cinema Cool.costyle",
+    "prompt": "cinema cool grading with blue shadows and subtle desaturation",
+    "tags": ["cinema", "cinematic", "cool", "blue", "grading"],
+    "style_spec": {
+      "name": "Cinema Cool Inspired",
+      "intent": ["cinematic", "cool"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.0,
+          "Contrast": 8,
+          "Saturation": -4,
+          "Clarity": 10,
+          "Highlights": -12,
+          "Shadows": 6,
+          "WhiteBalanceTemperature": 4900,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": -2,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": 5,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Styles / Film & Cine Looks / Cinema Warm.costyle",
+    "prompt": "cinema warm grading with amber highlights and moderate clarity",
+    "tags": ["cinema", "cinematic", "warm", "amber", "grading"],
+    "style_spec": {
+      "name": "Cinema Warm Inspired",
+      "intent": ["cinematic", "warm"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.1,
+          "Contrast": 8,
+          "Saturation": 5,
+          "Clarity": 16.14,
+          "Highlights": -10,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 6000,
+          "WhiteBalanceTint": 2,
+          "ColorBalanceRed": 5,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -3,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Styles / Creative Edits / Cozy Fall.costyle",
+    "prompt": "cozy fall edit with earthy warmth, gentle contrast and autumn color",
+    "tags": ["autumn", "fall", "earthy", "warm", "editorial"],
+    "style_spec": {
+      "name": "Cozy Fall Inspired",
+      "intent": ["warm", "autumn"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.1,
+          "Contrast": 7,
+          "Saturation": 4,
+          "Clarity": 6,
+          "Highlights": -8,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 6200,
+          "WhiteBalanceTint": 2,
+          "ColorBalanceRed": 6,
+          "ColorBalanceGreen": 4,
+          "ColorBalanceBlue": -3,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Styles / Creative Edits / Crisp Winter.costyle",
+    "prompt": "crisp winter look with cool whites, clean contrast and blue shadows",
+    "tags": ["winter", "cool", "crisp", "blue", "landscape"],
+    "style_spec": {
+      "name": "Crisp Winter Inspired",
+      "intent": ["cool", "winter", "landscape"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.0,
+          "Contrast": 11,
+          "Saturation": -4,
+          "Clarity": 14,
+          "Highlights": -18,
+          "Shadows": 16,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": 6,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Styles / Base Edits / Clear Contrast.costyle",
+    "prompt": "clear contrast base edit with crisp microcontrast and recovered highlights",
+    "tags": ["contrast", "clarity", "base", "crisp", "clean"],
+    "style_spec": {
+      "name": "Clear Contrast Inspired",
+      "intent": ["contrast", "clean"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.0,
+          "Contrast": 12,
+          "Saturation": 0,
+          "Clarity": 20.19,
+          "Highlights": -15.4,
+          "Shadows": 13.73,
+          "WhiteBalanceTemperature": 5600,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 0,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Cultural Heritage / Color Negative Film / Fujicolor Pro 160C.costyle",
+    "prompt": "fujicolor pro 160c negative film scan look with soft pastel warmth",
+    "tags": ["fujicolor", "film", "negative", "warm", "pastel"],
+    "style_spec": {
+      "name": "Fujicolor Pro 160C Inspired",
+      "intent": ["film", "warm"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.35,
+          "Contrast": 12,
+          "Saturation": 5,
+          "Clarity": 4,
+          "Highlights": -12,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 5900,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": 3,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Cultural Heritage / Color Slide Film / Fujichrome Velvia 100F.costyle",
+    "prompt": "velvia vivid landscape look with punchy color and crisp cool contrast",
+    "tags": ["velvia", "film", "landscape", "vivid", "cool"],
+    "style_spec": {
+      "name": "Velvia 100F Inspired",
+      "intent": ["film", "landscape", "vivid"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.0,
+          "Contrast": 14,
+          "Saturation": 12,
+          "Clarity": 10,
+          "Highlights": -10,
+          "Shadows": 6,
+          "WhiteBalanceTemperature": 5200,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 2,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": 4,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Nolan / Nolan_03_Cold_v1.costyle",
+    "prompt": "cold nolan inspired edit with restrained exposure and subtle cool clarity",
+    "tags": ["nolan", "cold", "cool", "cinematic", "portrait"],
+    "style_spec": {
+      "name": "Nolan Cold Inspired",
+      "intent": ["cinematic", "cool"],
+      "captureone": {
+        "keys": {
+          "Exposure": -0.03,
+          "Contrast": 9,
+          "Saturation": -3,
+          "Clarity": 4.64,
+          "Highlights": -8,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -1,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 4,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Capture One Nolan / Nolan_07_Warm_Portrait_v1.costyle",
+    "prompt": "warm portrait nolan look with richer skin tones and cinematic warmth",
+    "tags": ["nolan", "warm", "portrait", "cinematic", "skin"],
+    "style_spec": {
+      "name": "Nolan Warm Portrait Inspired",
+      "intent": ["cinematic", "warm", "portrait"],
+      "captureone": {
+        "keys": {
+          "Exposure": 0.15,
+          "Contrast": 8,
+          "Saturation": 5,
+          "Clarity": 7,
+          "Highlights": -8,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 6000,
+          "WhiteBalanceTint": 2,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
   }
 ]
