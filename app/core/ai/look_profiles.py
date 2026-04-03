@@ -2,6 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from app.core.ai.generation_engine import (
+    FamilyBaseline,
+    GenerationEngineConfig,
+    GenerationPlan,
+    RefinementLayer,
+    compose_generation_plan,
+    execute_generation_plan,
+)
 
 @dataclass(frozen=True)
 class PromptExpansion:
@@ -68,6 +76,44 @@ _MAIN_PROFILES: tuple[MainProfile, ...] = (
                 ("soft rolloff", "soft highlight", "gentle highlight"),
                 ("soft",),
                 {"Highlights": -6, "Contrast": -2, "Clarity": -1},
+            ),
+        ),
+    ),
+    MainProfile(
+        name="portra_film",
+        triggers=("portra", "kodak portra", "portra inspired"),
+        intents=("film", "portrait", "natural"),
+        adjustments={
+            "Exposure": 0.08,
+            "Contrast": 1,
+            "Saturation": 3,
+            "Clarity": -1,
+            "Highlights": -9,
+            "Shadows": 6,
+            "WhiteBalanceTemperature": 260,
+            "WhiteBalanceTint": 1,
+            "ColorBalanceRed": 3,
+            "ColorBalanceBlue": -1,
+            "ToneCurve": "Film Standard",
+        },
+        variants=(
+            _variant(
+                "soft_highlights",
+                ("soft highlights", "soft highlight", "gentle highlight"),
+                ("soft",),
+                {"Highlights": -4, "Contrast": -1},
+            ),
+            _variant(
+                "gentle_warmth",
+                ("gentle warmth", "warmth", "warm portrait"),
+                ("warm",),
+                {"WhiteBalanceTemperature": 180, "ColorBalanceRed": 2, "WhiteBalanceTint": 1},
+            ),
+            _variant(
+                "natural_skin_film",
+                ("natural skin", "natural skin tones", "honest skin"),
+                ("natural",),
+                {"Saturation": -1, "Clarity": -1, "Highlights": -2},
             ),
         ),
     ),
@@ -802,6 +848,27 @@ _STYLE_REFERENCE_ALIASES: dict[str, tuple[str, ...]] = {
     ),
 }
 
+_NEUTRAL_BASE_KEYS: dict[str, int | float | str] = {
+    "Exposure": 0.1,
+    "Contrast": 8,
+    "Saturation": 6,
+    "Clarity": 8,
+    "Highlights": -8,
+    "Shadows": 10,
+    "WhiteBalanceTemperature": 5600,
+    "WhiteBalanceTint": 2,
+    "ColorBalanceRed": 3,
+    "ColorBalanceGreen": 0,
+    "ColorBalanceBlue": -2,
+    "ToneCurve": "Film Standard",
+}
+
+_ANCHORED_FAMILIES: set[str] = {
+    "cinematic_portrait",
+    "gothic_fantasy",
+    "portra_film",
+}
+
 _INTENSITY_LIMITS: dict[str, tuple[float, float]] = {
     "Exposure": (-1.25, 1.25),
     "Contrast": (-18.0, 24.0),
@@ -817,9 +884,160 @@ _INTENSITY_LIMITS: dict[str, tuple[float, float]] = {
 }
 
 _INTENSITY_SCALES: dict[Intensity, float] = {
-    "subtle": 0.72,
-    "balanced": 0.88,
+    "subtle": 0.52,
+    "balanced": 0.78,
     "bold": 1.0,
+}
+
+_MAIN_PROFILE_INTENSITY_MULTIPLIERS: dict[str, dict[Intensity, float]] = {
+    "cinematic_portrait": {"subtle": 0.58, "balanced": 0.88, "bold": 1.18},
+    "gothic_fantasy": {"subtle": 0.5, "balanced": 0.78, "bold": 1.02},
+    "night_neon": {"subtle": 0.58, "balanced": 0.9, "bold": 1.28},
+    "portra_film": {"subtle": 0.42, "balanced": 0.72, "bold": 0.98},
+    "vivid_documentary": {"subtle": 0.56, "balanced": 0.82, "bold": 1.08},
+}
+
+_VARIANT_INTENSITY_MULTIPLIERS: dict[Intensity, float] = {
+    "subtle": 0.48,
+    "balanced": 0.8,
+    "bold": 1.08,
+}
+
+_FAMILY_SIGNATURES: dict[str, dict[Intensity, dict[str, str | int | float]]] = {
+    "cinematic_portrait": {
+        "subtle": {
+            "Exposure": 0.1,
+            "WhiteBalanceTemperature": -120,
+            "WhiteBalanceTint": 1,
+            "ColorBalanceBlue": 2,
+            "ColorBalanceRed": 1,
+            "Highlights": -2,
+            "Contrast": 1,
+        },
+        "balanced": {
+            "Exposure": 0.15,
+            "WhiteBalanceTemperature": -260,
+            "WhiteBalanceTint": 2,
+            "ColorBalanceBlue": 5,
+            "ColorBalanceRed": 3,
+            "Highlights": -5,
+            "Contrast": 3,
+            "Shadows": 1,
+        },
+        "bold": {
+            "Exposure": 0.2,
+            "WhiteBalanceTemperature": -420,
+            "WhiteBalanceTint": 3,
+            "ColorBalanceBlue": 8,
+            "ColorBalanceRed": 5,
+            "Highlights": -7,
+            "Contrast": 5,
+            "Clarity": 2,
+            "Shadows": 2,
+        },
+    },
+    "gothic_fantasy": {
+        "subtle": {
+            "Exposure": -0.15,
+            "WhiteBalanceTemperature": -320,
+            "WhiteBalanceTint": -1,
+            "ColorBalanceBlue": 3,
+            "ColorBalanceRed": -1,
+            "Saturation": -2,
+        },
+        "balanced": {
+            "Exposure": -0.3,
+            "WhiteBalanceTemperature": -540,
+            "WhiteBalanceTint": -3,
+            "ColorBalanceBlue": 6,
+            "ColorBalanceRed": -3,
+            "Saturation": -3,
+            "Highlights": -3,
+        },
+        "bold": {
+            "Exposure": -0.45,
+            "WhiteBalanceTemperature": -720,
+            "WhiteBalanceTint": -5,
+            "ColorBalanceBlue": 9,
+            "ColorBalanceRed": -5,
+            "Saturation": -4,
+            "Contrast": 2,
+            "Highlights": -5,
+        },
+    },
+    "night_neon": {
+        "subtle": {
+            "Exposure": -0.1,
+            "ColorBalanceBlue": 3,
+            "WhiteBalanceTint": 1,
+            "Contrast": 1,
+        },
+        "balanced": {
+            "Exposure": -0.25,
+            "ColorBalanceBlue": 6,
+            "WhiteBalanceTint": -1,
+            "Contrast": 4,
+            "Clarity": 2,
+            "Highlights": -3,
+        },
+        "bold": {
+            "Exposure": -0.45,
+            "ColorBalanceBlue": 10,
+            "WhiteBalanceTint": -4,
+            "Contrast": 8,
+            "Clarity": 5,
+            "Highlights": -6,
+            "Saturation": 2,
+        },
+    },
+    "portra_film": {
+        "subtle": {
+            "Exposure": 0.05,
+            "WhiteBalanceTemperature": 120,
+            "ColorBalanceRed": 1,
+            "Highlights": -2,
+            "Contrast": -1,
+            "Clarity": -4,
+        },
+        "balanced": {
+            "Exposure": 0.1,
+            "WhiteBalanceTemperature": 240,
+            "ColorBalanceRed": 2,
+            "Highlights": -4,
+            "Contrast": 1,
+            "Saturation": 1,
+            "Clarity": 0,
+        },
+        "bold": {
+            "Exposure": 0.15,
+            "WhiteBalanceTemperature": 360,
+            "ColorBalanceRed": 3,
+            "Highlights": -6,
+            "Contrast": 2,
+            "Saturation": 2,
+            "Clarity": 1,
+        },
+    },
+    "vivid_documentary": {
+        "subtle": {
+            "Contrast": 1,
+            "Saturation": 1,
+            "ColorBalanceRed": 2,
+        },
+        "balanced": {
+            "Contrast": 3,
+            "Saturation": 3,
+            "ColorBalanceRed": 4,
+            "Clarity": 1,
+        },
+        "bold": {
+            "Contrast": 5,
+            "Saturation": 5,
+            "ColorBalanceRed": 6,
+            "Clarity": 2,
+            "WhiteBalanceTemperature": 180,
+        },
+    },
 }
 
 
@@ -860,23 +1078,22 @@ def apply_creative_direction(
     prompt: str,
     constraints: dict | None = None,
 ) -> dict[str, str | int | float]:
-    updated = dict(keys)
     normalized = prompt.lower()
-
-    matched_profiles = _matched_profiles(normalized)
-    for profile in matched_profiles:
-        for key, delta_or_value in _profile_adjustments(profile).items():
-            current = updated.get(key)
-            if isinstance(delta_or_value, str):
-                updated[key] = delta_or_value
-                continue
-            numeric_value = float(delta_or_value)
-            if isinstance(current, (int, float)):
-                numeric_value += float(current)
-            updated[key] = _clamp_key(key, numeric_value)
-
     intensity = infer_intensity(prompt, constraints)
-    return _normalize_intensity(updated, matched_profiles, intensity)
+    matched_profiles = _matched_profiles(normalized)
+    plan = build_generation_plan(prompt, intensity, matched_profiles)
+    effective_base_keys = _resolve_base_keys_for_plan(keys, plan)
+    return execute_generation_plan(
+        base_keys=effective_base_keys,
+        plan=plan,
+        baselines=_baseline_registry(),
+        refinements=_refinement_registry(),
+        config=GenerationEngineConfig(
+            global_intensity_scales=_INTENSITY_SCALES,
+            key_limits=_INTENSITY_LIMITS,
+        ),
+        clamp_key=_clamp_key,
+    )
 
 
 def infer_intensity(prompt: str, constraints: dict | None = None) -> Intensity:
@@ -912,6 +1129,24 @@ def infer_intensity(prompt: str, constraints: dict | None = None) -> Intensity:
     return "balanced"
 
 
+def build_generation_plan(
+    prompt: str,
+    intensity: Intensity,
+    matched_profiles: list[MainProfile | VariantProfile] | None = None,
+) -> GenerationPlan:
+    profiles = matched_profiles if matched_profiles is not None else _matched_profiles(prompt.lower())
+    matched_profile_names = [profile.name for profile in profiles]
+    matched_family_ids = [profile.name for profile in profiles if isinstance(profile, MainProfile)]
+    matched_refinement_ids = [profile.name for profile in profiles if isinstance(profile, VariantProfile)]
+    return compose_generation_plan(
+        prompt=prompt,
+        intensity=intensity,
+        matched_profile_names=matched_profile_names,
+        matched_family_ids=matched_family_ids,
+        matched_refinement_ids=matched_refinement_ids,
+    )
+
+
 def _matched_profiles(prompt: str) -> list[MainProfile | VariantProfile]:
     normalized = prompt.lower()
     matches: list[MainProfile | VariantProfile] = []
@@ -934,38 +1169,47 @@ def _profile_adjustments(profile: MainProfile | VariantProfile) -> dict[str, str
     return profile.adjustments
 
 
-def _normalize_intensity(
+def _baseline_registry() -> dict[str, FamilyBaseline]:
+    return {
+        profile.name: FamilyBaseline(
+            family_id=profile.name,
+            intents=profile.intents,
+            base_adjustments=profile.adjustments,
+            intensity_multipliers=_MAIN_PROFILE_INTENSITY_MULTIPLIERS.get(
+                profile.name, {level: _INTENSITY_SCALES[level] for level in _INTENSITY_SCALES}
+            ),
+            family_signatures=_FAMILY_SIGNATURES.get(profile.name, {}),
+        )
+        for profile in _MAIN_PROFILES
+    }
+
+
+def _refinement_registry() -> dict[str, RefinementLayer]:
+    layers: dict[str, RefinementLayer] = {}
+    for profile in _MAIN_PROFILES:
+        for variant in profile.variants:
+            layers[variant.name] = RefinementLayer(
+                layer_id=variant.name,
+                family_id=profile.name,
+                intents=variant.intents,
+                adjustments=variant.adjustments,
+                intensity_multipliers=_VARIANT_INTENSITY_MULTIPLIERS,
+            )
+    return layers
+
+
+def _resolve_base_keys_for_plan(
     keys: dict[str, str | int | float],
-    matched_profiles: list[MainProfile | VariantProfile],
-    intensity: Intensity,
+    plan: GenerationPlan,
 ) -> dict[str, str | int | float]:
-    if not matched_profiles:
-        return keys
+    if plan.family_id not in _ANCHORED_FAMILIES:
+        return dict(keys)
 
-    normalized = dict(keys)
-    profile_count = len(matched_profiles)
-
-    if profile_count <= 2:
-        profile_scale = 1.0
-    elif profile_count == 3:
-        profile_scale = 0.92
-    elif profile_count == 4:
-        profile_scale = 0.84
-    else:
-        profile_scale = 0.76
-
-    intensity_scale = _INTENSITY_SCALES.get(intensity, _INTENSITY_SCALES["balanced"])
-    scale = profile_scale * intensity_scale
-
-    for key, limits in _INTENSITY_LIMITS.items():
-        current = normalized.get(key)
-        if not isinstance(current, (int, float)):
-            continue
-        scaled = float(current) * scale
-        bounded = max(limits[0], min(limits[1], scaled))
-        normalized[key] = _clamp_key(key, bounded)
-
-    return normalized
+    anchored = dict(_NEUTRAL_BASE_KEYS)
+    for key, value in keys.items():
+        if key not in anchored:
+            anchored[key] = value
+    return anchored
 
 
 def _clamp_key(key: str, value: float) -> int | float:
