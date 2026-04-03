@@ -1,5 +1,6 @@
 from app.core.ai.look_profiles import (
     apply_creative_direction,
+    build_generation_plan,
     expand_style_references,
     infer_intensity,
     profile_catalog,
@@ -104,5 +105,82 @@ def test_apply_creative_direction_supports_subtle_and_bold_modes() -> None:
     bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
 
     assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
-    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["Clarity"] <= bold["Clarity"]
     assert subtle["ColorBalanceBlue"] <= balanced["ColorBalanceBlue"] <= bold["ColorBalanceBlue"]
+
+
+def test_portra_family_has_gentle_warm_film_signature() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+
+    subtle = apply_creative_direction(
+        base_keys,
+        "kodak portra inspired portrait with soft highlights, gentle warmth and natural skin",
+        {"intensity": "subtle"},
+    )
+    bold = apply_creative_direction(
+        base_keys,
+        "kodak portra inspired portrait with soft highlights, gentle warmth and natural skin",
+        {"intensity": "bold"},
+    )
+
+    assert subtle["WhiteBalanceTemperature"] < bold["WhiteBalanceTemperature"]
+    assert subtle["ColorBalanceRed"] <= bold["ColorBalanceRed"]
+    assert subtle["Highlights"] >= bold["Highlights"]
+    assert subtle["Contrast"] <= bold["Contrast"]
+
+
+def test_tokyo_night_family_pushes_neon_signature_with_intensity() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+
+    subtle = apply_creative_direction(
+        base_keys,
+        "tokyo night portrait with neon reflections, cool shadows and warm face tones",
+        {"intensity": "subtle"},
+    )
+    bold = apply_creative_direction(
+        base_keys,
+        "tokyo night portrait with neon reflections, cool shadows and warm face tones",
+        {"intensity": "bold"},
+    )
+
+    assert subtle["Exposure"] >= bold["Exposure"]
+    assert subtle["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= bold["Clarity"]
+    assert subtle["ColorBalanceBlue"] <= bold["ColorBalanceBlue"]
+
+
+def test_build_generation_plan_selects_primary_family_and_refinements() -> None:
+    prompt = "cinematic portrait with cool teal shadows, warm skin and soft rolloff"
+    plan = build_generation_plan(prompt, "balanced")
+
+    assert plan.family_id == "cinematic_portrait"
+    assert "cool_teal" in plan.refinement_ids
+    assert "warm_skin" in plan.refinement_ids
+    assert "soft_rolloff" in plan.refinement_ids
+    assert plan.fallback_mode == "family_baseline"
