@@ -560,3 +560,95 @@ def test_ai_chat_guardrail_blocks_white_balance_when_safe_policy_disables_it(cli
     assert "WhiteBalanceTemperature" not in keys
     assert "WhiteBalanceTint" not in keys
     assert any("safe policy" in warning.lower() for warning in payload["turn"]["warnings"])
+
+
+def test_generate_style_spec_returns_503_when_generator_raises(client: TestClient) -> None:
+    class _BrokenGenerator:
+        def generate_style_spec(self, _payload):  # noqa: ANN001
+            raise RuntimeError("provider down")
+
+        def preview_prompt(self, _payload):  # noqa: ANN001
+            raise AssertionError("not used")
+
+        def health_check(self):
+            raise AssertionError("not used")
+
+    app.dependency_overrides[get_ai_generator] = lambda: _BrokenGenerator()
+
+    response = client.post("/ai/generate-style-spec", json={"prompt": "clean crisp preset"})
+
+    assert response.status_code == 503
+    assert response.json()["message"] == "AI provider request failed during generate."
+
+
+def test_ai_health_returns_503_when_generator_raises(client: TestClient) -> None:
+    class _BrokenGenerator:
+        def generate_style_spec(self, _payload):  # noqa: ANN001
+            raise AssertionError("not used")
+
+        def preview_prompt(self, _payload):  # noqa: ANN001
+            raise AssertionError("not used")
+
+        def health_check(self):
+            raise RuntimeError("health down")
+
+    app.dependency_overrides[get_ai_generator] = lambda: _BrokenGenerator()
+
+    response = client.get("/ai/health")
+
+    assert response.status_code == 503
+    assert response.json()["message"] == "AI provider request failed during health_check."
+
+
+def test_preview_prompt_returns_503_when_generator_raises(client: TestClient) -> None:
+    class _BrokenGenerator:
+        def generate_style_spec(self, _payload):  # noqa: ANN001
+            raise AssertionError("not used")
+
+        def preview_prompt(self, _payload):  # noqa: ANN001
+            raise RuntimeError("preview down")
+
+        def health_check(self):
+            raise AssertionError("not used")
+
+    app.dependency_overrides[get_ai_generator] = lambda: _BrokenGenerator()
+
+    response = client.post("/ai/debug/prompt-preview", json={"prompt": "moody winter"})
+
+    assert response.status_code == 503
+    assert response.json()["message"] == "AI provider request failed during prompt_preview."
+
+
+def test_ai_chat_turn_returns_503_when_generator_raises(client: TestClient) -> None:
+    class _BrokenGenerator:
+        def generate_style_spec(self, _payload):  # noqa: ANN001
+            raise RuntimeError("chat provider down")
+
+        def preview_prompt(self, _payload):  # noqa: ANN001
+            raise AssertionError("not used")
+
+        def health_check(self):
+            raise AssertionError("not used")
+
+    app.dependency_overrides[get_ai_generator] = lambda: _BrokenGenerator()
+
+    create_response = client.post(
+        "/ai/chat/sessions",
+        json={
+            "style_spec": {
+                "name": "Base",
+                "intent": ["portrait"],
+                "captureone": {"keys": {"Exposure": 0.0, "Contrast": 2}},
+            },
+        },
+    )
+    assert create_response.status_code == 201
+    session_id = create_response.json()["session_id"]
+
+    response = client.post(
+        f"/ai/chat/sessions/{session_id}/turns",
+        json={"message": "make it brighter"},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["message"] == "AI provider request failed during chat_turn."
