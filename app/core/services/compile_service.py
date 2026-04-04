@@ -6,6 +6,7 @@ from typing import Literal
 from app.core.captureone import apply_safe_policy, parse_costyle, write_costyle
 from app.core.captureone.costyle_parser import CostyleDocument, Entry
 from app.core.models import Artifact
+from app.core.services.errors import CompileConfigurationError, CompileValidationError
 from app.storage.base import Store
 
 _TARGET = "captureone"
@@ -20,15 +21,15 @@ def compile_style_version(
     template_path: Path | None = None,
 ) -> Artifact:
     if target != _TARGET:
-        raise ValueError(f"unsupported target: {target}")
+        raise CompileValidationError(f"unsupported target: {target}")
 
     style = store.get_style(style_id)
     if style is None:
-        raise ValueError(f"style not found: {style_id}")
+        raise LookupError(f"style not found: {style_id}")
 
     style_version = store.get_version(style_id, version)
     if style_version is None:
-        raise ValueError(f"version not found: {version}")
+        raise LookupError(f"version not found: {version}")
 
     template_content = _load_template(template_path)
     template_document = parse_costyle(template_content)
@@ -52,7 +53,7 @@ def compile_style_version(
 def _load_template(template_path: Path | None) -> str:
     path = template_path or _TEMPLATE_PATH
     if not path.exists():
-        raise ValueError(f"template not found: {path}")
+        raise CompileConfigurationError(f"template not found: {path}")
     return path.read_text(encoding="utf-8")
 
 

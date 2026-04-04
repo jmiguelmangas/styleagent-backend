@@ -83,6 +83,8 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
         error_id = "bad_request"
     elif exc.status_code == status.HTTP_429_TOO_MANY_REQUESTS:
         error_id = "rate_limited"
+    elif exc.status_code >= status.HTTP_500_INTERNAL_SERVER_ERROR:
+        error_id = "internal_error"
 
     return _error_response(
         request=request,
