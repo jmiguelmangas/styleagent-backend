@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from app.core.ai.look_profiles import apply_creative_direction, expand_style_references
+from app.core.ai.look_profiles import apply_creative_direction, expand_style_references, infer_intensity
 from app.core.models.ai import (
     AIHealthResponse,
+    AIPlannerTrace,
     AIPromptPreviewResponse,
     GeneratedStyleSpecResponse,
     PromptGenerateRequest,
@@ -39,6 +40,11 @@ class MockStyleGenerator:
             warnings=[],
             provider=self.provider,
             model=self.model,
+            planner_trace=AIPlannerTrace(
+                mode="mock_rule_based",
+                intensity=infer_intensity(prompt, payload.constraints),
+                source="mock rule-based generator",
+            ),
         )
 
     def preview_prompt(self, payload: PromptGenerateRequest) -> AIPromptPreviewResponse:
