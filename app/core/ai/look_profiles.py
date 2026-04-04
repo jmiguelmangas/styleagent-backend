@@ -325,6 +325,42 @@ _MAIN_PROFILES: tuple[MainProfile, ...] = (
         ),
     ),
     MainProfile(
+        name="jazz_club",
+        triggers=("jazz club", "smoky shadows", "brass glow", "red velvet light"),
+        intents=("moody", "portrait", "warm"),
+        adjustments={
+            "Exposure": -0.12,
+            "Contrast": 7,
+            "Saturation": 1,
+            "Clarity": 4,
+            "Highlights": -8,
+            "Shadows": 6,
+            "WhiteBalanceTemperature": -180,
+            "ColorBalanceRed": 2,
+            "ToneCurve": "Film Extra Shadow",
+        },
+        variants=(
+            _variant(
+                "velvet_red",
+                ("red velvet", "velvet light", "deep crimson"),
+                ("warm",),
+                {"ColorBalanceRed": 4, "WhiteBalanceTint": 1, "Saturation": 1},
+            ),
+            _variant(
+                "brass_glow",
+                ("brass glow", "amber brass", "gold horn"),
+                ("warm",),
+                {"WhiteBalanceTemperature": 140, "Highlights": -2, "ColorBalanceRed": 1},
+            ),
+            _variant(
+                "smoky_room",
+                ("smoky", "smoky shadows", "club smoke"),
+                ("moody",),
+                {"Contrast": 2, "Shadows": 3, "Clarity": 1},
+            ),
+        ),
+    ),
+    MainProfile(
         name="vintage_film",
         triggers=("vintage film", "retro film", "old film", "analogue"),
         intents=("film", "vintage"),
@@ -456,6 +492,40 @@ _MAIN_PROFILES: tuple[MainProfile, ...] = (
                 ("rock detail", "craggy", "texture"),
                 ("crisp",),
                 {"Clarity": 4, "Contrast": 2},
+            ),
+        ),
+    ),
+    MainProfile(
+        name="aerial_coastline",
+        triggers=("drone aerial", "aerial coastline", "coastline", "cyan sea"),
+        intents=("landscape", "aerial", "coastal"),
+        adjustments={
+            "Exposure": 0.12,
+            "Contrast": 3,
+            "Saturation": 1,
+            "Clarity": 2,
+            "Highlights": -2,
+            "Shadows": -1,
+            "ColorBalanceBlue": 1,
+        },
+        variants=(
+            _variant(
+                "cyan_sea",
+                ("deep cyan sea", "cyan sea", "coastal cyan"),
+                ("cool",),
+                {"ColorBalanceBlue": 3, "Saturation": 1, "WhiteBalanceTemperature": -120},
+            ),
+            _variant(
+                "midday_glare",
+                ("midday glare", "sun glare", "hard midday light"),
+                ("clean",),
+                {"Highlights": -3, "Contrast": 1, "Exposure": 0.05},
+            ),
+            _variant(
+                "crisp_edges",
+                ("crisp edges", "chalk", "cliff edge"),
+                ("crisp",),
+                {"Clarity": 2, "Contrast": 1},
             ),
         ),
     ),
@@ -865,8 +935,11 @@ _NEUTRAL_BASE_KEYS: dict[str, int | float | str] = {
 }
 
 _ANCHORED_FAMILIES: set[str] = {
+    "aerial_coastline",
     "cinematic_portrait",
     "gothic_fantasy",
+    "jazz_club",
+    "pastel_airy",
     "portra_film",
 }
 
@@ -894,6 +967,9 @@ _MAIN_PROFILE_INTENSITY_MULTIPLIERS: dict[str, dict[Intensity, float]] = {
     "cinematic_portrait": {"subtle": 0.58, "balanced": 0.88, "bold": 1.18},
     "gothic_fantasy": {"subtle": 0.5, "balanced": 0.78, "bold": 1.02},
     "night_neon": {"subtle": 0.58, "balanced": 0.9, "bold": 1.28},
+    "aerial_coastline": {"subtle": 0.48, "balanced": 0.72, "bold": 0.98},
+    "jazz_club": {"subtle": 0.46, "balanced": 0.74, "bold": 1.0},
+    "pastel_airy": {"subtle": 0.42, "balanced": 0.66, "bold": 0.9},
     "portra_film": {"subtle": 0.42, "balanced": 0.72, "bold": 0.98},
     "vivid_documentary": {"subtle": 0.56, "balanced": 0.82, "bold": 1.08},
 }
@@ -989,6 +1065,94 @@ _FAMILY_SIGNATURES: dict[str, dict[Intensity, dict[str, str | int | float]]] = {
             "Clarity": 5,
             "Highlights": -6,
             "Saturation": 2,
+        },
+    },
+    "aerial_coastline": {
+        "subtle": {
+            "Exposure": 0.04,
+            "Contrast": -1,
+            "Clarity": -1,
+            "Highlights": -1,
+            "ColorBalanceBlue": 1,
+        },
+        "balanced": {
+            "Exposure": 0.08,
+            "Contrast": 1,
+            "Clarity": 0,
+            "Highlights": -3,
+            "ColorBalanceBlue": 2,
+            "WhiteBalanceTemperature": -80,
+        },
+        "bold": {
+            "Exposure": 0.12,
+            "Contrast": 3,
+            "Clarity": 2,
+            "Highlights": -8,
+            "ColorBalanceBlue": 4,
+            "WhiteBalanceTemperature": -120,
+            "Saturation": 1,
+        },
+    },
+    "pastel_airy": {
+        "subtle": {
+            "Exposure": 0.04,
+            "Contrast": -1,
+            "Saturation": -1,
+            "Clarity": -2,
+            "WhiteBalanceTemperature": 80,
+            "WhiteBalanceTint": 1,
+            "ColorBalanceRed": 1,
+        },
+        "balanced": {
+            "Exposure": 0.08,
+            "Contrast": 0,
+            "Clarity": -1,
+            "Highlights": -2,
+            "Shadows": 2,
+            "WhiteBalanceTemperature": 140,
+            "WhiteBalanceTint": 2,
+            "ColorBalanceRed": 2,
+        },
+        "bold": {
+            "Exposure": 0.12,
+            "Contrast": 1,
+            "Saturation": 1,
+            "Clarity": 0,
+            "Highlights": -3,
+            "Shadows": 3,
+            "WhiteBalanceTemperature": 220,
+            "WhiteBalanceTint": 3,
+            "ColorBalanceRed": 3,
+        },
+    },
+    "jazz_club": {
+        "subtle": {
+            "Exposure": -0.04,
+            "Contrast": 1,
+            "Saturation": -1,
+            "Clarity": 0,
+            "Highlights": -2,
+            "WhiteBalanceTemperature": -160,
+            "ColorBalanceRed": 2,
+        },
+        "balanced": {
+            "Exposure": -0.08,
+            "Contrast": 3,
+            "Saturation": 0,
+            "Clarity": 1,
+            "Highlights": -4,
+            "WhiteBalanceTemperature": -260,
+            "ColorBalanceRed": 3,
+        },
+        "bold": {
+            "Exposure": -0.14,
+            "Contrast": 5,
+            "Saturation": 1,
+            "Clarity": 2,
+            "Highlights": -7,
+            "WhiteBalanceTemperature": -360,
+            "ColorBalanceRed": 4,
+            "Shadows": 2,
         },
     },
     "portra_film": {
@@ -1098,6 +1262,99 @@ _FAMILY_ENVELOPES: dict[str, dict[Intensity, dict[str, tuple[float, float]]]] = 
             "WhiteBalanceTemperature": (6300.0, 6700.0),
             "ColorBalanceRed": (8.0, 12.0),
             "ColorBalanceBlue": (-4.0, 1.0),
+        },
+    },
+    "aerial_coastline": {
+        "subtle": {
+            "Contrast": (6.0, 8.0),
+            "Saturation": (5.0, 7.0),
+            "Clarity": (6.0, 7.0),
+            "Highlights": (-8.0, -6.0),
+            "Shadows": (7.0, 9.0),
+            "WhiteBalanceTemperature": (5450.0, 5580.0),
+            "ColorBalanceBlue": (-1.0, 1.0),
+        },
+        "balanced": {
+            "Contrast": (8.0, 10.0),
+            "Saturation": (6.0, 8.0),
+            "Clarity": (7.0, 8.0),
+            "Highlights": (-14.0, -9.0),
+            "Shadows": (9.0, 12.0),
+            "WhiteBalanceTemperature": (5350.0, 5500.0),
+            "ColorBalanceBlue": (0.0, 2.0),
+        },
+        "bold": {
+            "Contrast": (11.0, 14.0),
+            "Saturation": (8.0, 11.0),
+            "Clarity": (8.0, 10.0),
+            "Highlights": (-24.0, -16.0),
+            "Shadows": (13.0, 17.0),
+            "WhiteBalanceTemperature": (6100.0, 6500.0),
+            "ColorBalanceBlue": (1.0, 4.0),
+        },
+    },
+    "pastel_airy": {
+        "subtle": {
+            "Contrast": (4.0, 6.0),
+            "Saturation": (5.0, 6.0),
+            "Clarity": (5.0, 7.0),
+            "Highlights": (-12.0, -8.0),
+            "Shadows": (10.0, 13.0),
+            "WhiteBalanceTemperature": (5640.0, 5740.0),
+            "WhiteBalanceTint": (2.0, 3.0),
+            "ColorBalanceRed": (4.0, 5.0),
+        },
+        "balanced": {
+            "Contrast": (7.0, 8.0),
+            "Saturation": (6.0, 7.0),
+            "Clarity": (7.0, 8.0),
+            "Highlights": (-12.0, -9.0),
+            "Shadows": (14.0, 17.0),
+            "WhiteBalanceTemperature": (5740.0, 5820.0),
+            "WhiteBalanceTint": (4.0, 5.0),
+            "ColorBalanceRed": (6.0, 7.0),
+        },
+        "bold": {
+            "Contrast": (9.0, 11.0),
+            "Saturation": (7.0, 9.0),
+            "Clarity": (7.0, 9.0),
+            "Highlights": (-16.0, -12.0),
+            "Shadows": (18.0, 21.0),
+            "WhiteBalanceTemperature": (5840.0, 5940.0),
+            "WhiteBalanceTint": (5.0, 7.0),
+            "ColorBalanceRed": (8.0, 9.0),
+        },
+    },
+    "jazz_club": {
+        "subtle": {
+            "Contrast": (8.0, 11.0),
+            "Saturation": (4.0, 6.0),
+            "Clarity": (8.0, 10.0),
+            "Highlights": (-14.0, -10.0),
+            "Shadows": (12.0, 14.0),
+            "WhiteBalanceTemperature": (5400.0, 5650.0),
+            "ColorBalanceRed": (4.0, 6.0),
+            "ColorBalanceBlue": (-1.0, 1.0),
+        },
+        "balanced": {
+            "Contrast": (12.0, 15.0),
+            "Saturation": (4.0, 7.0),
+            "Clarity": (9.0, 12.0),
+            "Highlights": (-20.0, -15.0),
+            "Shadows": (14.0, 17.0),
+            "WhiteBalanceTemperature": (4700.0, 5300.0),
+            "ColorBalanceRed": (4.0, 7.0),
+            "ColorBalanceBlue": (2.0, 6.0),
+        },
+        "bold": {
+            "Contrast": (18.0, 22.0),
+            "Saturation": (6.0, 9.0),
+            "Clarity": (12.0, 16.0),
+            "Highlights": (-28.0, -22.0),
+            "Shadows": (18.0, 21.0),
+            "WhiteBalanceTemperature": (3900.0, 4600.0),
+            "ColorBalanceRed": (5.0, 9.0),
+            "ColorBalanceBlue": (6.0, 11.0),
         },
     },
 }
@@ -1256,9 +1513,17 @@ def build_generation_plan(
     matched_profiles: list[MainProfile | VariantProfile] | None = None,
 ) -> GenerationPlan:
     profiles = matched_profiles if matched_profiles is not None else _matched_profiles(prompt.lower())
-    matched_profile_names = [profile.name for profile in profiles]
     matched_family_ids = [profile.name for profile in profiles if isinstance(profile, MainProfile)]
+    primary_family_id = matched_family_ids[0] if matched_family_ids else None
     matched_refinement_ids = [profile.name for profile in profiles if isinstance(profile, VariantProfile)]
+    if primary_family_id:
+        allowed_refinement_ids = {
+            variant.name for profile in _MAIN_PROFILES if profile.name == primary_family_id for variant in profile.variants
+        }
+        matched_refinement_ids = [refinement_id for refinement_id in matched_refinement_ids if refinement_id in allowed_refinement_ids]
+        matched_profile_names = [primary_family_id, *matched_refinement_ids]
+    else:
+        matched_profile_names = [profile.name for profile in profiles]
     return compose_generation_plan(
         prompt=prompt,
         intensity=intensity,
