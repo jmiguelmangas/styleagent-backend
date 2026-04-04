@@ -196,5 +196,67 @@
         }
       }
     }
+  },
+  {
+    "source": "AFC / Soft Mist 1-4.xmp",
+    "prompt": "soft mist portrait glow with lowered clarity, dreamy bloom and gentle halation feel",
+    "tags": [
+      "soft-mist",
+      "portrait",
+      "dreamy",
+      "glow",
+      "halation"
+    ],
+    "style_spec": {
+      "name": "AFC Soft Mist Inspired",
+      "intent": [
+        "portrait",
+        "soft",
+        "dreamy"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -2,
+          "Clarity": -12,
+          "Highlights": -8,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 5600,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Japan Mood / Japanese Mood 02.xmp",
+    "prompt": "japan mood night scene with muted saturation, lifted darks and melancholic urban color",
+    "tags": [
+      "japan",
+      "night",
+      "urban",
+      "muted",
+      "melancholic"
+    ],
+    "style_spec": {
+      "name": "Japan Mood 02 Inspired",
+      "intent": [
+        "night",
+        "urban",
+        "moody"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -10,
+          "Saturation": -9,
+          "Highlights": -20,
+          "Shadows": 22,
+          "WhiteBalanceTemperature": 5050,
+          "WhiteBalanceTint": -3,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": 6,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
   }
 ]
