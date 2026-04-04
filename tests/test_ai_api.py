@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from app.api.deps import get_ai_generator, get_store
 from app.api.routers.ai import reset_ai_rate_limiter_for_tests
 from app.core.ai.factory import get_ai_generator_instance
-from app.core.models import GeneratedStyleSpecResponse, StyleSpec
+from app.core.models import AIPlannerTrace, GeneratedStyleSpecResponse, StyleSpec
 from app.core.models.ai import PromptGenerateRequest
 from app.main import app
 from app.storage.fs_store import FSStore
@@ -418,6 +418,11 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
                 warnings=[],
                 provider=self.provider,
                 model=self.model,
+                planner_trace=AIPlannerTrace(
+                    mode="direct_style_spec",
+                    intensity="balanced",
+                    source="fake chat trace",
+                ),
             )
 
     app.dependency_overrides[get_ai_generator] = lambda: _FakeChatGenerator()
@@ -447,6 +452,8 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
     assert turn_response.status_code == 201
     payload = turn_response.json()
     assert payload["turn"]["assistant_message"].startswith("I analyzed your request with fake/fake-v1")
+    assert payload["turn"]["planner_trace"]["mode"] == "direct_style_spec"
+    assert payload["turn"]["planner_trace"]["intensity"] == "balanced"
 
     changes = {item["key"]: item for item in payload["turn"]["proposed_changes"]}
     assert "Exposure" in changes

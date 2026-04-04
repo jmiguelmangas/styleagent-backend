@@ -161,7 +161,7 @@ def _derive_change_intents_from_ai(
     spec: StyleSpec,
     goals: list[str],
     generator: AIStyleGenerator,
-) -> tuple[dict[str, float], list[str], str, str]:
+) -> tuple[dict[str, float], list[str], str, str, object | None]:
     constraints = {
         "mode": "chat_turn_delta",
         "allowed_keys": sorted(_PARAMETER_GUARDRAILS.keys()),
@@ -178,6 +178,7 @@ def _derive_change_intents_from_ai(
         target="captureone",
     )
     response = generator.generate_style_spec(payload)
+    planner_trace = response.planner_trace
 
     suggestions: dict[str, float] = {}
     warnings = list(response.warnings)
@@ -197,9 +198,9 @@ def _derive_change_intents_from_ai(
 
     if not suggestions:
         warnings.append("AI chat produced no supported deltas; heuristic fallback used.")
-        return _derive_change_intents(message), warnings, response.provider, response.model
+        return _derive_change_intents(message), warnings, response.provider, response.model, planner_trace
 
-    return suggestions, warnings, response.provider, response.model
+    return suggestions, warnings, response.provider, response.model, planner_trace
 
 
 def _detect_conversation_goals(message: str) -> list[str]:
@@ -459,7 +460,7 @@ def create_ai_chat_turn(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ai chat session not found")
 
     goals = _detect_conversation_goals(payload.message)
-    suggestions, ai_warnings, provider, model = _derive_change_intents_from_ai(
+    suggestions, ai_warnings, provider, model, planner_trace = _derive_change_intents_from_ai(
         payload.message,
         session.style_spec,
         goals,
@@ -479,6 +480,7 @@ def create_ai_chat_turn(
         proposed_changes=proposed_changes,
         warnings=warnings,
         guidance=guidance,
+        planner_trace=planner_trace,
         applied=False,
     )
 
