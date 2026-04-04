@@ -26,6 +26,16 @@ class StyleCreate(BaseModel):
             raise ValueError("name must not be blank")
         return trimmed
 
+    @field_validator("slug")
+    @classmethod
+    def validate_slug_not_blank(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        trimmed = value.strip()
+        if not trimmed:
+            raise ValueError("slug must not be blank")
+        return trimmed
+
     @model_validator(mode="after")
     def set_slug_from_name(self) -> "StyleCreate":
         if self.slug is None:
