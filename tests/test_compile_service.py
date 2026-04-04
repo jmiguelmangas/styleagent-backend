@@ -1,7 +1,11 @@
 import hashlib
+from pathlib import Path
+
+import pytest
 
 from app.core.models import SafePolicy, Style, StyleSpec, StyleVersion
 from app.core.services import compile_style_version
+from app.core.services.errors import CompileConfigurationError, CompileValidationError
 from app.storage.fs_store import FSStore
 
 
@@ -95,3 +99,39 @@ def test_compile_style_version_includes_richer_captureone_keys(tmp_path) -> None
     assert '<E K="WhiteBalanceTemperature" V="5900"/>' in text
     assert '<E K="ColorBalanceRed" V="7"/>' in text
     assert '<E K="ToneCurve" V="Film Standard"/>' in text
+
+
+def test_compile_style_version_raises_lookup_for_missing_style(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+
+    with pytest.raises(LookupError, match="style not found: missing-style"):
+        compile_style_version(store=store, style_id="missing-style", version="v1")
+
+
+def test_compile_style_version_raises_lookup_for_missing_version(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+    style = store.create_style(Style(name="Nolan Warm", slug="nolan-warm"))
+
+    with pytest.raises(LookupError, match="version not found: missing"):
+        compile_style_version(store=store, style_id=style.style_id, version="missing")
+
+
+def test_compile_style_version_rejects_unsupported_target(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+    style, _ = _create_style_with_version(store)
+
+    with pytest.raises(CompileValidationError, match="unsupported target: lightroom"):
+        compile_style_version(store=store, style_id=style.style_id, version="v1", target="lightroom")  # type: ignore[arg-type]
+
+
+def test_compile_style_version_raises_configuration_error_for_missing_template(tmp_path) -> None:
+    store = FSStore(base_dir=tmp_path / "data")
+    style, _ = _create_style_with_version(store)
+
+    with pytest.raises(CompileConfigurationError, match="template not found:"):
+        compile_style_version(
+            store=store,
+            style_id=style.style_id,
+            version="v1",
+            template_path=Path(tmp_path / "missing-template.costyle"),
+        )

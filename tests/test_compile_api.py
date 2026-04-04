@@ -2,7 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.deps import get_store
+from app.api.routers import styles as styles_router
 from app.main import app
+from app.core.services.errors import CompileConfigurationError
 from app.storage.fs_store import FSStore
 
 
@@ -70,6 +72,28 @@ def test_compile_endpoint_returns_404_for_missing_version(client: TestClient) ->
 
     missing_resp = client.post(f"/styles/{style_id}/versions/missing/compile?target=captureone")
     assert missing_resp.status_code == 404
+
+
+def test_compile_endpoint_returns_404_for_missing_style(client: TestClient) -> None:
+    response = client.post("/styles/missing-style/versions/v1/compile?target=captureone")
+
+    assert response.status_code == 404
+
+
+def test_compile_endpoint_returns_500_for_compile_configuration_error(client: TestClient, monkeypatch) -> None:
+    style_id = _create_style_and_version(client)
+
+    def _broken_compile(*_args, **_kwargs):  # noqa: ANN002, ANN003
+        raise CompileConfigurationError("template not found: /broken/template.costyle")
+
+    monkeypatch.setattr(styles_router, "compile_style_version", _broken_compile)
+
+    response = client.post(f"/styles/{style_id}/versions/v1/compile?target=captureone")
+
+    assert response.status_code == 500
+    payload = response.json()
+    assert payload["error_id"] == "internal_error"
+    assert payload["message"] == "template not found: /broken/template.costyle"
 
 
 def test_download_artifact_returns_404_for_missing_artifact(client: TestClient) -> None:

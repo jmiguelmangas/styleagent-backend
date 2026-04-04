@@ -12,7 +12,7 @@ from app.core.models import (
     StyleVersion,
     StyleVersionCreate,
 )
-from app.core.services import compile_style_version
+from app.core.services import CompileConfigurationError, CompileValidationError, compile_style_version
 from app.storage.base import Store
 from app.storage.errors import ConflictError
 
@@ -159,11 +159,12 @@ def compile_version(
             version=version,
             target=target,
         )
-    except ValueError as exc:
-        detail = str(exc)
-        if "not found" in detail:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail) from exc
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail) from exc
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except CompileValidationError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    except CompileConfigurationError as exc:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
 
     return CompileResponse(
         artifact_id=artifact.artifact_id,
