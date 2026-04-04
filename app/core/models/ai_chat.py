@@ -87,6 +87,14 @@ class AIChatTurnCreateRequest(BaseModel):
         default=False,
         description="If true, apply guard-railed proposed changes immediately after generation.",
     )
+    family_id: str | None = Field(
+        default=None,
+        description="Optional explicit family baseline hint for this turn.",
+    )
+    intensity: Literal["subtle", "balanced", "bold"] | None = Field(
+        default=None,
+        description="Optional explicit intensity override for this turn.",
+    )
 
     @field_validator("message")
     @classmethod
@@ -95,6 +103,14 @@ class AIChatTurnCreateRequest(BaseModel):
         if not trimmed:
             raise ValueError("message must not be blank")
         return trimmed
+
+    @field_validator("family_id")
+    @classmethod
+    def normalize_family_id(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        trimmed = value.strip()
+        return trimmed or None
 
 
 class AIChatTurnResponse(BaseModel):

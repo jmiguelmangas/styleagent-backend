@@ -1080,7 +1080,22 @@ def apply_creative_direction(
 ) -> dict[str, str | int | float]:
     intensity = infer_intensity(prompt, constraints)
     matched_profiles = _matched_profiles(prompt.lower())
-    plan = build_generation_plan(prompt, intensity, matched_profiles)
+    family_id = None
+    if isinstance(constraints, dict):
+        raw_family_id = constraints.get("family_id")
+        if isinstance(raw_family_id, str) and raw_family_id.strip():
+            family_id = raw_family_id.strip()
+
+    if family_id:
+        matched_refinement_ids = [profile.name for profile in matched_profiles if isinstance(profile, VariantProfile)]
+        plan = build_generation_plan_from_selection(
+            prompt=prompt,
+            intensity=intensity,
+            family_id=family_id,
+            refinement_ids=matched_refinement_ids,
+        )
+    else:
+        plan = build_generation_plan(prompt, intensity, matched_profiles)
     return apply_generation_plan(keys, plan)
 
 

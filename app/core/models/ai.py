@@ -29,6 +29,21 @@ class AIPlannerTrace(BaseModel):
     )
 
 
+class AIPlannerOptionsResponse(BaseModel):
+    families: list[str] = Field(
+        default_factory=list,
+        description="Known family baseline identifiers that can be used as explicit planner hints.",
+    )
+    refinements: list[str] = Field(
+        default_factory=list,
+        description="Known refinement identifiers available to the planner.",
+    )
+    intensities: list[Literal["subtle", "balanced", "bold"]] = Field(
+        default_factory=lambda: ["subtle", "balanced", "bold"],
+        description="Supported preset intensity levels.",
+    )
+
+
 class PromptGenerateRequest(BaseModel):
     prompt: str = Field(
         min_length=1,
