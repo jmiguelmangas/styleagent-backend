@@ -8,9 +8,11 @@ from typing import Any, Literal
 
 from pymongo import ASCENDING, DESCENDING, MongoClient, ReturnDocument
 from pymongo.collection import Collection
+from pymongo.errors import DuplicateKeyError
 
 from app.core.models import AIGenerationRecord, AIChatSession, AIChatTurn, Artifact, RunnerJob, Style, StyleVersion
 from app.storage.fs_store import FSStore
+from app.storage.errors import ConflictError
 
 
 class MongoStore(FSStore):
@@ -51,7 +53,10 @@ class MongoStore(FSStore):
 
     def create_style(self, style: Style) -> Style:
         self._ensure_indexes()
-        self._styles.insert_one(style.model_dump(mode="python"))
+        try:
+            self._styles.insert_one(style.model_dump(mode="python"))
+        except DuplicateKeyError as exc:
+            raise ConflictError(f"style slug already exists: {style.slug}") from exc
         return style
 
     def get_style(self, style_id: str) -> Style | None:
@@ -69,7 +74,10 @@ class MongoStore(FSStore):
         if self.get_style(style_id) is None:
             raise ValueError(f"style not found: {style_id}")
 
-        self._style_versions.insert_one(version.model_dump(mode="python"))
+        try:
+            self._style_versions.insert_one(version.model_dump(mode="python"))
+        except DuplicateKeyError as exc:
+            raise ConflictError(f"style version already exists: {style_id}/{version.version}") from exc
         return version
 
     def get_version(self, style_id: str, version: str) -> StyleVersion | None:

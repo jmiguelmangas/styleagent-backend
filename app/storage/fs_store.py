@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 from app.core.models import AIGenerationRecord, AIChatSession, AIChatTurn, Artifact, RunnerJob, Style, StyleVersion
+from app.storage.errors import ConflictError
 
 
 class FSStore:
@@ -24,11 +25,16 @@ class FSStore:
 
     def create_style(self, style: Style) -> Style:
         self._ensure_layout()
+        styles_index = self._read_json(self.styles_index_path)
+        if style.style_id in styles_index:
+            raise ConflictError(f"style already exists: {style.style_id}")
+        if style.slug in styles_index.values():
+            raise ConflictError(f"style slug already exists: {style.slug}")
+
         style_path = self._style_dir(style.slug)
         style_path.mkdir(parents=True, exist_ok=True)
         self._write_json(style_path / "style.json", style.model_dump(mode="json"))
 
-        styles_index = self._read_json(self.styles_index_path)
         styles_index[style.style_id] = style.slug
         self._write_json(self.styles_index_path, styles_index)
         return style
@@ -60,9 +66,12 @@ class FSStore:
             raise ValueError(f"style not found: {style_id}")
 
         version_dir = self._version_dir(style.slug, version.version)
+        version_file = version_dir / "version.json"
+        if version_file.exists():
+            raise ConflictError(f"style version already exists: {style_id}/{version.version}")
         version_dir.mkdir(parents=True, exist_ok=True)
 
-        self._write_json(version_dir / "version.json", version.model_dump(mode="json"))
+        self._write_json(version_file, version.model_dump(mode="json"))
         self._write_json(version_dir / "spec.json", version.style_spec.model_dump(mode="json"))
         self._write_json(version_dir / "policy.json", version.safe_policy.model_dump(mode="json"))
         return version

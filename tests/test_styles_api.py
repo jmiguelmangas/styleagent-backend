@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from app.api.deps import get_store
 from app.main import app
 from app.storage.fs_store import FSStore
+from app.storage.errors import ConflictError
 
 
 @pytest.fixture
@@ -43,6 +44,22 @@ def test_list_styles_returns_created_styles(client: TestClient) -> None:
     names = {style["name"] for style in list_response.json()}
     assert "Style A" in names
     assert "Style B" in names
+
+
+def test_create_style_rejects_duplicate_slug(client: TestClient) -> None:
+    first = client.post("/styles", json={"name": "Tokyo Night"})
+    second = client.post("/styles", json={"name": "Tokyo Night"})
+
+    assert first.status_code == 201
+    assert second.status_code == 409
+    assert second.json()["message"] == "style slug already exists: tokyo-night"
+
+
+def test_create_style_rejects_blank_slug(client: TestClient) -> None:
+    response = client.post("/styles", json={"name": "Tokyo Night", "slug": "   "})
+
+    assert response.status_code == 422
+    assert response.json()["error_id"] == "validation_error"
 
 
 def test_create_and_get_style_version(client: TestClient) -> None:
@@ -87,3 +104,38 @@ def test_create_and_get_style_version(client: TestClient) -> None:
         json=payload,
     )
     assert missing_style_create_response.status_code == 404
+
+
+def test_create_style_version_rejects_duplicate_version(client: TestClient) -> None:
+    create_style_response = client.post("/styles", json={"name": "Film Warm"})
+    style_id = create_style_response.json()["style_id"]
+    payload = {
+        "version": "v1",
+        "style_spec": {
+            "name": "Film Warm",
+            "intent": ["warm", "cinematic"],
+            "captureone": {"keys": {"Exposure": 0.35, "Contrast": 12}},
+        },
+    }
+
+    first = client.post(f"/styles/{style_id}/versions", json=payload)
+    duplicate = client.post(f"/styles/{style_id}/versions", json=payload)
+
+    assert first.status_code == 201
+    assert duplicate.status_code == 409
+    assert duplicate.json()["message"] == f"style version already exists: {style_id}/v1"
+
+
+def test_create_style_returns_conflict_from_store_override(tmp_path) -> None:
+    class ConflictStore(FSStore):
+        def create_style(self, style):  # type: ignore[override]
+            raise ConflictError("style slug already exists: duplicated")
+
+    store = ConflictStore(base_dir=tmp_path / "data")
+    app.dependency_overrides[get_store] = lambda: store
+    with TestClient(app) as test_client:
+        response = test_client.post("/styles", json={"name": "Duplicated"})
+    app.dependency_overrides.clear()
+
+    assert response.status_code == 409
+    assert response.json()["message"] == "style slug already exists: duplicated"

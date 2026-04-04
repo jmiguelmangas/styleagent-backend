@@ -14,6 +14,7 @@ from app.core.models import (
 )
 from app.core.services import compile_style_version
 from app.storage.base import Store
+from app.storage.errors import ConflictError
 
 router = APIRouter(prefix="/styles", tags=["styles"])
 
@@ -42,7 +43,10 @@ def create_style(
     store: Store = Depends(get_store),
 ) -> Style:
     style = Style(name=payload.name, slug=payload.slug or "")
-    return store.create_style(style)
+    try:
+        return store.create_style(style)
+    except ConflictError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
 
 @router.get(
@@ -88,6 +92,8 @@ def create_style_version(
 
     try:
         return store.create_version(style_id, version)
+    except ConflictError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
