@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
 from app.api.deps import get_ai_generator, get_store
 from app.core.ai.base import AIStyleGenerator
+from app.core.ai.look_profiles import known_family_ids, known_refinement_ids
 from app.core.models import (
     AIHealthResponse,
     AIChatSession,
@@ -21,6 +22,7 @@ from app.core.models import (
     AIConversationGuidance,
     AIPromptPreviewResponse,
     AIParameterChange,
+    AIPlannerOptionsResponse,
     StyleSpec,
 )
 from app.core.models.ai import AIGenerationRecord, GeneratedStyleSpecResponse, PromptGenerateRequest
@@ -95,6 +97,19 @@ def reset_ai_rate_limiter_for_tests() -> None:
     _rate_limiter.reset()
 
 
+@router.get(
+    "/planner-options",
+    response_model=AIPlannerOptionsResponse,
+    summary="List AI Planner Options",
+    description="Return the currently known planner families, refinements, and supported intensity levels.",
+)
+def get_ai_planner_options() -> AIPlannerOptionsResponse:
+    return AIPlannerOptionsResponse(
+        families=list(known_family_ids()),
+        refinements=list(known_refinement_ids()),
+    )
+
+
 def _clamp(value: float, min_value: float, max_value: float) -> float:
     return max(min_value, min(max_value, value))
 
@@ -161,6 +176,8 @@ def _derive_change_intents_from_ai(
     spec: StyleSpec,
     goals: list[str],
     generator: AIStyleGenerator,
+    family_id: str | None = None,
+    intensity: str | None = None,
 ) -> tuple[dict[str, float], list[str], str, str, object | None]:
     constraints = {
         "mode": "chat_turn_delta",
@@ -171,6 +188,10 @@ def _derive_change_intents_from_ai(
             if key in _PARAMETER_GUARDRAILS and isinstance(value, (int, float))
         },
     }
+    if family_id:
+        constraints["family_id"] = family_id
+    if intensity:
+        constraints["intensity"] = intensity
     payload = PromptGenerateRequest(
         prompt=message,
         intent=goals or None,
@@ -465,6 +486,8 @@ def create_ai_chat_turn(
         session.style_spec,
         goals,
         generator,
+        family_id=payload.family_id,
+        intensity=payload.intensity,
     )
     proposed_changes, warnings = _guardrail_changes(session.style_spec, suggestions)
     warnings = [*ai_warnings, *warnings]

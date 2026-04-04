@@ -172,6 +172,16 @@ def test_preview_prompt_with_mock_provider(client: TestClient) -> None:
     assert "Mock provider does not call an external model" in payload["prompt"]
 
 
+def test_ai_planner_options_returns_known_families(client: TestClient) -> None:
+    response = client.get("/ai/planner-options")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert "cinematic_portrait" in payload["families"]
+    assert "cool_teal" in payload["refinements"]
+    assert payload["intensities"] == ["subtle", "balanced", "bold"]
+
+
 def test_ai_health_with_mock_provider(client: TestClient) -> None:
     response = client.get("/ai/health")
 
@@ -407,6 +417,8 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
         def generate_style_spec(self, payload: PromptGenerateRequest) -> GeneratedStyleSpecResponse:
             assert payload.constraints is not None
             assert payload.constraints["mode"] == "chat_turn_delta"
+            assert payload.constraints["family_id"] == "cinematic_portrait"
+            assert payload.constraints["intensity"] == "bold"
             generated = StyleSpec(
                 name="AI Chat",
                 intent=payload.intent or [],
@@ -420,6 +432,7 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
                 model=self.model,
                 planner_trace=AIPlannerTrace(
                     mode="direct_style_spec",
+                    family_id="cinematic_portrait",
                     intensity="balanced",
                     source="fake chat trace",
                 ),
@@ -447,12 +460,17 @@ def test_ai_chat_turn_uses_model_output_for_proposed_changes(client: TestClient)
 
     turn_response = client.post(
         f"/ai/chat/sessions/{session_id}/turns",
-        json={"message": "make it brighter and punchy"},
+        json={
+            "message": "make it brighter and punchy",
+            "family_id": "cinematic_portrait",
+            "intensity": "bold",
+        },
     )
     assert turn_response.status_code == 201
     payload = turn_response.json()
     assert payload["turn"]["assistant_message"].startswith("I analyzed your request with fake/fake-v1")
     assert payload["turn"]["planner_trace"]["mode"] == "direct_style_spec"
+    assert payload["turn"]["planner_trace"]["family_id"] == "cinematic_portrait"
     assert payload["turn"]["planner_trace"]["intensity"] == "balanced"
 
     changes = {item["key"]: item for item in payload["turn"]["proposed_changes"]}

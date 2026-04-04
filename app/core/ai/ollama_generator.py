@@ -74,8 +74,11 @@ class OllamaStyleGenerator:
                     prompt_builder=self._build_direct_style_prompt,
                 )
                 style_spec = self._parse_style_spec(raw_json, payload)
+                constraints = payload.constraints if isinstance(payload.constraints, dict) else {}
+                family_id = constraints.get("family_id")
                 planner_trace = AIPlannerTrace(
                     mode="direct_style_spec",
+                    family_id=family_id if isinstance(family_id, str) and family_id.strip() else None,
                     intensity=infer_intensity(payload.prompt, payload.constraints),
                     source="ollama direct style spec generation",
                 )
