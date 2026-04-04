@@ -15,6 +15,7 @@ class FamilyBaseline:
     base_adjustments: dict[str, CaptureOneValue]
     intensity_multipliers: dict[Intensity, float]
     family_signatures: dict[Intensity, dict[str, CaptureOneValue]]
+    family_envelopes: dict[Intensity, dict[str, tuple[float, float]]]
 
 
 @dataclass(frozen=True)
@@ -120,7 +121,7 @@ def execute_generation_plan(
         if signature:
             _apply_adjustments(updated, signature, 1.0, clamp_key)
 
-    return _normalize_deltas(
+    normalized = _normalize_deltas(
         original_keys=original,
         updated_keys=updated,
         key_limits=config.key_limits,
@@ -128,6 +129,13 @@ def execute_generation_plan(
         profile_count=max(1, len(plan.matched_profile_names)),
         clamp_key=clamp_key,
     )
+    if baseline:
+        normalized = _apply_family_envelope(
+            normalized,
+            envelope=baseline.family_envelopes.get(plan.intensity, {}),
+            clamp_key=clamp_key,
+        )
+    return normalized
 
 
 def _apply_adjustments(
@@ -179,3 +187,22 @@ def _normalize_deltas(
         bounded = max(limits[0], min(limits[1], scaled))
         normalized[key] = clamp_key(key, bounded)
     return normalized
+
+
+def _apply_family_envelope(
+    keys: dict[str, CaptureOneValue],
+    *,
+    envelope: dict[str, tuple[float, float]],
+    clamp_key: Callable[[str, float], int | float],
+) -> dict[str, CaptureOneValue]:
+    if not envelope:
+        return keys
+
+    constrained = dict(keys)
+    for key, (min_value, max_value) in envelope.items():
+        current = constrained.get(key)
+        if not isinstance(current, (int, float)):
+            continue
+        bounded = max(min_value, min(max_value, float(current)))
+        constrained[key] = clamp_key(key, bounded)
+    return constrained

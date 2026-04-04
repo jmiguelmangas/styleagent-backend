@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 
 from app.core.ai.generation_engine import (
     FamilyBaseline,
@@ -1040,6 +1041,67 @@ _FAMILY_SIGNATURES: dict[str, dict[Intensity, dict[str, str | int | float]]] = {
     },
 }
 
+_FAMILY_ENVELOPES: dict[str, dict[Intensity, dict[str, tuple[float, float]]]] = {
+    "gothic_fantasy": {
+        "subtle": {
+            "Contrast": (4.0, 8.0),
+            "Saturation": (-4.0, -1.0),
+            "Clarity": (0.0, 4.0),
+            "Highlights": (-22.0, -12.0),
+            "WhiteBalanceTemperature": (3800.0, 4600.0),
+            "ColorBalanceRed": (-4.0, 0.0),
+            "ColorBalanceBlue": (8.0, 14.0),
+        },
+        "balanced": {
+            "Contrast": (8.0, 14.0),
+            "Saturation": (-6.0, -2.0),
+            "Clarity": (2.0, 7.0),
+            "Highlights": (-30.0, -18.0),
+            "WhiteBalanceTemperature": (3500.0, 4300.0),
+            "ColorBalanceRed": (-5.0, -1.0),
+            "ColorBalanceBlue": (10.0, 16.0),
+        },
+        "bold": {
+            "Contrast": (14.0, 22.0),
+            "Saturation": (-7.0, -2.0),
+            "Clarity": (5.0, 10.0),
+            "Highlights": (-38.0, -24.0),
+            "WhiteBalanceTemperature": (3200.0, 4000.0),
+            "ColorBalanceRed": (-6.0, -2.0),
+            "ColorBalanceBlue": (12.0, 18.0),
+        },
+    },
+    "portra_film": {
+        "subtle": {
+            "Contrast": (3.0, 6.0),
+            "Saturation": (5.0, 8.0),
+            "Clarity": (0.0, 4.0),
+            "Highlights": (-18.0, -12.0),
+            "WhiteBalanceTemperature": (5900.0, 6200.0),
+            "ColorBalanceRed": (4.0, 7.0),
+            "ColorBalanceBlue": (-5.0, -1.0),
+        },
+        "balanced": {
+            "Contrast": (6.0, 9.0),
+            "Saturation": (7.0, 10.0),
+            "Clarity": (4.0, 6.0),
+            "Highlights": (-24.0, -16.0),
+            "WhiteBalanceTemperature": (6100.0, 6400.0),
+            "ColorBalanceRed": (6.0, 9.0),
+            "ColorBalanceBlue": (-4.0, 0.0),
+        },
+        "bold": {
+            "Contrast": (8.0, 12.0),
+            "Saturation": (8.0, 12.0),
+            "Clarity": (7.0, 8.0),
+            "Highlights": (-32.0, -22.0),
+            "WhiteBalanceTemperature": (6300.0, 6700.0),
+            "ColorBalanceRed": (8.0, 12.0),
+            "ColorBalanceBlue": (-4.0, 1.0),
+        },
+    },
+}
+
 
 def profile_catalog() -> tuple[MainProfile, ...]:
     return _MAIN_PROFILES
@@ -1211,13 +1273,23 @@ def _matched_profiles(prompt: str) -> list[MainProfile | VariantProfile]:
     matches: list[MainProfile | VariantProfile] = []
 
     for profile in _MAIN_PROFILES:
-        if any(trigger in normalized for trigger in profile.triggers):
+        if any(_trigger_matches(normalized, trigger) for trigger in profile.triggers):
             matches.append(profile)
         for variant in profile.variants:
-            if any(trigger in normalized for trigger in variant.triggers):
+            if any(_trigger_matches(normalized, trigger) for trigger in variant.triggers):
                 matches.append(variant)
 
     return matches
+
+
+def _trigger_matches(prompt: str, trigger: str) -> bool:
+    normalized_trigger = trigger.lower().strip()
+    if not normalized_trigger:
+        return False
+    if " " in normalized_trigger:
+        return normalized_trigger in prompt
+    pattern = rf"(?<![a-z0-9]){re.escape(normalized_trigger)}(?![a-z0-9])"
+    return re.search(pattern, prompt) is not None
 
 
 def _profile_intents(profile: MainProfile | VariantProfile) -> tuple[str, ...]:
@@ -1238,6 +1310,7 @@ def _baseline_registry() -> dict[str, FamilyBaseline]:
                 profile.name, {level: _INTENSITY_SCALES[level] for level in _INTENSITY_SCALES}
             ),
             family_signatures=_FAMILY_SIGNATURES.get(profile.name, {}),
+            family_envelopes=_FAMILY_ENVELOPES.get(profile.name, {}),
         )
         for profile in _MAIN_PROFILES
     }

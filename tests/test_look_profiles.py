@@ -175,6 +175,62 @@ def test_tokyo_night_family_pushes_neon_signature_with_intensity() -> None:
     assert subtle["ColorBalanceBlue"] <= bold["ColorBalanceBlue"]
 
 
+def test_gothic_family_keeps_cold_progressive_envelope() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "gothic fantasy portrait with moonlit blue, porcelain skin and twisted whimsy"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["WhiteBalanceTemperature"] >= balanced["WhiteBalanceTemperature"] >= bold["WhiteBalanceTemperature"]
+    assert subtle["ColorBalanceBlue"] <= balanced["ColorBalanceBlue"] <= bold["ColorBalanceBlue"]
+    assert subtle["Saturation"] >= balanced["Saturation"] >= bold["Saturation"]
+
+
+def test_portra_family_keeps_gentle_monotonic_progression() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "kodak portra inspired portrait with soft highlights, gentle warmth and natural skin"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["WhiteBalanceTemperature"] <= balanced["WhiteBalanceTemperature"] <= bold["WhiteBalanceTemperature"]
+    assert subtle["ColorBalanceRed"] <= balanced["ColorBalanceRed"] <= bold["ColorBalanceRed"]
+    assert subtle["Highlights"] >= balanced["Highlights"] >= bold["Highlights"]
+
+
 def test_build_generation_plan_selects_primary_family_and_refinements() -> None:
     prompt = "cinematic portrait with cool teal shadows, warm skin and soft rolloff"
     plan = build_generation_plan(prompt, "balanced")
@@ -184,3 +240,11 @@ def test_build_generation_plan_selects_primary_family_and_refinements() -> None:
     assert "warm_skin" in plan.refinement_ids
     assert "soft_rolloff" in plan.refinement_ids
     assert plan.fallback_mode == "family_baseline"
+
+
+def test_portra_trigger_does_not_false_match_portrait() -> None:
+    prompt = "gothic fantasy portrait with moonlit blue, porcelain skin and twisted whimsy"
+
+    plan = build_generation_plan(prompt, "balanced")
+
+    assert plan.family_id == "gothic_fantasy"
