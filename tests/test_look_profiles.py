@@ -248,3 +248,101 @@ def test_portra_trigger_does_not_false_match_portrait() -> None:
     plan = build_generation_plan(prompt, "balanced")
 
     assert plan.family_id == "gothic_fantasy"
+
+
+def test_build_generation_plan_filters_cross_family_refinements_when_family_selected() -> None:
+    prompt = "drone aerial of a chalk coastline with deep cyan sea, midday glare and crisp edges"
+
+    plan = build_generation_plan(prompt, "balanced")
+
+    assert plan.family_id == "aerial_coastline"
+    assert "cyan_sea" in plan.refinement_ids
+    assert "midday_glare" in plan.refinement_ids
+    assert "crisp_edges" in plan.refinement_ids
+    assert "cyan_glow" not in plan.refinement_ids
+    assert "soft_chalk" not in plan.refinement_ids
+
+
+def test_aerial_coastline_family_is_selected_and_progressive() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "drone aerial of a chalk coastline with deep cyan sea, midday glare and crisp edges"
+
+    plan = build_generation_plan(prompt, "balanced")
+    assert plan.family_id == "aerial_coastline"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["Highlights"] >= balanced["Highlights"] >= bold["Highlights"]
+
+
+def test_pastel_airy_family_stays_soft_but_progressive() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "pastel maternity portrait with milky tones, luminous skin and gentle blush warmth"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Saturation"] <= balanced["Saturation"] <= bold["Saturation"]
+    assert subtle["WhiteBalanceTemperature"] <= balanced["WhiteBalanceTemperature"] <= bold["WhiteBalanceTemperature"]
+    assert subtle["ColorBalanceRed"] <= balanced["ColorBalanceRed"] <= bold["ColorBalanceRed"]
+
+
+def test_jazz_club_family_is_selected_and_progressive() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "moody jazz club portrait with red velvet light, brass glow and smoky shadows"
+
+    plan = build_generation_plan(prompt, "balanced")
+    assert plan.family_id == "jazz_club"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["Highlights"] >= balanced["Highlights"] >= bold["Highlights"]
