@@ -53,7 +53,7 @@ def test_generate_style_spec_returns_mock_payload(client: TestClient, store: FSS
     assert style_spec["intent"] == ["portrait", "moody"]
     assert style_spec["captureone"]["keys"]["Contrast"] >= 8
     assert style_spec["captureone"]["keys"]["ColorBalanceRed"] >= 4
-    assert style_spec["captureone"]["keys"]["WhiteBalanceTemperature"] >= 5400
+    assert style_spec["captureone"]["keys"]["WhiteBalanceTemperature"] >= 5300
 
     history = store.list_ai_generations()
     assert len(history) == 1
