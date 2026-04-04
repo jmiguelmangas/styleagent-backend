@@ -6,3 +6,4 @@ pytest-cov==7.1.0
 ruff==0.15.8
 httpx==0.28.1
 pymongo==4.16.0
+mongomock==4.3.0
