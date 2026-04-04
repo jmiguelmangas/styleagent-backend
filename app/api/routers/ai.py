@@ -74,6 +74,14 @@ _PARAMETER_GUARDRAILS: dict[str, dict[str, float]] = {
 }
 
 
+def _raise_ai_provider_unavailable(operation: str, exc: Exception) -> None:
+    logger.exception("ai.%s provider_failed: %s", operation, exc)
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=f"AI provider request failed during {operation}.",
+    ) from exc
+
+
 def _rate_limit_per_minute() -> int:
     raw = os.getenv("STYLEAGENT_AI_RATE_LIMIT_PER_MINUTE", "30").strip()
     try:
@@ -338,7 +346,10 @@ def generate_style_spec(
         )
 
     start = time.perf_counter()
-    response = generator.generate_style_spec(payload)
+    try:
+        response = generator.generate_style_spec(payload)
+    except Exception as exc:  # noqa: BLE001
+        _raise_ai_provider_unavailable("generate", exc)
     duration_ms = int((time.perf_counter() - start) * 1000)
     fallback_used = any("fallback mock used" in warning.lower() for warning in response.warnings)
     response.generation_ms = duration_ms
@@ -392,7 +403,10 @@ def generate_style_spec(
 def get_ai_health(
     generator: AIStyleGenerator = Depends(get_ai_generator),
 ) -> AIHealthResponse:
-    return generator.health_check()
+    try:
+        return generator.health_check()
+    except Exception as exc:  # noqa: BLE001
+        _raise_ai_provider_unavailable("health_check", exc)
 
 
 @router.get(
@@ -428,7 +442,10 @@ def preview_ai_prompt(
     payload: PromptGenerateRequest = Body(..., description="Prompt payload to preview."),
     generator: AIStyleGenerator = Depends(get_ai_generator),
 ) -> AIPromptPreviewResponse:
-    return generator.preview_prompt(payload)
+    try:
+        return generator.preview_prompt(payload)
+    except Exception as exc:  # noqa: BLE001
+        _raise_ai_provider_unavailable("prompt_preview", exc)
 
 
 @router.post(
@@ -481,14 +498,17 @@ def create_ai_chat_turn(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ai chat session not found")
 
     goals = _detect_conversation_goals(payload.message)
-    suggestions, ai_warnings, provider, model, planner_trace = _derive_change_intents_from_ai(
-        payload.message,
-        session.style_spec,
-        goals,
-        generator,
-        family_id=payload.family_id,
-        intensity=payload.intensity,
-    )
+    try:
+        suggestions, ai_warnings, provider, model, planner_trace = _derive_change_intents_from_ai(
+            payload.message,
+            session.style_spec,
+            goals,
+            generator,
+            family_id=payload.family_id,
+            intensity=payload.intensity,
+        )
+    except Exception as exc:  # noqa: BLE001
+        _raise_ai_provider_unavailable("chat_turn", exc)
     proposed_changes, warnings = _guardrail_changes(session.style_spec, suggestions)
     warnings = [*ai_warnings, *warnings]
     guidance = _guidance_for_turn(goals, warnings, proposed_changes)
