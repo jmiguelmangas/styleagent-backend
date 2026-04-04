@@ -50,6 +50,10 @@ def test_ollama_generator_returns_model_output(monkeypatch) -> None:
     assert response.model == "llama3.1:8b"
     assert response.warnings == []
     assert response.style_spec.name == "AI Cinematic Warm"
+    assert response.planner_trace is not None
+    assert response.planner_trace.mode == "family_planner"
+    assert response.planner_trace.family_id == "cinematic_portrait"
+    assert "warm_skin" in response.planner_trace.refinement_ids
     assert response.style_spec.captureone.keys["Contrast"] >= 10
     assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] >= 5400
     assert "Highlights" in response.style_spec.captureone.keys
@@ -84,6 +88,8 @@ def test_ollama_generator_retries_with_cold_start_timeout(monkeypatch) -> None:
 
     assert calls == [2.0, 15.0]
     assert response.warnings == []
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "cinematic_portrait"
     assert response.style_spec.captureone.keys["Contrast"] >= 9
 
 
@@ -99,6 +105,8 @@ def test_ollama_generator_fallback_when_invalid_json(monkeypatch) -> None:
     assert response.provider == "ollama"
     assert response.model == "llama3.1:8b"
     assert any("fallback mock used" in warning for warning in response.warnings)
+    assert response.planner_trace is not None
+    assert response.planner_trace.mode == "mock_rule_based"
     assert response.style_spec.captureone.keys
 
 
@@ -114,6 +122,8 @@ def test_ollama_generator_fallback_when_http_error(monkeypatch) -> None:
     assert response.provider == "ollama"
     assert response.model == "llama3.1:8b"
     assert any("fallback mock used" in warning for warning in response.warnings)
+    assert response.planner_trace is not None
+    assert response.planner_trace.mode == "mock_rule_based"
     assert response.style_spec.captureone.keys
 
 
@@ -144,6 +154,8 @@ def test_ollama_generator_keeps_chat_delta_payload_sparse(monkeypatch) -> None:
     )
 
     assert set(response.style_spec.captureone.keys.keys()) == {"Contrast"}
+    assert response.planner_trace is not None
+    assert response.planner_trace.mode == "direct_style_spec"
 
 
 def test_ollama_generator_respects_max_prompt_examples(monkeypatch) -> None:
@@ -190,7 +202,8 @@ def test_ollama_generator_uses_semantic_example_for_seasonal_landscape_prompt() 
 
 def test_ollama_generator_expands_named_style_reference_into_richer_traits(monkeypatch) -> None:
     def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
-        assert "gothic cinematic portrait" in json["prompt"].lower()
+        assert "gothic fantasy" in json["prompt"].lower()
+        assert "cinematic portrait" in json["prompt"].lower()
         assert "tim burton" in json["prompt"].lower()
         return _FakeResponse(
             {
@@ -209,6 +222,8 @@ def test_ollama_generator_expands_named_style_reference_into_richer_traits(monke
     )
 
     keys = response.style_spec.captureone.keys
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "gothic_fantasy"
     assert keys["Contrast"] >= 16
     assert keys["ColorBalanceBlue"] >= 1
     assert keys["ColorBalanceGreen"] >= 1
@@ -233,3 +248,5 @@ def test_ollama_generator_falls_back_when_planner_selects_unknown_family(monkeyp
 
     assert response.provider == "ollama"
     assert any("fallback mock used" in warning for warning in response.warnings)
+    assert response.planner_trace is not None
+    assert response.planner_trace.mode == "mock_rule_based"

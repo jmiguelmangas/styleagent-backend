@@ -347,6 +347,7 @@ def generate_style_spec(
                 model=response.model,
                 generation_ms=response.generation_ms,
                 fallback_used=response.fallback_used,
+                planner_trace=response.planner_trace,
             )
         )
     except Exception:  # noqa: BLE001

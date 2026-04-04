@@ -7,6 +7,28 @@ from app.core.models.style_spec import StyleSpec
 from app.core.utils import generate_id
 
 
+class AIPlannerTrace(BaseModel):
+    mode: Literal["direct_style_spec", "family_planner", "mock_rule_based"] = Field(
+        description="Internal generation path used to produce the final style spec.",
+    )
+    family_id: str | None = Field(
+        default=None,
+        description="Resolved family baseline identifier, when applicable.",
+    )
+    refinement_ids: list[str] = Field(
+        default_factory=list,
+        description="Resolved refinement layer identifiers, when applicable.",
+    )
+    intensity: Literal["subtle", "balanced", "bold"] | None = Field(
+        default=None,
+        description="Resolved intensity mode used by the generation engine.",
+    )
+    source: str | None = Field(
+        default=None,
+        description="Short note describing where the plan came from (for example: ollama planner or fallback).",
+    )
+
+
 class PromptGenerateRequest(BaseModel):
     prompt: str = Field(
         min_length=1,
@@ -54,6 +76,10 @@ class GeneratedStyleSpecResponse(BaseModel):
         default=False,
         description="Whether provider generation fell back to mock behavior.",
     )
+    planner_trace: AIPlannerTrace | None = Field(
+        default=None,
+        description="Resolved planning metadata used to compose the final preset.",
+    )
 
 
 class AIGenerationRecord(BaseModel):
@@ -91,6 +117,10 @@ class AIGenerationRecord(BaseModel):
     fallback_used: bool = Field(
         default=False,
         description="Whether provider generation fell back to mock behavior.",
+    )
+    planner_trace: AIPlannerTrace | None = Field(
+        default=None,
+        description="Resolved planning metadata captured for this generation.",
     )
 
 

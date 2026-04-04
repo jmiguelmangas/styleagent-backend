@@ -45,6 +45,8 @@ def test_generate_style_spec_returns_mock_payload(client: TestClient, store: FSS
     assert payload["rationale"]
     assert isinstance(payload["generation_ms"], int)
     assert payload["fallback_used"] is False
+    assert payload["planner_trace"]["mode"] == "mock_rule_based"
+    assert payload["planner_trace"]["intensity"] == "balanced"
 
     style_spec = payload["style_spec"]
     assert style_spec["name"].startswith("AI ")
@@ -59,6 +61,8 @@ def test_generate_style_spec_returns_mock_payload(client: TestClient, store: FSS
     assert history[0].provider == "mock"
     assert history[0].model == "mock-v1"
     assert history[0].style_spec.name.startswith("AI ")
+    assert history[0].planner_trace is not None
+    assert history[0].planner_trace.mode == "mock_rule_based"
 
 
 def test_generate_style_spec_named_reference_is_translated_to_descriptive_traits(
@@ -136,6 +140,9 @@ def test_generate_style_spec_with_ollama_provider(client: TestClient, monkeypatc
     assert payload["model"] == "llama3.1:8b"
     assert payload["warnings"] == []
     assert payload["fallback_used"] is False
+    assert payload["planner_trace"]["mode"] == "family_planner"
+    assert payload["planner_trace"]["family_id"] == "clean_commercial"
+    assert payload["planner_trace"]["refinement_ids"] == ["studio_clean"]
 
 
 def test_generate_style_spec_rate_limited(client: TestClient, monkeypatch) -> None:
@@ -316,6 +323,7 @@ def test_list_ai_generations_returns_newest_first(client: TestClient) -> None:
     assert payload[0]["prompt"] == "second prompt"
     assert payload[0]["target"] == "captureone"
     assert payload[0]["provider"] == "mock"
+    assert payload[0]["planner_trace"]["mode"] == "mock_rule_based"
 
 
 def test_ai_chat_session_turn_and_apply_flow(client: TestClient) -> None:

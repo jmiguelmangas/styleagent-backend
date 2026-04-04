@@ -1,6 +1,7 @@
 from app.core.models.ai import (
     AIHealthResponse,
     AIGenerationRecord,
+    AIPlannerTrace,
     AIPromptPreviewResponse,
     GeneratedStyleSpecResponse,
     PromptGenerateRequest,
@@ -37,6 +38,7 @@ __all__ = [
     "Artifact",
     "AIHealthResponse",
     "AIGenerationRecord",
+    "AIPlannerTrace",
     "AIPromptPreviewResponse",
     "AIChatSession",
     "AIChatSessionCreateRequest",
