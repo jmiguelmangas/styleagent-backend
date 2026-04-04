@@ -771,5 +771,207 @@
         }
       }
     }
+  },
+  {
+    "source": "AFC / Portra 160.xmp",
+    "prompt": "portra 160 soft film portrait with lifted shadows, gentle warmth and low clarity glow",
+    "tags": [
+      "portra",
+      "film",
+      "portrait",
+      "soft",
+      "warm"
+    ],
+    "style_spec": {
+      "name": "AFC Portra 160 Inspired",
+      "intent": [
+        "film",
+        "portrait",
+        "soft"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 6,
+          "Saturation": -3,
+          "Clarity": -8,
+          "Highlights": -22,
+          "Shadows": 15,
+          "WhiteBalanceTemperature": 5950,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "AFC / Fuji 400H.xmp",
+    "prompt": "fuji 400h pastel daylight film look with soft greens, open shadows and airy color",
+    "tags": [
+      "fuji",
+      "400h",
+      "film",
+      "airy",
+      "pastel"
+    ],
+    "style_spec": {
+      "name": "AFC Fuji 400H Inspired",
+      "intent": [
+        "film",
+        "airy",
+        "soft"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 0,
+          "Saturation": 0,
+          "Highlights": -26,
+          "Shadows": 18,
+          "WhiteBalanceTemperature": 5550,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": 4,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "AFC / HP5 Pushed 2 stops.xmp",
+    "prompt": "hp5 pushed black and white look with crushed highlights, gritty shadows and documentary punch",
+    "tags": [
+      "hp5",
+      "monochrome",
+      "film",
+      "gritty",
+      "documentary"
+    ],
+    "style_spec": {
+      "name": "AFC HP5 Pushed Inspired",
+      "intent": [
+        "monochrome",
+        "gritty",
+        "documentary"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 10,
+          "Saturation": -18,
+          "Clarity": -1,
+          "Highlights": -35,
+          "Shadows": -8,
+          "WhiteBalanceTemperature": 5400,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 0,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
+  },
+  {
+    "source": "AFC / Astia S.xmp",
+    "prompt": "astia soft color film with pastel magenta skin, soft contrast and elegant fashion color",
+    "tags": [
+      "astia",
+      "film",
+      "fashion",
+      "soft",
+      "pastel"
+    ],
+    "style_spec": {
+      "name": "AFC Astia Inspired",
+      "intent": [
+        "film",
+        "fashion",
+        "soft"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 12,
+          "Saturation": -5,
+          "Clarity": -5,
+          "Highlights": -26,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5600,
+          "WhiteBalanceTint": 2,
+          "ColorBalanceRed": 3,
+          "ColorBalanceGreen": -2,
+          "ColorBalanceBlue": 1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Japan Mood / Japanese Mood 01.xmp",
+    "prompt": "japanese mood urban portrait with subdued neon, lifted shadows and cool cinematic color separation",
+    "tags": [
+      "japan",
+      "urban",
+      "cinematic",
+      "moody",
+      "neon"
+    ],
+    "style_spec": {
+      "name": "Japan Mood 01 Inspired",
+      "intent": [
+        "urban",
+        "cinematic",
+        "moody"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -8,
+          "Saturation": -8,
+          "Highlights": -18,
+          "Shadows": 20,
+          "WhiteBalanceTemperature": 5200,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": 5,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Japan Mood / Japanese Mood 03.xmp",
+    "prompt": "tokyo rain cinematic look with cool split toning, deep blue shadows and stylized urban night color",
+    "tags": [
+      "japan",
+      "tokyo",
+      "night",
+      "cinematic",
+      "blue"
+    ],
+    "style_spec": {
+      "name": "Japan Mood 03 Inspired",
+      "intent": [
+        "night",
+        "cinematic",
+        "stylized"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -10,
+          "Saturation": -11,
+          "Clarity": -4,
+          "Highlights": -22,
+          "Shadows": 22,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -3,
+          "ColorBalanceRed": -2,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": 8,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
   }
 ]
