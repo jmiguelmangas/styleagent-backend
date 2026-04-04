@@ -5,6 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.core.models.ai import AIPlannerTrace
 from app.core.models.style_spec import StyleSpec
 from app.core.utils import generate_id
 
@@ -56,6 +57,10 @@ class AIChatTurn(BaseModel):
     )
     warnings: list[str] = Field(default_factory=list, description="Guard-rail warnings for skipped/adjusted changes.")
     guidance: AIConversationGuidance = Field(description="Guided conversation metadata for the UI.")
+    planner_trace: AIPlannerTrace | None = Field(
+        default=None,
+        description="Resolved planning metadata used by the generator for this turn.",
+    )
     applied: bool = Field(default=False, description="Whether this turn was applied to session style spec.")
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
