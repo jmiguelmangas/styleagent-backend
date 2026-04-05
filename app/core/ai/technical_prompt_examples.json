@@ -1243,5 +1243,276 @@
         }
       }
     }
+  },
+  {
+    "source": "Urban Atmosphere Pack / Muted Urban Soft.xmp",
+    "prompt": "muted urban soft city look with compressed highlights, lowered clarity and restrained color",
+    "tags": [
+      "urban",
+      "muted",
+      "soft",
+      "city",
+      "restrained"
+    ],
+    "style_spec": {
+      "name": "Muted Urban Soft Inspired",
+      "intent": [
+        "urban",
+        "soft",
+        "muted"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -8,
+          "Saturation": -6,
+          "Clarity": -12,
+          "Highlights": -24,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5200,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": 0,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Portrait Atmosphere Pack / Soft Airy Portrait.xmp",
+    "prompt": "soft airy portrait look with lifted blacks, low texture and delicate clean light",
+    "tags": [
+      "soft",
+      "airy",
+      "portrait",
+      "delicate",
+      "light"
+    ],
+    "style_spec": {
+      "name": "Soft Airy Portrait Inspired",
+      "intent": [
+        "soft",
+        "airy",
+        "portrait"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -8,
+          "Saturation": 2,
+          "Clarity": -8,
+          "Highlights": -8,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 5600,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Emotive Atmosphere Pack / Emotive Matte.xmp",
+    "prompt": "emotive matte look with very low contrast, soft depth and nostalgic color restraint",
+    "tags": [
+      "emotive",
+      "matte",
+      "nostalgic",
+      "soft",
+      "restrained"
+    ],
+    "style_spec": {
+      "name": "Emotive Matte Inspired",
+      "intent": [
+        "emotive",
+        "matte",
+        "soft"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -18,
+          "Saturation": 2,
+          "Clarity": -12,
+          "Highlights": -10,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5250,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": 0,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Monochrome Pack / Clean Monochrome.xmp",
+    "prompt": "clean monochrome look with brighter tonal separation and soft black and white rendering",
+    "tags": [
+      "monochrome",
+      "clean",
+      "black-and-white",
+      "soft",
+      "bright"
+    ],
+    "style_spec": {
+      "name": "Clean Monochrome Inspired",
+      "intent": [
+        "monochrome",
+        "clean"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 6,
+          "Saturation": -100,
+          "Clarity": -14,
+          "Highlights": 4,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5400,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 0,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Monochrome Pack / Deep Monochrome.xmp",
+    "prompt": "deep monochrome look with darker matte blacks and dramatic black and white depth",
+    "tags": [
+      "monochrome",
+      "deep",
+      "black-and-white",
+      "dramatic",
+      "matte"
+    ],
+    "style_spec": {
+      "name": "Deep Monochrome Inspired",
+      "intent": [
+        "monochrome",
+        "deep",
+        "dramatic"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -12,
+          "Saturation": -100,
+          "Clarity": -6,
+          "Highlights": -20,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5200,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 0,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
+  },
+  {
+    "source": "Cinema Atmosphere Pack / Soft Cinematic Desaturation.xmp",
+    "prompt": "soft cinematic desaturated look with compressed highlights and gentle urban color",
+    "tags": [
+      "cinematic",
+      "desaturated",
+      "soft",
+      "urban",
+      "gentle"
+    ],
+    "style_spec": {
+      "name": "Soft Cinematic Desaturation Inspired",
+      "intent": [
+        "cinematic",
+        "soft",
+        "desaturated"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -4,
+          "Saturation": -6,
+          "Clarity": -12,
+          "Highlights": -28,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5300,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Film Matte Pack / Soft Film Matte.xmp",
+    "prompt": "soft film matte look with lifted shadows and low-clarity analog softness",
+    "tags": [
+      "film",
+      "matte",
+      "soft",
+      "analog",
+      "lifted"
+    ],
+    "style_spec": {
+      "name": "Soft Film Matte Inspired",
+      "intent": [
+        "film",
+        "matte",
+        "soft"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -12,
+          "Saturation": 0,
+          "Clarity": -10,
+          "Highlights": -14,
+          "Shadows": 20,
+          "WhiteBalanceTemperature": 5500,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Urban Night Pack / Rainy Urban Night.xmp",
+    "prompt": "rainy urban night look with cool tint, softened contrast and damp city atmosphere",
+    "tags": [
+      "rainy",
+      "urban",
+      "night",
+      "cool",
+      "atmospheric"
+    ],
+    "style_spec": {
+      "name": "Rainy Urban Night Inspired",
+      "intent": [
+        "urban",
+        "night",
+        "cool"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -6,
+          "Saturation": 0,
+          "Clarity": -4,
+          "Highlights": -16,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -5,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 3,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
   }
 ]
