@@ -1,16 +1,16 @@
 [
   {
-    "source": "Mastin Labs Fujicolor Everyday / 1b. Fujicolor C200.costyle",
-    "prompt": "fujicolor c200 everyday warm film look with soft highlight recovery",
+    "source": "Consumer Film Pack / Warm Consumer Film.costyle",
+    "prompt": "consumer color film c200 everyday warm film look with soft highlight recovery",
     "tags": [
-      "fujicolor",
+      "consumer-film",
       "film",
       "warm",
       "everyday",
       "portrait"
     ],
     "style_spec": {
-      "name": "Fujicolor C200 Inspired",
+      "name": "Warm Consumer Film Inspired",
       "intent": [
         "film",
         "warm",
@@ -28,16 +28,16 @@
     }
   },
   {
-    "source": "Mastin Labs Fujicolor Everyday / 1c. Superia 400.costyle",
-    "prompt": "fujicolor superia 400 balanced color film look",
+    "source": "Consumer Film Pack / Balanced Consumer Film.costyle",
+    "prompt": "consumer color film superia 400 balanced color film look",
     "tags": [
-      "fujicolor",
+      "consumer-film",
       "film",
       "balanced",
       "everyday"
     ],
     "style_spec": {
-      "name": "Superia 400 Inspired",
+      "name": "Balanced Consumer Film Inspired",
       "intent": [
         "film",
         "balanced"
@@ -54,7 +54,7 @@
     }
   },
   {
-    "source": "Mastin Labs Fujicolor Everyday / 2a. Daylight.costyle",
+    "source": "Consumer Film Pack / Daylight Balance.costyle",
     "prompt": "daylight white balance natural neutral color",
     "tags": [
       "daylight",
@@ -77,7 +77,7 @@
     }
   },
   {
-    "source": "Mastin Labs Fujicolor Everyday / 2d. Tungsten.costyle",
+    "source": "Consumer Film Pack / Tungsten Balance.costyle",
     "prompt": "tungsten indoor cool white balance correction",
     "tags": [
       "tungsten",
@@ -100,7 +100,7 @@
     }
   },
   {
-    "source": "Northlandscapes Moody Landscapes / Autumn Colors.costyle",
+    "source": "Moody Landscapes Pack / Autumn Colors.costyle",
     "prompt": "autumn landscape earthy moody contrast with muted saturation",
     "tags": [
       "landscape",
@@ -129,7 +129,7 @@
     }
   },
   {
-    "source": "Northlandscapes Moody Landscapes / Moody Days.costyle",
+    "source": "Moody Landscapes Pack / Moody Days.costyle",
     "prompt": "dark moody day cinematic landscape with deep shadows",
     "tags": [
       "landscape",
@@ -160,7 +160,7 @@
     }
   },
   {
-    "source": "Northlandscapes Moody Landscapes / Winter Blues.costyle",
+    "source": "Moody Landscapes Pack / Winter Blues.costyle",
     "prompt": "winter blue landscape cool tones with crisp clarity",
     "tags": [
       "landscape",
@@ -190,7 +190,7 @@
     }
   },
   {
-    "source": "nolan-warm-v1.costyle (user sample)",
+    "source": "User Warm Portrait Sample",
     "prompt": "warm cinematic portrait preset balanced skin tones",
     "tags": [
       "portrait",
@@ -199,7 +199,7 @@
       "balanced"
     ],
     "style_spec": {
-      "name": "Nolan Warm v1",
+      "name": "Warm Portrait Sample",
       "intent": [
         "cinematic",
         "warm",
@@ -224,7 +224,7 @@
     }
   },
   {
-    "source": "Capture One Match Look Styles / Cinematic Portraits / 32. Cinematic - Warm.costyle",
+    "source": "Built-in Match Look Styles / Cinematic Portraits / 32. Cinematic - Warm.costyle",
     "prompt": "cinematic warm portrait with soft contrast rolloff and warm skin tones",
     "tags": [
       "cinematic",
@@ -234,7 +234,7 @@
       "film"
     ],
     "style_spec": {
-      "name": "Cinematic Warm Portrait Inspired",
+      "name": "Cinematic Warm Portrait",
       "intent": [
         "cinematic",
         "warm",
@@ -259,7 +259,7 @@
     }
   },
   {
-    "source": "Capture One Match Look Styles / Cinematic Portraits / 39. Cinematic - Cool Green.costyle",
+    "source": "Built-in Match Look Styles / Cinematic Portraits / 39. Cinematic - Cool Green.costyle",
     "prompt": "cinematic cool green portrait with restrained saturation and cool shadows",
     "tags": [
       "cinematic",
@@ -294,7 +294,7 @@
     }
   },
   {
-    "source": "Capture One Styles / Film & Cine Looks / Cinema Cool.costyle",
+    "source": "Built-in Styles / Film & Cine Looks / Cinema Cool.costyle",
     "prompt": "cinema cool grading with blue shadows and subtle desaturation",
     "tags": [
       "cinema",
@@ -328,7 +328,7 @@
     }
   },
   {
-    "source": "Capture One Styles / Film & Cine Looks / Cinema Warm.costyle",
+    "source": "Built-in Styles / Film & Cine Looks / Cinema Warm.costyle",
     "prompt": "cinema warm grading with amber highlights and moderate clarity",
     "tags": [
       "cinema",
@@ -362,7 +362,7 @@
     }
   },
   {
-    "source": "Capture One Styles / Creative Edits / Cozy Fall.costyle",
+    "source": "Built-in Styles / Creative Edits / Cozy Fall.costyle",
     "prompt": "cozy fall edit with earthy warmth, gentle contrast and autumn color",
     "tags": [
       "autumn",
@@ -396,7 +396,7 @@
     }
   },
   {
-    "source": "Capture One Styles / Creative Edits / Crisp Winter.costyle",
+    "source": "Built-in Styles / Creative Edits / Crisp Winter.costyle",
     "prompt": "crisp winter look with cool whites, clean contrast and blue shadows",
     "tags": [
       "winter",
@@ -431,7 +431,7 @@
     }
   },
   {
-    "source": "Capture One Styles / Base Edits / Clear Contrast.costyle",
+    "source": "Built-in Styles / Base Edits / Clear Contrast.costyle",
     "prompt": "clear contrast base edit with crisp microcontrast and recovered highlights",
     "tags": [
       "contrast",
@@ -465,17 +465,17 @@
     }
   },
   {
-    "source": "Capture One Cultural Heritage / Color Negative Film / Fujicolor Pro 160C.costyle",
-    "prompt": "fujicolor pro 160c negative film scan look with soft pastel warmth",
+    "source": "Built-in Film Archive / Soft Negative Film.costyle",
+    "prompt": "consumer color film pro 160c negative film scan look with soft pastel warmth",
     "tags": [
-      "fujicolor",
+      "consumer-film",
       "film",
       "negative",
       "warm",
       "pastel"
     ],
     "style_spec": {
-      "name": "Fujicolor Pro 160C Inspired",
+      "name": "Soft Negative Film Inspired",
       "intent": [
         "film",
         "warm"
@@ -499,7 +499,7 @@
     }
   },
   {
-    "source": "Capture One Cultural Heritage / Color Slide Film / Fujichrome Velvia 100F.costyle",
+    "source": "Built-in Film Archive / Vivid Slide Film.costyle",
     "prompt": "velvia vivid landscape look with punchy color and crisp cool contrast",
     "tags": [
       "velvia",
@@ -534,7 +534,7 @@
     }
   },
   {
-    "source": "Capture One Nolan / Nolan_03_Cold_v1.costyle",
+    "source": "Portrait Sample Pack / Cool Portrait.costyle",
     "prompt": "cold nolan inspired edit with restrained exposure and subtle cool clarity",
     "tags": [
       "nolan",
@@ -544,7 +544,7 @@
       "portrait"
     ],
     "style_spec": {
-      "name": "Nolan Cold Inspired",
+      "name": "Cool Portrait Sample",
       "intent": [
         "cinematic",
         "cool"
@@ -568,7 +568,7 @@
     }
   },
   {
-    "source": "Capture One Nolan / Nolan_07_Warm_Portrait_v1.costyle",
+    "source": "Portrait Sample Pack / Warm Portrait.costyle",
     "prompt": "warm portrait nolan look with richer skin tones and cinematic warmth",
     "tags": [
       "nolan",
@@ -578,7 +578,7 @@
       "skin"
     ],
     "style_spec": {
-      "name": "Nolan Warm Portrait Inspired",
+      "name": "Warm Portrait Sample Inspired",
       "intent": [
         "cinematic",
         "warm",
@@ -603,18 +603,18 @@
     }
   },
   {
-    "source": "Color Precision Kodak / Portra 400 +0EV Frontier.xmp",
-    "prompt": "kodak portra 400 frontier portrait film look with rich skin tones and restrained blues",
+    "source": "Color Precision Film Pack / Neutral Portrait Film.xmp",
+    "prompt": "soft neutral portrait film portrait film look with rich skin tones and restrained blues",
     "tags": [
-      "kodak",
-      "portra",
+      "film-color",
+      "portrait-film",
       "portrait",
       "film",
       "frontier",
       "skin"
     ],
     "style_spec": {
-      "name": "Kodak Portra 400 Frontier Inspired",
+      "name": "Soft Neutral Portrait Film Inspired",
       "intent": [
         "film",
         "portrait",
@@ -636,18 +636,18 @@
     }
   },
   {
-    "source": "Color Precision Kodak / Ektar +0EV Frontier.xmp",
-    "prompt": "kodak ektar vivid landscape color with punchy reds, bright saturation and clean contrast",
+    "source": "Color Precision Film Pack / Vivid Color Film.xmp",
+    "prompt": "vivid color film vivid landscape color with punchy reds, bright saturation and clean contrast",
     "tags": [
-      "kodak",
-      "ektar",
+      "film-color",
+      "vivid-film",
       "landscape",
       "vivid",
       "frontier",
       "bold"
     ],
     "style_spec": {
-      "name": "Kodak Ektar Frontier Inspired",
+      "name": "Vivid Color Film Inspired",
       "intent": [
         "landscape",
         "vivid",
@@ -669,10 +669,10 @@
     }
   },
   {
-    "source": "Color Precision Kodak / Gold +1EV Noritsu.xmp",
-    "prompt": "kodak gold overexposed noritsu warm nostalgic family film with softened contrast",
+    "source": "Color Precision Film Pack / Warm Consumer Film.xmp",
+    "prompt": "warm consumer film overexposed noritsu warm nostalgic family film with softened contrast",
     "tags": [
-      "kodak",
+      "film-color",
       "gold",
       "warm",
       "nostalgic",
@@ -680,7 +680,7 @@
       "overexposed"
     ],
     "style_spec": {
-      "name": "Kodak Gold Noritsu Inspired",
+      "name": "Warm Consumer Film Inspired",
       "intent": [
         "film",
         "warm",
@@ -704,18 +704,18 @@
     }
   },
   {
-    "source": "Color Precision Kodak / Ultramax +1EV Noritsu.xmp",
-    "prompt": "kodak ultramax bright casual color film with energetic warmth and consumer film punch",
+    "source": "Color Precision Film Pack / Punchy Consumer Film.xmp",
+    "prompt": "punchy consumer film bright casual color film with energetic warmth and consumer film punch",
     "tags": [
-      "kodak",
-      "ultramax",
+      "film-color",
+      "consumer-film",
       "warm",
       "bright",
       "noritsu",
       "casual"
     ],
     "style_spec": {
-      "name": "Kodak Ultramax Noritsu Inspired",
+      "name": "Punchy Consumer Film Inspired",
       "intent": [
         "film",
         "warm",
@@ -739,18 +739,18 @@
     }
   },
   {
-    "source": "Color Precision Kodak / Colorplus +0EV Frontier.xmp",
-    "prompt": "kodak colorplus affordable vintage color film with orange warmth and lively low-light color",
+    "source": "Color Precision Film Pack / Bright Consumer Film.xmp",
+    "prompt": "bright consumer film affordable vintage color film with orange warmth and lively low-light color",
     "tags": [
-      "kodak",
-      "colorplus",
+      "film-color",
+      "consumer-film",
       "vintage",
       "warm",
       "frontier",
       "everyday"
     ],
     "style_spec": {
-      "name": "Kodak ColorPlus Frontier Inspired",
+      "name": "Bright Consumer Film Inspired",
       "intent": [
         "film",
         "warm",
@@ -773,17 +773,17 @@
     }
   },
   {
-    "source": "AFC / Portra 160.xmp",
+    "source": "Analog Film Collection / Soft Portrait Film.xmp",
     "prompt": "portra 160 soft film portrait with lifted shadows, gentle warmth and low clarity glow",
     "tags": [
-      "portra",
+      "portrait-film",
       "film",
       "portrait",
       "soft",
       "warm"
     ],
     "style_spec": {
-      "name": "AFC Portra 160 Inspired",
+      "name": "Soft Portrait Film Inspired",
       "intent": [
         "film",
         "portrait",
@@ -807,7 +807,7 @@
     }
   },
   {
-    "source": "AFC / Fuji 400H.xmp",
+    "source": "Analog Film Collection / Airy Cool Film.xmp",
     "prompt": "fuji 400h pastel daylight film look with soft greens, open shadows and airy color",
     "tags": [
       "fuji",
@@ -817,7 +817,7 @@
       "pastel"
     ],
     "style_spec": {
-      "name": "AFC Fuji 400H Inspired",
+      "name": "Airy Cool Film Inspired",
       "intent": [
         "film",
         "airy",
@@ -840,7 +840,7 @@
     }
   },
   {
-    "source": "AFC / HP5 Pushed 2 stops.xmp",
+    "source": "Analog Film Collection / Pushed Monochrome Film.xmp",
     "prompt": "hp5 pushed black and white look with crushed highlights, gritty shadows and documentary punch",
     "tags": [
       "hp5",
@@ -850,7 +850,7 @@
       "documentary"
     ],
     "style_spec": {
-      "name": "AFC HP5 Pushed Inspired",
+      "name": "Pushed Monochrome Film Inspired",
       "intent": [
         "monochrome",
         "gritty",
@@ -874,7 +874,7 @@
     }
   },
   {
-    "source": "AFC / Astia S.xmp",
+    "source": "Analog Film Collection / Soft Slide Film.xmp",
     "prompt": "astia soft color film with pastel magenta skin, soft contrast and elegant fashion color",
     "tags": [
       "astia",
@@ -884,7 +884,7 @@
       "pastel"
     ],
     "style_spec": {
-      "name": "AFC Astia Inspired",
+      "name": "Soft Slide Film Inspired",
       "intent": [
         "film",
         "fashion",
@@ -908,17 +908,17 @@
     }
   },
   {
-    "source": "Japan Mood / Japanese Mood 01.xmp",
+    "source": "Urban Mood Pack / Urban Neon 01.xmp",
     "prompt": "japanese mood urban portrait with subdued neon, lifted shadows and cool cinematic color separation",
     "tags": [
-      "japan",
+      "urban-night",
       "urban",
       "cinematic",
       "moody",
       "neon"
     ],
     "style_spec": {
-      "name": "Japan Mood 01 Inspired",
+      "name": "Urban Neon Mood 01",
       "intent": [
         "urban",
         "cinematic",
@@ -941,17 +941,16 @@
     }
   },
   {
-    "source": "Japan Mood / Japanese Mood 03.xmp",
-    "prompt": "tokyo rain cinematic look with cool split toning, deep blue shadows and stylized urban night color",
+    "source": "Urban Mood Pack / Urban Neon 03.xmp",
+    "prompt": "rainy urban night cinematic look with cool split toning, deep blue shadows and stylized urban night color",
     "tags": [
-      "japan",
-      "tokyo",
+      "urban-night",
       "night",
       "cinematic",
       "blue"
     ],
     "style_spec": {
-      "name": "Japan Mood 03 Inspired",
+      "name": "Urban Neon Mood 03",
       "intent": [
         "night",
         "cinematic",
@@ -975,7 +974,7 @@
     }
   },
   {
-    "source": "PSD Stack Dark & Moody / Dark Blue.xmp",
+    "source": "Dark & Moody Pack / Dark Blue.xmp",
     "prompt": "dark blue moody portrait with cool steel shadows and restrained cinematic saturation",
     "tags": [
       "dark-blue",
@@ -1009,7 +1008,7 @@
     }
   },
   {
-    "source": "PSD Stack Dark & Moody / Orange & Green.xmp",
+    "source": "Dark & Moody Pack / Orange & Green.xmp",
     "prompt": "orange and green cinematic grading with moody contrast and stylized complementary color separation",
     "tags": [
       "orange-green",
@@ -1042,7 +1041,7 @@
     }
   },
   {
-    "source": "PSD Stack Dark & Moody / Soft & Warm.xmp",
+    "source": "Dark & Moody Pack / Soft & Warm.xmp",
     "prompt": "soft warm portrait with lowered contrast, luminous skin and gentle film warmth",
     "tags": [
       "soft",
@@ -1076,7 +1075,7 @@
     }
   },
   {
-    "source": "Amar Muric Moody Woodlands / Moonlit Pines - Core.xmp",
+    "source": "Moody Woodlands Pack / Moonlit Pines - Core.xmp",
     "prompt": "moonlit pine forest look with cool deep greens, blue dusk shadows and moody woodland depth",
     "tags": [
       "forest",
@@ -1110,7 +1109,7 @@
     }
   },
   {
-    "source": "Amar Muric Moody Woodlands / Ash and Ember - Punchy.xmp",
+    "source": "Moody Woodlands Pack / Ash and Ember - Punchy.xmp",
     "prompt": "ash and ember woodland grading with smoky contrast, ember warmth and punchy moody earth tones",
     "tags": [
       "ember",
@@ -1144,7 +1143,7 @@
     }
   },
   {
-    "source": "Amar Muric Moody Woodlands / Espresso Black - Core.xmp",
+    "source": "Moody Woodlands Pack / Espresso Black - Core.xmp",
     "prompt": "espresso black moody look with rich dark browns, restrained highlights and deep premium shadow density",
     "tags": [
       "espresso",

@@ -1,6 +1,6 @@
 [
   {
-    "source": "Heavenly Seasons pack / Moody Light.lnp",
+    "source": "Seasonal Mood Pack / Moody Light.lnp",
     "prompt": "moody landscape light with forest atmosphere and subdued contrast",
     "tags": [
       "landscape",
@@ -34,7 +34,7 @@
     }
   },
   {
-    "source": "Heavenly Seasons pack / Magic Autumn Exposure.lnp",
+    "source": "Seasonal Mood Pack / Magic Autumn Exposure.lnp",
     "prompt": "magic autumn exposure with golden forest light and earthy warmth",
     "tags": [
       "autumn",
@@ -69,7 +69,7 @@
     }
   },
   {
-    "source": "Heavenly Seasons pack / White Winter.lnp",
+    "source": "Seasonal Mood Pack / White Winter.lnp",
     "prompt": "white winter landscape with clean snow, soft blue shadows and crisp air",
     "tags": [
       "winter",
@@ -104,7 +104,7 @@
     }
   },
   {
-    "source": "Heavenly Seasons pack / Summer Sunrise.lnp",
+    "source": "Seasonal Mood Pack / Summer Sunrise.lnp",
     "prompt": "summer sunrise landscape with warm sunlight and gentle morning haze",
     "tags": [
       "summer",
@@ -139,7 +139,7 @@
     }
   },
   {
-    "source": "CP Kodak Presets / Soft Highlights 3.xmp",
+    "source": "Color Precision Film Pack / Soft Highlights 3.xmp",
     "prompt": "soft cinematic highlights with gentle rolloff and polished luminous skin",
     "tags": [
       "highlights",
@@ -167,7 +167,7 @@
     }
   },
   {
-    "source": "CP Kodak Presets / Expired Film 3.xmp",
+    "source": "Color Precision Film Pack / Expired Film 3.xmp",
     "prompt": "expired film aesthetic with faded contrast, cool cast and imperfect nostalgic color",
     "tags": [
       "expired",
@@ -198,7 +198,7 @@
     }
   },
   {
-    "source": "AFC / Soft Mist 1-4.xmp",
+    "source": "Analog Film Collection / Soft Mist 1-4.xmp",
     "prompt": "soft mist portrait glow with lowered clarity, dreamy bloom and gentle halation feel",
     "tags": [
       "soft-mist",
@@ -208,7 +208,7 @@
       "halation"
     ],
     "style_spec": {
-      "name": "AFC Soft Mist Inspired",
+      "name": "Soft Mist Inspired",
       "intent": [
         "portrait",
         "soft",
@@ -227,17 +227,17 @@
     }
   },
   {
-    "source": "Japan Mood / Japanese Mood 02.xmp",
-    "prompt": "japan mood night scene with muted saturation, lifted darks and melancholic urban color",
+    "source": "Urban Mood Pack / Urban Neon 02.xmp",
+    "prompt": "urban neon mood night scene with muted saturation, lifted darks and melancholic urban color",
     "tags": [
-      "japan",
+      "urban-night",
       "night",
       "urban",
       "muted",
       "melancholic"
     ],
     "style_spec": {
-      "name": "Japan Mood 02 Inspired",
+      "name": "Urban Neon Mood 02",
       "intent": [
         "night",
         "urban",
@@ -260,17 +260,17 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_Tokyo Drift.cube",
-    "prompt": "tokyo street racing night look with neon reflections, cool shadows, wet asphalt and electric urban contrast",
+    "source": "Cinema LUT Collection / Neon Street Racing.cube",
+    "prompt": "neon street racing night look with neon reflections, cool shadows, wet asphalt and electric urban contrast",
     "tags": [
-      "tokyo",
+      "urban-night",
       "night",
       "urban",
       "neon",
       "street"
     ],
     "style_spec": {
-      "name": "Tokyo Drift Inspired",
+      "name": "Neon Street Racing Inspired",
       "intent": [
         "night",
         "urban",
@@ -293,7 +293,7 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_Interstellar.cube",
+    "source": "Cinema LUT Collection / Epic Cool Sci-Fi.cube",
     "prompt": "epic cinematic sci-fi tone with cool steel light, muted earth color and expansive atmospheric contrast",
     "tags": [
       "cinematic",
@@ -303,7 +303,7 @@
       "epic"
     ],
     "style_spec": {
-      "name": "Interstellar Inspired",
+      "name": "Epic Cool Sci-Fi Inspired",
       "intent": [
         "cinematic",
         "cool",
@@ -326,7 +326,7 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_Dark Knight.cube",
+    "source": "Cinema LUT Collection / Dark Urban Noir.cube",
     "prompt": "dark urban cinematic look with crushed mood, cold steel shadows and restrained dramatic color",
     "tags": [
       "dark",
@@ -336,7 +336,7 @@
       "dramatic"
     ],
     "style_spec": {
-      "name": "Dark Knight Inspired",
+      "name": "Dark Urban Noir Inspired",
       "intent": [
         "dark",
         "urban",
@@ -359,7 +359,7 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_Casino Royale.cube",
+    "source": "Cinema LUT Collection / Luxury Spy Cinema.cube",
     "prompt": "clean luxury spy look with crisp contrast, polished skin, cool neutrals and premium cinematic finish",
     "tags": [
       "luxury",
@@ -369,7 +369,7 @@
       "premium"
     ],
     "style_spec": {
-      "name": "Casino Royale Inspired",
+      "name": "Luxury Spy Cinema Inspired",
       "intent": [
         "clean",
         "cinematic",
@@ -392,7 +392,7 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_Gladiator.cube",
+    "source": "Cinema LUT Collection / Epic Historical Warmth.cube",
     "prompt": "dusty epic historical look with warm earth tones, sunbaked highlights and rugged dramatic contrast",
     "tags": [
       "historical",
@@ -402,7 +402,7 @@
       "dusty"
     ],
     "style_spec": {
-      "name": "Gladiator Inspired",
+      "name": "Epic Historical Warmth Inspired",
       "intent": [
         "epic",
         "earthy",
@@ -425,7 +425,7 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_V for Vendetta.cube",
+    "source": "Cinema LUT Collection / Cold Political Noir.cube",
     "prompt": "political noir look with cold shadows, restrained palette, sharp contrast and urban tension",
     "tags": [
       "noir",
@@ -435,7 +435,7 @@
       "political"
     ],
     "style_spec": {
-      "name": "V for Vendetta Inspired",
+      "name": "Cold Political Noir Inspired",
       "intent": [
         "noir",
         "urban",
@@ -458,7 +458,7 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_Pulp Fiction.cube",
+    "source": "Cinema LUT Collection / Retro Crime Cinema.cube",
     "prompt": "retro crime cinema look with punchy warmth, bold contrast and stylized vintage color separation",
     "tags": [
       "retro",
@@ -468,7 +468,7 @@
       "vintage"
     ],
     "style_spec": {
-      "name": "Pulp Fiction Inspired",
+      "name": "Retro Crime Cinema Inspired",
       "intent": [
         "retro",
         "cinematic",
@@ -491,7 +491,7 @@
     }
   },
   {
-    "source": "IMDB Hollywood Movie LUTS / Hollywood_Saving Private Ryan.cube",
+    "source": "Cinema LUT Collection / Desaturated War Documentary.cube",
     "prompt": "desaturated war documentary look with muted color, gritty contrast and cool battlefield haze",
     "tags": [
       "war",
@@ -501,7 +501,7 @@
       "cool"
     ],
     "style_spec": {
-      "name": "Saving Private Ryan Inspired",
+      "name": "Desaturated War Documentary Inspired",
       "intent": [
         "documentary",
         "gritty",
@@ -525,7 +525,7 @@
     }
   },
   {
-    "source": "PSD Stack Dark & Moody / Faded.xmp",
+    "source": "Dark & Moody Pack / Faded.xmp",
     "prompt": "dark moody faded look with washed contrast, muted color and understated atmospheric depth",
     "tags": [
       "faded",
@@ -552,7 +552,7 @@
     }
   },
   {
-    "source": "PSD Stack Dark & Moody / Minimal.xmp",
+    "source": "Dark & Moody Pack / Minimal.xmp",
     "prompt": "minimal moody neutral look with low color noise, clean tonal structure and restrained atmosphere",
     "tags": [
       "minimal",
@@ -580,7 +580,7 @@
     }
   },
   {
-    "source": "Amar Muric Moody Woodlands / Shadowed Trails - Faded.xmp",
+    "source": "Moody Woodlands Pack / Shadowed Trails - Faded.xmp",
     "prompt": "shadowed forest trail look with moody woodland depth, faded contrast and cool earthy shadows",
     "tags": [
       "shadowed-trails",
@@ -609,7 +609,7 @@
     }
   },
   {
-    "source": "Amar Muric Moody Woodlands / Chocolate Gold - Core.xmp",
+    "source": "Moody Woodlands Pack / Chocolate Gold - Core.xmp",
     "prompt": "chocolate gold cinematic grading with rich brown warmth, amber highlights and moody premium depth",
     "tags": [
       "chocolate",
@@ -638,7 +638,7 @@
     }
   },
   {
-    "source": "AdaptiveStyles / Art Inspired Landscapes / Hiroshige's Serene Vistas.copreset",
+    "source": "Art-Inspired Style Pack / Art Inspired Landscapes / Serene Vistas.copreset",
     "prompt": "serene japanese vista with quiet pastel atmosphere, elegant tonal simplicity and calm distant depth",
     "tags": [
       "japanese",
@@ -648,7 +648,7 @@
       "calm"
     ],
     "style_spec": {
-      "name": "Hiroshige Serene Vistas Inspired",
+      "name": "Serene Vista Inspired",
       "intent": [
         "landscape",
         "serene",
@@ -667,7 +667,7 @@
     }
   },
   {
-    "source": "AdaptiveStyles / Art Inspired Portraits / Degas' Pastel Impressions.copreset",
+    "source": "Art-Inspired Style Pack / Art Inspired Portraits / Pastel Impressions.copreset",
     "prompt": "pastel portrait impression with soft powder color, delicate contrast and airy gentle skin rendering",
     "tags": [
       "pastel",
@@ -677,7 +677,7 @@
       "delicate"
     ],
     "style_spec": {
-      "name": "Degas Pastel Impressions Inspired",
+      "name": "Pastel Impression Inspired",
       "intent": [
         "pastel",
         "portrait",
@@ -696,7 +696,7 @@
     }
   },
   {
-    "source": "AdaptiveStyles / Art Inspired Portraits / Caravaggio's Olive Depths.copreset",
+    "source": "Art-Inspired Style Pack / Art Inspired Portraits / Olive Depths.copreset",
     "prompt": "baroque olive portrait look with dramatic depth, warm skin against shadow and painterly subdued greens",
     "tags": [
       "baroque",
@@ -706,7 +706,7 @@
       "painterly"
     ],
     "style_spec": {
-      "name": "Caravaggio Olive Depths Inspired",
+      "name": "Olive Depth Portrait Inspired",
       "intent": [
         "portrait",
         "dramatic",
@@ -720,6 +720,93 @@
           "Highlights": -14,
           "Shadows": 10,
           "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
+  },
+  {
+    "source": "Cinematic LUT Collection / Strong Editorial Teal & Orange.cube",
+    "prompt": "strong editorial teal and orange cinema grade with stylized contrast and bold complementary separation",
+    "tags": [
+      "editorial",
+      "teal-orange",
+      "cinematic",
+      "strong",
+      "stylized"
+    ],
+    "style_spec": {
+      "name": "Strong Editorial Teal-Orange Inspired",
+      "intent": [
+        "editorial",
+        "cinematic",
+        "stylized"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 12,
+          "Saturation": 4,
+          "Clarity": 8,
+          "Highlights": -12,
+          "Shadows": 10,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Cinematic LUT Collection / Faded Balanced Indigo & Teal.cube",
+    "prompt": "faded indigo and teal cinema look with muted contrast and cool atmospheric depth",
+    "tags": [
+      "faded",
+      "indigo",
+      "teal",
+      "cool",
+      "atmospheric"
+    ],
+    "style_spec": {
+      "name": "Faded Indigo-Teal Inspired",
+      "intent": [
+        "faded",
+        "cool",
+        "atmospheric"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 4,
+          "Saturation": -6,
+          "Clarity": 4,
+          "Highlights": -10,
+          "Shadows": 10,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Cinematic LUT Collection / Strong Commercial Balanced.cube",
+    "prompt": "strong commercial clean look with crisp contrast, controlled color and polished premium finish",
+    "tags": [
+      "commercial",
+      "clean",
+      "premium",
+      "balanced",
+      "crisp"
+    ],
+    "style_spec": {
+      "name": "Strong Commercial Balanced Inspired",
+      "intent": [
+        "commercial",
+        "clean",
+        "premium"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 10,
+          "Saturation": 2,
+          "Clarity": 8,
+          "Highlights": -8,
+          "Shadows": 6,
+          "ToneCurve": "Film Standard"
         }
       }
     }

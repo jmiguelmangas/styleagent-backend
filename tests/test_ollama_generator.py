@@ -196,8 +196,22 @@ def test_ollama_generator_uses_semantic_example_for_seasonal_landscape_prompt() 
     )
 
     sources = [example["source"] for example in preview.examples]
-    assert any("Heavenly Seasons pack /" in source for source in sources)
-    assert any("Northlandscapes Moody Landscapes /" in source for source in sources)
+    assert any("Seasonal Mood Pack /" in source for source in sources)
+    assert any("Moody Landscapes Pack /" in source for source in sources)
+
+
+def test_ollama_generator_uses_curated_semantic_lut_for_editorial_teal_orange_prompt() -> None:
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    preview = generator.preview_prompt(
+        PromptGenerateRequest(
+            prompt="strong editorial teal and orange commercial grade with polished finish",
+            intent=["editorial", "commercial"],
+        )
+    )
+
+    sources = [example["source"] for example in preview.examples]
+    assert any("Cinematic LUT Collection / Strong Editorial Teal & Orange.cube" == source for source in sources)
 
 
 def test_ollama_generator_expands_named_style_reference_into_richer_traits(monkeypatch) -> None:
