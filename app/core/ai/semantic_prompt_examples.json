@@ -258,5 +258,270 @@
         }
       }
     }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_Tokyo Drift.cube",
+    "prompt": "tokyo street racing night look with neon reflections, cool shadows, wet asphalt and electric urban contrast",
+    "tags": [
+      "tokyo",
+      "night",
+      "urban",
+      "neon",
+      "street"
+    ],
+    "style_spec": {
+      "name": "Tokyo Drift Inspired",
+      "intent": [
+        "night",
+        "urban",
+        "neon"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 12,
+          "Saturation": 5,
+          "Highlights": -18,
+          "Shadows": 16,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": -1,
+          "ColorBalanceBlue": 8,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_Interstellar.cube",
+    "prompt": "epic cinematic sci-fi tone with cool steel light, muted earth color and expansive atmospheric contrast",
+    "tags": [
+      "cinematic",
+      "sci-fi",
+      "cool",
+      "atmospheric",
+      "epic"
+    ],
+    "style_spec": {
+      "name": "Interstellar Inspired",
+      "intent": [
+        "cinematic",
+        "cool",
+        "atmospheric"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 10,
+          "Saturation": -4,
+          "Highlights": -12,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 4900,
+          "WhiteBalanceTint": -1,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 5,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_Dark Knight.cube",
+    "prompt": "dark urban cinematic look with crushed mood, cold steel shadows and restrained dramatic color",
+    "tags": [
+      "dark",
+      "urban",
+      "cinematic",
+      "cold",
+      "dramatic"
+    ],
+    "style_spec": {
+      "name": "Dark Knight Inspired",
+      "intent": [
+        "dark",
+        "urban",
+        "cinematic"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 14,
+          "Saturation": -6,
+          "Highlights": -15,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 4700,
+          "WhiteBalanceTint": -1,
+          "ColorBalanceRed": -2,
+          "ColorBalanceGreen": -1,
+          "ColorBalanceBlue": 6,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_Casino Royale.cube",
+    "prompt": "clean luxury spy look with crisp contrast, polished skin, cool neutrals and premium cinematic finish",
+    "tags": [
+      "luxury",
+      "spy",
+      "clean",
+      "cinematic",
+      "premium"
+    ],
+    "style_spec": {
+      "name": "Casino Royale Inspired",
+      "intent": [
+        "clean",
+        "cinematic",
+        "luxury"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 9,
+          "Clarity": 8,
+          "Highlights": -10,
+          "Shadows": 6,
+          "WhiteBalanceTemperature": 5200,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 3,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_Gladiator.cube",
+    "prompt": "dusty epic historical look with warm earth tones, sunbaked highlights and rugged dramatic contrast",
+    "tags": [
+      "historical",
+      "epic",
+      "earthy",
+      "warm",
+      "dusty"
+    ],
+    "style_spec": {
+      "name": "Gladiator Inspired",
+      "intent": [
+        "epic",
+        "earthy",
+        "warm"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 11,
+          "Saturation": 4,
+          "Highlights": -14,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 6200,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_V for Vendetta.cube",
+    "prompt": "political noir look with cold shadows, restrained palette, sharp contrast and urban tension",
+    "tags": [
+      "noir",
+      "urban",
+      "cold",
+      "dramatic",
+      "political"
+    ],
+    "style_spec": {
+      "name": "V for Vendetta Inspired",
+      "intent": [
+        "noir",
+        "urban",
+        "cold"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 13,
+          "Saturation": -7,
+          "Highlights": -16,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 4800,
+          "WhiteBalanceTint": -1,
+          "ColorBalanceRed": -1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 5,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_Pulp Fiction.cube",
+    "prompt": "retro crime cinema look with punchy warmth, bold contrast and stylized vintage color separation",
+    "tags": [
+      "retro",
+      "crime",
+      "cinematic",
+      "warm",
+      "vintage"
+    ],
+    "style_spec": {
+      "name": "Pulp Fiction Inspired",
+      "intent": [
+        "retro",
+        "cinematic",
+        "warm"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 12,
+          "Saturation": 6,
+          "Highlights": -10,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 5900,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "IMDB Hollywood Movie LUTS / Hollywood_Saving Private Ryan.cube",
+    "prompt": "desaturated war documentary look with muted color, gritty contrast and cool battlefield haze",
+    "tags": [
+      "war",
+      "documentary",
+      "desaturated",
+      "gritty",
+      "cool"
+    ],
+    "style_spec": {
+      "name": "Saving Private Ryan Inspired",
+      "intent": [
+        "documentary",
+        "gritty",
+        "cool"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 10,
+          "Saturation": -12,
+          "Clarity": 10,
+          "Highlights": -12,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -1,
+          "ColorBalanceRed": -2,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 4,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
   }
 ]
