@@ -523,5 +523,205 @@
         }
       }
     }
+  },
+  {
+    "source": "PSD Stack Dark & Moody / Faded.xmp",
+    "prompt": "dark moody faded look with washed contrast, muted color and understated atmospheric depth",
+    "tags": [
+      "faded",
+      "moody",
+      "muted",
+      "atmospheric",
+      "dark"
+    ],
+    "style_spec": {
+      "name": "Dark Moody Faded Inspired",
+      "intent": [
+        "moody",
+        "faded"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": -4,
+          "Saturation": -8,
+          "Highlights": -10,
+          "Shadows": 12,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "PSD Stack Dark & Moody / Minimal.xmp",
+    "prompt": "minimal moody neutral look with low color noise, clean tonal structure and restrained atmosphere",
+    "tags": [
+      "minimal",
+      "neutral",
+      "moody",
+      "clean",
+      "restrained"
+    ],
+    "style_spec": {
+      "name": "Minimal Moody Inspired",
+      "intent": [
+        "minimal",
+        "neutral"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 2,
+          "Saturation": -6,
+          "Clarity": 2,
+          "Highlights": -8,
+          "Shadows": 8,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Amar Muric Moody Woodlands / Shadowed Trails - Faded.xmp",
+    "prompt": "shadowed forest trail look with moody woodland depth, faded contrast and cool earthy shadows",
+    "tags": [
+      "shadowed-trails",
+      "forest",
+      "woodland",
+      "moody",
+      "faded"
+    ],
+    "style_spec": {
+      "name": "Shadowed Trails Inspired",
+      "intent": [
+        "forest",
+        "moody",
+        "faded"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 6,
+          "Saturation": -5,
+          "Clarity": 7,
+          "Highlights": -12,
+          "Shadows": 12,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Amar Muric Moody Woodlands / Chocolate Gold - Core.xmp",
+    "prompt": "chocolate gold cinematic grading with rich brown warmth, amber highlights and moody premium depth",
+    "tags": [
+      "chocolate",
+      "gold",
+      "amber",
+      "warm",
+      "premium"
+    ],
+    "style_spec": {
+      "name": "Chocolate Gold Inspired",
+      "intent": [
+        "warm",
+        "amber",
+        "premium"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 8,
+          "Saturation": 4,
+          "Highlights": -10,
+          "Shadows": 8,
+          "WhiteBalanceTemperature": 6000,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "AdaptiveStyles / Art Inspired Landscapes / Hiroshige's Serene Vistas.copreset",
+    "prompt": "serene japanese vista with quiet pastel atmosphere, elegant tonal simplicity and calm distant depth",
+    "tags": [
+      "japanese",
+      "serene",
+      "landscape",
+      "pastel",
+      "calm"
+    ],
+    "style_spec": {
+      "name": "Hiroshige Serene Vistas Inspired",
+      "intent": [
+        "landscape",
+        "serene",
+        "pastel"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 3,
+          "Saturation": -2,
+          "Clarity": 4,
+          "Highlights": -8,
+          "Shadows": 8,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "AdaptiveStyles / Art Inspired Portraits / Degas' Pastel Impressions.copreset",
+    "prompt": "pastel portrait impression with soft powder color, delicate contrast and airy gentle skin rendering",
+    "tags": [
+      "pastel",
+      "portrait",
+      "airy",
+      "soft",
+      "delicate"
+    ],
+    "style_spec": {
+      "name": "Degas Pastel Impressions Inspired",
+      "intent": [
+        "pastel",
+        "portrait",
+        "soft"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 2,
+          "Saturation": 3,
+          "Clarity": -2,
+          "Highlights": -10,
+          "Shadows": 8,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "AdaptiveStyles / Art Inspired Portraits / Caravaggio's Olive Depths.copreset",
+    "prompt": "baroque olive portrait look with dramatic depth, warm skin against shadow and painterly subdued greens",
+    "tags": [
+      "baroque",
+      "olive",
+      "portrait",
+      "dramatic",
+      "painterly"
+    ],
+    "style_spec": {
+      "name": "Caravaggio Olive Depths Inspired",
+      "intent": [
+        "portrait",
+        "dramatic",
+        "olive"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 10,
+          "Saturation": -2,
+          "Clarity": 8,
+          "Highlights": -14,
+          "Shadows": 10,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
   }
 ]
