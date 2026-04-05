@@ -488,3 +488,219 @@ def test_ollama_generator_normalizes_underwater_editorial_family(monkeypatch) ->
 
     assert response.planner_trace is not None
     assert response.planner_trace.family_id == "underwater_editorial"
+
+
+def test_ollama_generator_prefers_prompt_subtle_over_planner_intensity(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"cinematic_portrait","refinements":["cool_teal"],'
+                    '"intensity":"balanced","name":"Night Portrait"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="Keep it natural: tokyo night portrait with neon reflections, cool shadows and warm face tones"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.intensity == "subtle"
+
+
+def test_ollama_generator_prefers_prompt_bold_over_soft_words(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"portra_film","refinements":["natural_skin_film"],'
+                    '"intensity":"balanced","name":"Portra Bold"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="Make it bold: kodak portra inspired portrait with soft highlights, gentle warmth and natural skin"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.intensity == "bold"
+
+
+def test_ollama_generator_normalizes_portra_family_from_vintage_choice(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"vintage_film","refinements":["warm_grain"],'
+                    '"intensity":"balanced","name":"Portra Portrait"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="I want a kodak portra inspired portrait with soft highlights, gentle warmth and natural skin"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "portra_film"
+
+
+def test_ollama_generator_normalizes_tokyo_neon_family_from_cinematic_choice(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"cinematic_portrait","refinements":["warm_skin"],'
+                    '"intensity":"bold","name":"Tokyo Neon"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="Make it bold: tokyo night portrait with neon reflections, cool shadows and warm face tones"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "night_neon"
+
+
+def test_ollama_generator_normalizes_minimal_scandi_when_planner_misses_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"refinements":["neutral_whites"],'
+                    '"intensity":"balanced","name":"Minimal Nordic"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="I want a minimal scandinavian interior look with neutral tones and soft contrast"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "minimal_scandi"
+
+
+def test_ollama_generator_normalizes_spanish_winter_prompt(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"minimal_scandi","refinements":["cool_white"],'
+                    '"intensity":"balanced","name":"Invierno Minimal"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="Quiero un look de escena invernal minimalista con blancos limpios y acero frío"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "crisp_winter"
+
+
+def test_ollama_generator_preserves_pastel_airy_when_luminous_skin_is_present(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"clean_beauty","refinements":["dewy_skin"],'
+                    '"intensity":"balanced","name":"Airy Portrait"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="I want a soft airy portrait with luminous skin, delicate pastel softness and lifted blacks"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "pastel_airy"
+
+
+def test_ollama_generator_normalizes_vivid_documentary_over_travel_earth(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"travel_earth","refinements":["market_colors"],'
+                    '"intensity":"balanced","name":"Doc Travel"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="I want a vivid documentary travel portrait with rich reds, warm earth and natural skin"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "vivid_documentary"
+
+
+def test_ollama_generator_normalizes_jazz_club_over_night_neon(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"night_neon","refinements":["wet_streets"],'
+                    '"intensity":"balanced","name":"Jazz Night"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="I want a moody jazz club portrait with red velvet light, brass glow and smoky shadows"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "jazz_club"

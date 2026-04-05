@@ -3,6 +3,7 @@ from app.core.ai.look_profiles import (
     build_generation_plan,
     expand_style_references,
     infer_intensity,
+    infer_prompt_intensity,
     profile_catalog,
 )
 
@@ -79,8 +80,11 @@ def test_apply_creative_direction_normalizes_high_intensity_mixes() -> None:
 def test_infer_intensity_supports_prompt_markers_and_constraints() -> None:
     assert infer_intensity("make it subtle and natural") == "subtle"
     assert infer_intensity("make it bold and dramatic") == "bold"
+    assert infer_prompt_intensity("Make it bold: kodak portra inspired portrait with natural skin") == "bold"
+    assert infer_prompt_intensity("Make it bold: clean commercial portrait with restrained color") == "bold"
     assert infer_intensity("cinematic portrait") == "balanced"
     assert infer_intensity("cinematic portrait", {"intensity": "subtle"}) == "subtle"
+    assert infer_prompt_intensity("Keep it natural: tokyo night portrait") == "subtle"
 
 
 def test_apply_creative_direction_supports_subtle_and_bold_modes() -> None:
@@ -248,6 +252,58 @@ def test_portra_trigger_does_not_false_match_portrait() -> None:
     plan = build_generation_plan(prompt, "balanced")
 
     assert plan.family_id == "gothic_fantasy"
+
+
+def test_clean_beauty_family_stays_luminous_but_controlled() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "clean beauty portrait with luminous skin, low color cast and soft tonal shaping"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Exposure"] >= 0.15
+    assert subtle["Clarity"] <= 7
+    assert subtle["Contrast"] <= bold["Contrast"]
+    assert subtle["ColorBalanceBlue"] <= -1
+
+
+def test_minimal_scandi_family_stays_soft_and_neutral() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "minimal scandinavian interior look with neutral tones and soft contrast"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+
+    assert subtle["Saturation"] <= 4
+    assert subtle["Contrast"] <= 4
+    assert subtle["Clarity"] <= balanced["Clarity"]
+    assert subtle["WhiteBalanceTemperature"] <= 5450
 
 
 def test_build_generation_plan_filters_cross_family_refinements_when_family_selected() -> None:

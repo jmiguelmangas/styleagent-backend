@@ -13,6 +13,7 @@ from app.core.ai.look_profiles import (
     build_generation_plan_from_selection,
     expand_style_references,
     infer_intensity,
+    infer_prompt_intensity,
     known_family_ids,
     known_refinement_ids,
 )
@@ -64,15 +65,15 @@ _PRODUCT_TECH_PROMPT_RE = re.compile(
     re.IGNORECASE,
 )
 _WILDLIFE_SAFARI_PROMPT_RE = re.compile(
-    r"\b(safari|wildlife|golden grass|dusty air|documentary realism|animal)\b",
+    r"\b(safari|wildlife|golden grass|dusty air|documentary realism|animal|travel portrait|retrato de viaje|aire polvoriento|tonos tierra)\b",
     re.IGNORECASE,
 )
 _MOODY_WOODLAND_PROMPT_RE = re.compile(
-    r"\b(woodland|moonlit pines|shadowed trails|ember warmth|forest portrait)\b",
+    r"\b(woodland|moonlit pines|shadowed trails|ember warmth|forest portrait|bosque oscuro|pinos a la luna|senderos en sombra)\b",
     re.IGNORECASE,
 )
 _SOFT_FILM_MATTE_PROMPT_RE = re.compile(
-    r"\b(soft film matte|nostalgic color|lifted shadows|gentle contrast)\b",
+    r"\b(soft film matte|nostalgic color|lifted shadows|gentle contrast|matte de pel[ií]cula|color nost[áa]lgico|sombras levantadas)\b",
     re.IGNORECASE,
 )
 _EMOTIVE_MATTE_PROMPT_RE = re.compile(
@@ -80,7 +81,39 @@ _EMOTIVE_MATTE_PROMPT_RE = re.compile(
     re.IGNORECASE,
 )
 _UNDERWATER_EDITORIAL_PROMPT_RE = re.compile(
-    r"\b(underwater editorial|underwater portrait|aqua caustics|pearlescent skin|drifting fabric)\b",
+    r"\b(underwater editorial|underwater portrait|aqua caustics|pearlescent skin|drifting fabric|bajo el agua|c[áa]usticas aqua|piel perlada)\b",
+    re.IGNORECASE,
+)
+_VIVID_DOCUMENTARY_PROMPT_RE = re.compile(
+    r"\b(vivid documentary|rich reds|documentary travel|rojos ricos)\b",
+    re.IGNORECASE,
+)
+_PORTRA_FILM_PROMPT_RE = re.compile(
+    r"\b(kodak portra|portra inspired|portra)\b",
+    re.IGNORECASE,
+)
+_JAZZ_CLUB_PROMPT_RE = re.compile(
+    r"\b(jazz club|red velvet light|brass glow|smoky shadows|club de jazz|terciopelo rojo)\b",
+    re.IGNORECASE,
+)
+_NIGHT_NEON_PROMPT_RE = re.compile(
+    r"\b(tokyo night|neon reflections|city lights|night neon|urban night|neon)\b",
+    re.IGNORECASE,
+)
+_MINIMAL_SCANDI_PROMPT_RE = re.compile(
+    r"\b(scandinavian|scandi|escandinav|nordic interior|minimal scandi)\b",
+    re.IGNORECASE,
+)
+_CLEAN_BEAUTY_PROMPT_RE = re.compile(
+    r"\b(clean beauty|beauty portrait|luminous skin|low color cast|cosmetic|piel luminosa|beauty limpio)\b",
+    re.IGNORECASE,
+)
+_CRISP_WINTER_STRONG_PROMPT_RE = re.compile(
+    r"\b(winter|snow|snowy|frost|icy|cold steel|soft blue daylight|invernal|acero fr[ií]o|blancos limpios)\b",
+    re.IGNORECASE,
+)
+_CLEAN_COMMERCIAL_PROMPT_RE = re.compile(
+    r"\b(clean commercial|bright whites|polished clarity|commercial portrait|retrato comercial limpio|blancos brillantes|claridad pulida)\b",
     re.IGNORECASE,
 )
 
@@ -268,13 +301,15 @@ class OllamaStyleGenerator:
 
         parsed_intensity = parsed.get("intensity")
         constraints = payload.constraints if isinstance(payload.constraints, dict) else None
-        if isinstance(parsed_intensity, str) and not (constraints and constraints.get("intensity")):
-            effective_constraints = dict(constraints or {})
-            effective_constraints["intensity"] = parsed_intensity
+        prompt_intensity = infer_prompt_intensity(payload.prompt)
+        if constraints and constraints.get("intensity"):
+            intensity = infer_intensity(payload.prompt, constraints)
+        elif prompt_intensity is not None:
+            intensity = prompt_intensity
+        elif isinstance(parsed_intensity, str):
+            intensity = infer_intensity(payload.prompt, {"intensity": parsed_intensity})
         else:
-            effective_constraints = constraints
-
-        intensity = infer_intensity(payload.prompt, effective_constraints)
+            intensity = infer_intensity(payload.prompt, constraints)
         plan = build_generation_plan_from_selection(
             prompt=payload.prompt,
             intensity=intensity,
@@ -313,15 +348,32 @@ class OllamaStyleGenerator:
         payload: PromptGenerateRequest,
         family_id: str | None,
     ) -> str | None:
-        if not family_id:
-            return family_id
-
         prompt = expand_style_references(payload.prompt, payload.intent).expanded_prompt
+        prompt_lower = prompt.lower()
         if _PASTEL_AIRY_PROMPT_RE.search(prompt):
-            if family_id == "bridal_luminous" or "maternity" in prompt.lower():
+            if family_id == "bridal_luminous" or any(
+                token in prompt_lower for token in ("maternity", "airy", "pastel", "milky", "blush", "lifted blacks")
+            ):
                 return "pastel_airy"
+        if _VIVID_DOCUMENTARY_PROMPT_RE.search(prompt):
+            return "vivid_documentary"
+        if _PORTRA_FILM_PROMPT_RE.search(prompt):
+            return "portra_film"
+        if _JAZZ_CLUB_PROMPT_RE.search(prompt):
+            return "jazz_club"
+        if _NIGHT_NEON_PROMPT_RE.search(prompt) and ("night" in prompt_lower or "tokyo" in prompt_lower):
+            return "night_neon"
+        if _CLEAN_BEAUTY_PROMPT_RE.search(prompt):
+            return "clean_beauty"
+        if _MINIMAL_SCANDI_PROMPT_RE.search(prompt):
+            return "minimal_scandi"
+        if _CLEAN_COMMERCIAL_PROMPT_RE.search(prompt):
+            return "clean_commercial"
+        if _CRISP_WINTER_STRONG_PROMPT_RE.search(prompt) and any(
+            token in prompt_lower for token in ("winter", "snow", "frost", "cold steel", "invernal", "acero frío")
+        ):
+            return "crisp_winter"
         if _SNOWY_ARCHITECTURE_PROMPT_RE.search(prompt):
-            prompt_lower = prompt.lower()
             if "architecture" in prompt_lower and "winter" in prompt_lower:
                 return "crisp_winter"
         if _FOOD_FIRELIGHT_PROMPT_RE.search(prompt):
@@ -346,8 +398,24 @@ class OllamaStyleGenerator:
         refinement_ids: list[str],
     ) -> list[str]:
         if family_id != "pastel_airy":
+            if family_id == "portra_film":
+                allowed = {"soft_highlights", "gentle_warmth", "natural_skin_film"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "night_neon":
+                allowed = {"magenta_signage", "cyan_glow", "wet_streets"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
             if family_id == "crisp_winter":
                 allowed = {"snow_glow", "blue_ice"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "clean_beauty":
+                allowed = {"dewy_skin", "clean_studio", "soft_peach"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "minimal_scandi":
+                allowed = {"cool_white", "oak_warmth", "soft_daylight"}
                 filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
                 return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
             if family_id == "food_rich_color":
