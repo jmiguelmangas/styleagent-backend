@@ -258,9 +258,115 @@ def test_build_generation_plan_filters_cross_family_refinements_when_family_sele
     assert plan.family_id == "aerial_coastline"
     assert "cyan_sea" in plan.refinement_ids
     assert "midday_glare" in plan.refinement_ids
-    assert "crisp_edges" in plan.refinement_ids
-    assert "cyan_glow" not in plan.refinement_ids
-    assert "soft_chalk" not in plan.refinement_ids
+
+
+def test_moody_woodland_family_keeps_monotonic_progression() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "moody woodland portrait with moonlit pines, ember warmth and shadowed trails"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["WhiteBalanceTemperature"] >= balanced["WhiteBalanceTemperature"] >= bold["WhiteBalanceTemperature"]
+    assert subtle["ColorBalanceBlue"] <= balanced["ColorBalanceBlue"] <= bold["ColorBalanceBlue"]
+
+
+def test_soft_film_matte_family_keeps_monotonic_progression() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "soft film matte portrait with nostalgic color, gentle contrast and lifted shadows"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["Shadows"] <= balanced["Shadows"] <= bold["Shadows"]
+    assert subtle["WhiteBalanceTemperature"] <= balanced["WhiteBalanceTemperature"] <= bold["WhiteBalanceTemperature"]
+
+
+def test_emotive_matte_family_keeps_monotonic_progression() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "emotive matte portrait with washed contrast, soft color and nostalgic softness"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["Shadows"] <= balanced["Shadows"] <= bold["Shadows"]
+    assert subtle["WhiteBalanceTemperature"] <= balanced["WhiteBalanceTemperature"] <= bold["WhiteBalanceTemperature"]
+
+
+def test_underwater_editorial_family_keeps_monotonic_progression() -> None:
+    base_keys = {
+        "Exposure": 0.1,
+        "Contrast": 8,
+        "Saturation": 6,
+        "Clarity": 8,
+        "Highlights": -8,
+        "Shadows": 10,
+        "WhiteBalanceTemperature": 5600,
+        "WhiteBalanceTint": 2,
+        "ColorBalanceRed": 3,
+        "ColorBalanceGreen": 0,
+        "ColorBalanceBlue": -2,
+        "ToneCurve": "Film Standard",
+    }
+    prompt = "underwater editorial portrait with aqua caustics, pearlescent skin and drifting fabric"
+
+    subtle = apply_creative_direction(base_keys, prompt, {"intensity": "subtle"})
+    balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
+    bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
+
+    assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
+    assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
+    assert subtle["Highlights"] >= balanced["Highlights"] >= bold["Highlights"]
+    assert subtle["WhiteBalanceTemperature"] >= balanced["WhiteBalanceTemperature"] >= bold["WhiteBalanceTemperature"]
+    assert subtle["ColorBalanceBlue"] <= balanced["ColorBalanceBlue"] <= bold["ColorBalanceBlue"]
 
 
 def test_aerial_coastline_family_is_selected_and_progressive() -> None:
@@ -287,6 +393,9 @@ def test_aerial_coastline_family_is_selected_and_progressive() -> None:
     balanced = apply_creative_direction(base_keys, prompt, {"intensity": "balanced"})
     bold = apply_creative_direction(base_keys, prompt, {"intensity": "bold"})
 
+    assert "crisp_edges" in plan.refinement_ids
+    assert "cyan_glow" not in plan.refinement_ids
+    assert "soft_chalk" not in plan.refinement_ids
     assert subtle["Contrast"] <= balanced["Contrast"] <= bold["Contrast"]
     assert subtle["Clarity"] <= balanced["Clarity"] <= bold["Clarity"]
     assert subtle["Highlights"] >= balanced["Highlights"] >= bold["Highlights"]

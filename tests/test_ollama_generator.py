@@ -392,3 +392,99 @@ def test_ollama_generator_normalizes_wildlife_safari_family(monkeypatch) -> None
 
     assert response.planner_trace is not None
     assert response.planner_trace.family_id == "travel_earth"
+
+
+def test_ollama_generator_normalizes_moody_woodland_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"gothic_fantasy","refinements":["moonlit_blue","warm_skin"],'
+                    '"intensity":"balanced","name":"Woodland Mood"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="moody woodland portrait with moonlit pines, ember warmth and shadowed trails"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "moody_woodland"
+
+
+def test_ollama_generator_normalizes_soft_film_matte_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"analog_fade","refinements":["dusty_pink","flat_midtones"],'
+                    '"intensity":"balanced","name":"Soft Film"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="soft film matte portrait with nostalgic color, gentle contrast and lifted shadows"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "soft_film_matte"
+
+
+def test_ollama_generator_normalizes_emotive_matte_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"fine_art_matte","refinements":["soft_chalk","sepia_hint"],'
+                    '"intensity":"balanced","name":"Emotive Memory"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="emotive matte portrait with washed contrast, soft color and nostalgic softness"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "emotive_matte"
+
+
+def test_ollama_generator_normalizes_underwater_editorial_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"editorial_fashion","refinements":["cool_teal","soft_rolloff"],'
+                    '"intensity":"balanced","name":"Underwater Fashion"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="underwater editorial portrait with aqua caustics, pearlescent skin and drifting fabric"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "underwater_editorial"
