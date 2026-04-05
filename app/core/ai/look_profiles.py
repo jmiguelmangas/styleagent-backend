@@ -1081,8 +1081,11 @@ _NEUTRAL_BASE_KEYS: dict[str, int | float | str] = {
 _ANCHORED_FAMILIES: set[str] = {
     "aerial_coastline",
     "cinematic_portrait",
+    "clean_beauty",
+    "crisp_winter",
     "gothic_fantasy",
     "jazz_club",
+    "minimal_scandi",
     "moody_woodland",
     "pastel_airy",
     "portra_film",
@@ -1124,6 +1127,9 @@ _MAIN_PROFILE_INTENSITY_MULTIPLIERS: dict[str, dict[Intensity, float]] = {
     "soft_film_matte": {"subtle": 0.34, "balanced": 0.62, "bold": 0.88},
     "emotive_matte": {"subtle": 0.32, "balanced": 0.58, "bold": 0.82},
     "underwater_editorial": {"subtle": 0.42, "balanced": 0.72, "bold": 1.0},
+    "clean_beauty": {"subtle": 0.34, "balanced": 0.58, "bold": 0.8},
+    "minimal_scandi": {"subtle": 0.28, "balanced": 0.52, "bold": 0.74},
+    "crisp_winter": {"subtle": 0.44, "balanced": 0.7, "bold": 0.96},
 }
 
 _VARIANT_INTENSITY_MULTIPLIERS: dict[Intensity, float] = {
@@ -1742,14 +1748,87 @@ _FAMILY_ENVELOPES: dict[str, dict[Intensity, dict[str, tuple[float, float]]]] = 
             "ColorBalanceRed": (2.0, 4.0),
         },
     },
+    "clean_beauty": {
+        "subtle": {
+            "Exposure": (0.15, 0.3),
+            "Contrast": (4.0, 6.0),
+            "Saturation": (4.0, 6.0),
+            "Clarity": (5.0, 7.0),
+            "Highlights": (-11.0, -8.0),
+            "Shadows": (11.0, 13.0),
+            "WhiteBalanceTemperature": (5600.0, 5750.0),
+            "WhiteBalanceTint": (1.0, 3.0),
+            "ColorBalanceRed": (2.0, 4.0),
+            "ColorBalanceBlue": (-3.0, -1.0),
+        },
+        "balanced": {
+            "Exposure": (0.18, 0.34),
+            "Contrast": (6.0, 8.0),
+            "Saturation": (5.0, 7.0),
+            "Clarity": (6.0, 8.0),
+            "Highlights": (-14.0, -10.0),
+            "Shadows": (13.0, 15.0),
+            "WhiteBalanceTemperature": (5700.0, 5850.0),
+            "WhiteBalanceTint": (2.0, 4.0),
+            "ColorBalanceRed": (3.0, 5.0),
+            "ColorBalanceBlue": (-3.0, -1.0),
+        },
+        "bold": {
+            "Exposure": (0.22, 0.38),
+            "Contrast": (8.0, 10.0),
+            "Saturation": (6.0, 8.0),
+            "Clarity": (7.0, 8.0),
+            "Highlights": (-18.0, -14.0),
+            "Shadows": (15.0, 18.0),
+            "WhiteBalanceTemperature": (5800.0, 5950.0),
+            "WhiteBalanceTint": (3.0, 5.0),
+            "ColorBalanceRed": (4.0, 6.0),
+            "ColorBalanceBlue": (-2.0, -1.0),
+        },
+    },
+    "minimal_scandi": {
+        "subtle": {
+            "Exposure": (0.12, 0.24),
+            "Contrast": (2.0, 4.0),
+            "Saturation": (2.0, 4.0),
+            "Clarity": (4.0, 6.0),
+            "Highlights": (-10.0, -7.0),
+            "Shadows": (10.0, 13.0),
+            "WhiteBalanceTemperature": (5200.0, 5450.0),
+            "ColorBalanceBlue": (0.0, 2.0),
+            "ColorBalanceRed": (1.0, 3.0),
+        },
+        "balanced": {
+            "Exposure": (0.16, 0.28),
+            "Contrast": (4.0, 6.0),
+            "Saturation": (3.0, 5.0),
+            "Clarity": (5.0, 7.0),
+            "Highlights": (-12.0, -9.0),
+            "Shadows": (12.0, 15.0),
+            "WhiteBalanceTemperature": (5150.0, 5380.0),
+            "ColorBalanceBlue": (1.0, 3.0),
+            "ColorBalanceRed": (1.0, 3.0),
+        },
+        "bold": {
+            "Exposure": (0.18, 0.32),
+            "Contrast": (6.0, 8.0),
+            "Saturation": (4.0, 5.0),
+            "Clarity": (6.0, 8.0),
+            "Highlights": (-14.0, -11.0),
+            "Shadows": (14.0, 17.0),
+            "WhiteBalanceTemperature": (5050.0, 5300.0),
+            "ColorBalanceBlue": (2.0, 4.0),
+            "ColorBalanceRed": (1.0, 3.0),
+        },
+    },
     "crisp_winter": {
         "subtle": {
             "Contrast": (8.0, 10.0),
             "Saturation": (4.0, 5.0),
-            "Clarity": (10.0, 12.0),
+            "Clarity": (11.0, 12.0),
             "Highlights": (-12.0, -9.0),
             "Shadows": (11.0, 13.0),
-            "WhiteBalanceTemperature": (5480.0, 5560.0),
+            "WhiteBalanceTemperature": (5460.0, 5500.0),
             "ColorBalanceBlue": (-1.0, 0.0),
         },
         "balanced": {
@@ -1960,6 +2039,46 @@ def apply_generation_plan(
     )
 
 
+def infer_prompt_intensity(prompt: str) -> Intensity | None:
+    normalized_prompt = prompt.lower()
+    explicit_bold_markers = (
+        "make it bold",
+        "push it further",
+        "push this further",
+        "push it harder",
+        "stronger",
+    )
+    explicit_subtle_markers = (
+        "make it subtle",
+        "keep it natural",
+        "keep this natural",
+        "keep it soft",
+        "keep this soft",
+        "light touch",
+    )
+    subtle_markers = (
+        "subtle",
+        "softly",
+    )
+    bold_markers = (
+        "bold",
+        "dramatic",
+        "pushed",
+        "intense",
+        "stylized",
+    )
+
+    if any(marker in normalized_prompt for marker in explicit_subtle_markers):
+        return "subtle"
+    if any(marker in normalized_prompt for marker in explicit_bold_markers):
+        return "bold"
+    if any(marker in normalized_prompt for marker in subtle_markers):
+        return "subtle"
+    if any(marker in normalized_prompt for marker in bold_markers):
+        return "bold"
+    return None
+
+
 def infer_intensity(prompt: str, constraints: dict | None = None) -> Intensity:
     if isinstance(constraints, dict):
         raw = constraints.get("intensity")
@@ -1968,28 +2087,9 @@ def infer_intensity(prompt: str, constraints: dict | None = None) -> Intensity:
             if normalized in _INTENSITY_SCALES:
                 return normalized
 
-    normalized_prompt = prompt.lower()
-    subtle_markers = (
-        "subtle",
-        "gentle",
-        "light touch",
-        "restrained",
-        "natural",
-        "softly",
-    )
-    bold_markers = (
-        "bold",
-        "strong",
-        "dramatic",
-        "pushed",
-        "intense",
-        "stylized",
-    )
-
-    if any(marker in normalized_prompt for marker in subtle_markers):
-        return "subtle"
-    if any(marker in normalized_prompt for marker in bold_markers):
-        return "bold"
+    prompt_intensity = infer_prompt_intensity(prompt)
+    if prompt_intensity is not None:
+        return prompt_intensity
     return "balanced"
 
 
