@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from typing import Any
 
 import httpx
@@ -46,6 +47,26 @@ _SEMANTIC_PROMPT_EXAMPLES_PATH = os.path.join(
     os.path.dirname(__file__), "semantic_prompt_examples.json"
 )
 _PLANNER_FALLBACK_REFINEMENT_LIMIT = 4
+_PASTEL_AIRY_PROMPT_RE = re.compile(
+    r"\b(maternity|newborn|blush|milky|pastel|airy|gentle|soft\s+blush|luminous\s+skin)\b",
+    re.IGNORECASE,
+)
+_SNOWY_ARCHITECTURE_PROMPT_RE = re.compile(
+    r"\b(winter|snow|snowy|frost|cold steel|soft blue daylight|architecture|minimal)\b",
+    re.IGNORECASE,
+)
+_FOOD_FIRELIGHT_PROMPT_RE = re.compile(
+    r"\b(food|restaurant|sauce|charred|firelit|culinary|dish)\b",
+    re.IGNORECASE,
+)
+_PRODUCT_TECH_PROMPT_RE = re.compile(
+    r"\b(smartwatch|product shot|black acrylic|icy highlights|precise contrast|luxury product|tech)\b",
+    re.IGNORECASE,
+)
+_WILDLIFE_SAFARI_PROMPT_RE = re.compile(
+    r"\b(safari|wildlife|golden grass|dusty air|documentary realism|animal)\b",
+    re.IGNORECASE,
+)
 
 
 class OllamaStyleGenerator:
@@ -221,11 +242,13 @@ class OllamaStyleGenerator:
 
         selected_family = parsed.get("family")
         family_id = selected_family if isinstance(selected_family, str) else None
+        family_id = self._normalize_selected_family(payload, family_id)
 
         raw_refinements = parsed.get("refinements", [])
         refinement_ids = [item for item in raw_refinements if isinstance(item, str)]
         if len(refinement_ids) > _PLANNER_FALLBACK_REFINEMENT_LIMIT:
             refinement_ids = refinement_ids[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+        refinement_ids = self._normalize_selected_refinements(family_id, refinement_ids)
 
         parsed_intensity = parsed.get("intensity")
         constraints = payload.constraints if isinstance(payload.constraints, dict) else None
@@ -268,6 +291,58 @@ class OllamaStyleGenerator:
             intensity=plan.intensity,
             source="ollama family planner",
         )
+
+    def _normalize_selected_family(
+        self,
+        payload: PromptGenerateRequest,
+        family_id: str | None,
+    ) -> str | None:
+        if not family_id:
+            return family_id
+
+        prompt = expand_style_references(payload.prompt, payload.intent).expanded_prompt
+        if _PASTEL_AIRY_PROMPT_RE.search(prompt):
+            if family_id == "bridal_luminous" or "maternity" in prompt.lower():
+                return "pastel_airy"
+        if _SNOWY_ARCHITECTURE_PROMPT_RE.search(prompt):
+            prompt_lower = prompt.lower()
+            if "architecture" in prompt_lower and "winter" in prompt_lower:
+                return "crisp_winter"
+        if _FOOD_FIRELIGHT_PROMPT_RE.search(prompt):
+            return "food_rich_color"
+        if _PRODUCT_TECH_PROMPT_RE.search(prompt):
+            return "clean_commercial"
+        if _WILDLIFE_SAFARI_PROMPT_RE.search(prompt):
+            return "travel_earth"
+        return family_id
+
+    def _normalize_selected_refinements(
+        self,
+        family_id: str | None,
+        refinement_ids: list[str],
+    ) -> list[str]:
+        if family_id != "pastel_airy":
+            if family_id == "crisp_winter":
+                allowed = {"snow_glow", "blue_ice"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "food_rich_color":
+                allowed = {"warm_table", "crispy_texture", "fresh_greens"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "clean_commercial":
+                allowed = {"neutral_whites", "catalog_even", "premium_polish"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "travel_earth":
+                allowed = {"dusty_sand", "sun_baked", "market_colors"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            return refinement_ids
+
+        allowed = {"soft_rolloff", "warm_skin"}
+        filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+        return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
 
     def _is_chat_delta_mode(self, payload: PromptGenerateRequest) -> bool:
         constraints = payload.constraints
