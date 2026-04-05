@@ -250,3 +250,131 @@ def test_ollama_generator_falls_back_when_planner_selects_unknown_family(monkeyp
     assert any("fallback mock used" in warning for warning in response.warnings)
     assert response.planner_trace is not None
     assert response.planner_trace.mode == "mock_rule_based"
+
+
+def test_ollama_generator_normalizes_pastel_maternity_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"bridal_luminous","refinements":["warm_skin","soft_rolloff"],'
+                    '"intensity":"subtle","name":"Pastel Motherhood"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="pastel maternity portrait with milky tones, luminous skin and gentle blush warmth"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.mode == "family_planner"
+    assert response.planner_trace.family_id == "pastel_airy"
+    assert response.planner_trace.intensity == "subtle"
+    assert response.style_spec.captureone.keys["Contrast"] <= 5
+    assert response.style_spec.captureone.keys["Clarity"] <= 5
+
+
+def test_ollama_generator_normalizes_snowy_architecture_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"cozy_autumn","refinements":["soft_highlights","cool_white"],'
+                    '"intensity":"balanced","name":"Winter Minimalist"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="minimal winter architecture scene with clean whites, cold steel and soft blue daylight"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.mode == "family_planner"
+    assert response.planner_trace.family_id == "crisp_winter"
+    assert response.planner_trace.intensity == "balanced"
+    assert response.style_spec.captureone.keys["Contrast"] >= 8
+    assert response.style_spec.captureone.keys["WhiteBalanceTemperature"] <= 5500
+
+
+def test_ollama_generator_normalizes_food_firelight_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"clean_commercial","refinements":["warm_grain","rich_reds"],'
+                    '"intensity":"balanced","name":"Restaurant Firelight"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="restaurant food photo with firelit warmth, glossy sauce and rich charred texture"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "food_rich_color"
+
+
+def test_ollama_generator_normalizes_product_tech_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"editorial_fashion","refinements":["cool_teal","soft_rolloff"],'
+                    '"intensity":"bold","name":"Luxury Watch"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="luxury smartwatch product shot on black acrylic with icy highlights and precise contrast"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "clean_commercial"
+
+
+def test_ollama_generator_normalizes_wildlife_safari_family(monkeypatch) -> None:
+    def _fake_post(url: str, json: dict, timeout: float):  # noqa: ANN001
+        return _FakeResponse(
+            {
+                "response": (
+                    '{"family":"portra_film","refinements":["warm_skin"],'
+                    '"intensity":"balanced","name":"Safari Realism"}'
+                )
+            }
+        )
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+    generator = OllamaStyleGenerator(base_url="http://localhost:11434", model="llama3.1:8b")
+
+    response = generator.generate_style_spec(
+        PromptGenerateRequest(
+            prompt="safari wildlife portrait with dry golden grass, dusty air and restrained documentary realism"
+        )
+    )
+
+    assert response.planner_trace is not None
+    assert response.planner_trace.family_id == "travel_earth"

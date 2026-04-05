@@ -142,7 +142,7 @@ def test_generate_style_spec_with_ollama_provider(client: TestClient, monkeypatc
     assert payload["fallback_used"] is False
     assert payload["planner_trace"]["mode"] == "family_planner"
     assert payload["planner_trace"]["family_id"] == "clean_commercial"
-    assert payload["planner_trace"]["refinement_ids"] == ["studio_clean"]
+    assert payload["planner_trace"]["refinement_ids"] == []
 
 
 def test_generate_style_spec_rate_limited(client: TestClient, monkeypatch) -> None:
