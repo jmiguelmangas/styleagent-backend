@@ -67,6 +67,22 @@ _WILDLIFE_SAFARI_PROMPT_RE = re.compile(
     r"\b(safari|wildlife|golden grass|dusty air|documentary realism|animal)\b",
     re.IGNORECASE,
 )
+_MOODY_WOODLAND_PROMPT_RE = re.compile(
+    r"\b(woodland|moonlit pines|shadowed trails|ember warmth|forest portrait)\b",
+    re.IGNORECASE,
+)
+_SOFT_FILM_MATTE_PROMPT_RE = re.compile(
+    r"\b(soft film matte|nostalgic color|lifted shadows|gentle contrast)\b",
+    re.IGNORECASE,
+)
+_EMOTIVE_MATTE_PROMPT_RE = re.compile(
+    r"\b(emotive matte|washed contrast|nostalgic softness|soft color)\b",
+    re.IGNORECASE,
+)
+_UNDERWATER_EDITORIAL_PROMPT_RE = re.compile(
+    r"\b(underwater editorial|underwater portrait|aqua caustics|pearlescent skin|drifting fabric)\b",
+    re.IGNORECASE,
+)
 
 
 class OllamaStyleGenerator:
@@ -314,6 +330,14 @@ class OllamaStyleGenerator:
             return "clean_commercial"
         if _WILDLIFE_SAFARI_PROMPT_RE.search(prompt):
             return "travel_earth"
+        if _MOODY_WOODLAND_PROMPT_RE.search(prompt):
+            return "moody_woodland"
+        if _SOFT_FILM_MATTE_PROMPT_RE.search(prompt):
+            return "soft_film_matte"
+        if _EMOTIVE_MATTE_PROMPT_RE.search(prompt):
+            return "emotive_matte"
+        if _UNDERWATER_EDITORIAL_PROMPT_RE.search(prompt):
+            return "underwater_editorial"
         return family_id
 
     def _normalize_selected_refinements(
@@ -336,6 +360,22 @@ class OllamaStyleGenerator:
                 return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
             if family_id == "travel_earth":
                 allowed = {"dusty_sand", "sun_baked", "market_colors"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "moody_woodland":
+                allowed = {"pine_depth", "ember_warmth", "shadowed_trails"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "soft_film_matte":
+                allowed = {"nostalgic_color", "gentle_contrast", "lifted_shadows"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "emotive_matte":
+                allowed = {"washed_contrast", "soft_color", "nostalgic_softness"}
+                filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
+                return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
+            if family_id == "underwater_editorial":
+                allowed = {"aqua_caustics", "pearlescent_skin", "drifting_fabric"}
                 filtered = [refinement_id for refinement_id in refinement_ids if refinement_id in allowed]
                 return filtered[:_PLANNER_FALLBACK_REFINEMENT_LIMIT]
             return refinement_ids
