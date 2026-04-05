@@ -1175,5 +1175,73 @@
         }
       }
     }
+  },
+  {
+    "source": "Signature Neutral Pack / Soft Matte Contrast.xmp",
+    "prompt": "soft matte neutral look with compressed highlights, lifted shadows and low-texture portrait finish",
+    "tags": [
+      "soft",
+      "matte",
+      "neutral",
+      "portrait",
+      "low-texture"
+    ],
+    "style_spec": {
+      "name": "Soft Matte Contrast Inspired",
+      "intent": [
+        "soft",
+        "neutral",
+        "portrait"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 8,
+          "Saturation": -2,
+          "Clarity": -6,
+          "Highlights": -22,
+          "Shadows": 18,
+          "WhiteBalanceTemperature": 5500,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Signature Neutral Pack / Punchy Clean Texture.xmp",
+    "prompt": "punchy clean commercial look with stronger contrast, crisp texture and controlled polished tonality",
+    "tags": [
+      "punchy",
+      "clean",
+      "commercial",
+      "crisp",
+      "texture"
+    ],
+    "style_spec": {
+      "name": "Punchy Clean Texture Inspired",
+      "intent": [
+        "commercial",
+        "clean",
+        "punchy"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 16,
+          "Saturation": 0,
+          "Clarity": 16,
+          "Highlights": -22,
+          "Shadows": 18,
+          "WhiteBalanceTemperature": 5500,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 1,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 0,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
   }
 ]
