@@ -973,5 +973,208 @@
         }
       }
     }
+  },
+  {
+    "source": "PSD Stack Dark & Moody / Dark Blue.xmp",
+    "prompt": "dark blue moody portrait with cool steel shadows and restrained cinematic saturation",
+    "tags": [
+      "dark-blue",
+      "cool",
+      "moody",
+      "portrait",
+      "cinematic"
+    ],
+    "style_spec": {
+      "name": "Dark Blue Inspired",
+      "intent": [
+        "cool",
+        "moody",
+        "portrait"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 10,
+          "Saturation": -6,
+          "Clarity": 9,
+          "Highlights": -16,
+          "Shadows": 14,
+          "WhiteBalanceTemperature": 4850,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": -2,
+          "ColorBalanceGreen": 0,
+          "ColorBalanceBlue": 7,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
+  },
+  {
+    "source": "PSD Stack Dark & Moody / Orange & Green.xmp",
+    "prompt": "orange and green cinematic grading with moody contrast and stylized complementary color separation",
+    "tags": [
+      "orange-green",
+      "cinematic",
+      "moody",
+      "teal-orange",
+      "stylized"
+    ],
+    "style_spec": {
+      "name": "Orange & Green Inspired",
+      "intent": [
+        "cinematic",
+        "stylized"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 12,
+          "Saturation": 3,
+          "Clarity": 10,
+          "Highlights": -14,
+          "Shadows": 18,
+          "WhiteBalanceTemperature": 5600,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 3,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "PSD Stack Dark & Moody / Soft & Warm.xmp",
+    "prompt": "soft warm portrait with lowered contrast, luminous skin and gentle film warmth",
+    "tags": [
+      "soft",
+      "warm",
+      "portrait",
+      "skin",
+      "luminous"
+    ],
+    "style_spec": {
+      "name": "Soft & Warm Inspired",
+      "intent": [
+        "soft",
+        "warm",
+        "portrait"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 2,
+          "Saturation": 5,
+          "Clarity": -3,
+          "Highlights": -12,
+          "Shadows": 10,
+          "WhiteBalanceTemperature": 6050,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 4,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Amar Muric Moody Woodlands / Moonlit Pines - Core.xmp",
+    "prompt": "moonlit pine forest look with cool deep greens, blue dusk shadows and moody woodland depth",
+    "tags": [
+      "forest",
+      "moonlit",
+      "pines",
+      "cool",
+      "woodland"
+    ],
+    "style_spec": {
+      "name": "Moonlit Pines Inspired",
+      "intent": [
+        "forest",
+        "cool",
+        "moody"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 11,
+          "Saturation": -3,
+          "Clarity": 12,
+          "Highlights": -18,
+          "Shadows": 16,
+          "WhiteBalanceTemperature": 5000,
+          "WhiteBalanceTint": -2,
+          "ColorBalanceRed": -2,
+          "ColorBalanceGreen": 3,
+          "ColorBalanceBlue": 6,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
+  },
+  {
+    "source": "Amar Muric Moody Woodlands / Ash and Ember - Punchy.xmp",
+    "prompt": "ash and ember woodland grading with smoky contrast, ember warmth and punchy moody earth tones",
+    "tags": [
+      "ember",
+      "earthy",
+      "woodland",
+      "warm",
+      "punchy"
+    ],
+    "style_spec": {
+      "name": "Ash and Ember Punchy Inspired",
+      "intent": [
+        "earthy",
+        "warm",
+        "moody"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 14,
+          "Saturation": 4,
+          "Clarity": 11,
+          "Highlights": -15,
+          "Shadows": 14,
+          "WhiteBalanceTemperature": 5900,
+          "WhiteBalanceTint": 1,
+          "ColorBalanceRed": 5,
+          "ColorBalanceGreen": 2,
+          "ColorBalanceBlue": -2,
+          "ToneCurve": "Film Standard"
+        }
+      }
+    }
+  },
+  {
+    "source": "Amar Muric Moody Woodlands / Espresso Black - Core.xmp",
+    "prompt": "espresso black moody look with rich dark browns, restrained highlights and deep premium shadow density",
+    "tags": [
+      "espresso",
+      "black",
+      "dark",
+      "moody",
+      "premium"
+    ],
+    "style_spec": {
+      "name": "Espresso Black Inspired",
+      "intent": [
+        "dark",
+        "moody",
+        "premium"
+      ],
+      "captureone": {
+        "keys": {
+          "Contrast": 15,
+          "Saturation": -5,
+          "Clarity": 10,
+          "Highlights": -20,
+          "Shadows": 12,
+          "WhiteBalanceTemperature": 5400,
+          "WhiteBalanceTint": 0,
+          "ColorBalanceRed": 2,
+          "ColorBalanceGreen": 1,
+          "ColorBalanceBlue": -1,
+          "ToneCurve": "Film Extra Shadow"
+        }
+      }
+    }
   }
 ]
