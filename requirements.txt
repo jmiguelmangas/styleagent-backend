@@ -1,6 +1,6 @@
 fastapi==0.135.3
 uvicorn[standard]==0.42.0
-pydantic==2.12.5
+pydantic==2.13.3
 pytest==9.0.2
 pytest-cov==7.1.0
 ruff==0.15.8
